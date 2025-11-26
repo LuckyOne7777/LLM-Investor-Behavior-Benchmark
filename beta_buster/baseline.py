@@ -2,65 +2,63 @@
 
 from __future__ import annotations
 
-import json
 import logging
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Optional
 
 import yfinance as yf
 
-Baseline = Dict[str, float]
+from utils import load_json, save_json
+
+BaselineData = Dict[str, float]
 
 
-def load_baseline(path: Path) -> Baseline:
-    """Load a baseline JSON file from disk."""
+@dataclass
+class BaselineState:
+    """Typed baseline container for clarity."""
 
-    if not path.exists():
-        raise FileNotFoundError(f"Baseline file missing: {path}")
-    with path.open("r", encoding="utf-8") as f:
-        return json.load(f)
+    units: float = 0.0
+    initial_price: float = 0.0
 
+    @classmethod
+    def from_dict(cls, data: Dict[str, float]) -> "BaselineState":
+        return cls(units=float(data.get("units", 0.0)), initial_price=float(data.get("initial_price", 0.0)))
 
-def save_baseline(path: Path, data: Baseline) -> None:
-    """Persist baseline data to disk."""
-
-    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
-
-
-def _fetch_latest_price(ticker: str) -> float:
-    """Fetch the latest close price for a ticker using yfinance."""
-
-    data = yf.download(tickers=[ticker], period="2d", progress=False, auto_adjust=False)
-    close_series = data["Close"]
-    return float(close_series.iloc[-1])
+    def to_dict(self) -> Dict[str, float]:
+        return {"units": float(self.units), "initial_price": float(self.initial_price)}
 
 
-def initialize_baseline_if_missing(portfolio: Dict[str, object], rules: Dict[str, object], baseline_path: Path) -> Baseline:
-    """Ensure a baseline.json exists and return its contents."""
+def fetch_latest_price(ticker: str) -> Optional[float]:
+    """Fetch the most recent close price for a ticker using yfinance."""
 
-    if baseline_path.exists():
-        existing = load_baseline(baseline_path)
-        if "units" in existing and "initial_price" in existing:
-            return existing
-
-    benchmark = str(rules.get("benchmark", "")).strip()
-    if not benchmark:
-        raise ValueError("Rules must specify a benchmark ticker to initialize baseline")
-
+    if not ticker:
+        return None
     try:
-        price = _fetch_latest_price(benchmark)
+        data = yf.download(tickers=[ticker], period="2d", progress=False, auto_adjust=False)
+        close_series = data["Close"]
+        return float(close_series.iloc[-1])
     except Exception as exc:  # noqa: BLE001
-        logging.error("Failed to initialize baseline for %s: %s", benchmark, exc)
-        raise
-
-    units = float(portfolio.get("cash", 0.0)) / price if price else 0.0
-    baseline = {"units": units, "initial_price": price}
-    save_baseline(baseline_path, baseline)
-    return baseline
+        logging.error("Failed to fetch price for %s: %s", ticker, exc)
+        return None
 
 
-def compute_baseline_value(baseline: Baseline, current_price: float) -> float:
+def ensure_baseline(path: Path, benchmark_ticker: str, starting_cash: float) -> BaselineState:
+    """Load or initialize baseline exposure based on the benchmark."""
+
+    existing = load_json(path)
+    if existing and "units" in existing:
+        return BaselineState.from_dict(existing)  # type: ignore[arg-type]
+
+    price = fetch_latest_price(benchmark_ticker) or 0.0
+    units = (float(starting_cash) / price) if price else 0.0
+    baseline_state = BaselineState(units=units, initial_price=price)
+    save_json(path, baseline_state.to_dict())
+    return baseline_state
+
+
+def compute_baseline_value(baseline: BaselineState, current_price: float) -> float:
     """Calculate the current value of the scaled benchmark."""
 
-    units = float(baseline.get("units", 0.0))
-    return units * float(current_price)
+    return float(baseline.units) * float(current_price)
+
