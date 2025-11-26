@@ -1,7 +1,7 @@
 {
   "name": "Microcap Division",
   "market_cap_max": 300000000,
-  "model_type": "llm",
+  "model_type": "openai",
   "model_name": "gpt-5.1",
   "benchmark": "IWM"
 }
