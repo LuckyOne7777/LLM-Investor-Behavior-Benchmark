@@ -1,8 +1,8 @@
 """Trading strategy logic for Beta Buster divisions.
 
-This module is designed for extensibility: new model types can be added without
-changing callers. The dispatcher in ``run_strategy`` routes to specific strategy
-implementations based on ``rules['model_type']``.
+This module is designed for extensibility: different model providers
+(OpenAI, DeepSeek, Gemini, rule-based, etc.) can be plugged in via the
+``model_type`` field in rules.json.
 """
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import yfinance as yf
-from openai import OpenAI
+from openai import OpenAI  # Used for OpenAI and DeepSeek-compatible APIs
 
 from utils import load_json
 
@@ -27,6 +27,7 @@ Rules = Dict[str, object]
 # Rules loading
 # ---------------------------------------------------------------------------
 
+
 def load_rules(path: Path) -> Rules:
     """Load division rules from disk."""
 
@@ -38,6 +39,7 @@ def load_rules(path: Path) -> Rules:
 # ---------------------------------------------------------------------------
 # Shared helpers
 # ---------------------------------------------------------------------------
+
 
 def validate_trade(action: str, ticker: Optional[str], shares: Optional[float]) -> bool:
     """Validate the basic shape of a trade decision."""
@@ -128,11 +130,51 @@ def _apply_trade(portfolio: Portfolio, trade: Dict[str, object]) -> Portfolio:
     return updated
 
 
+def _build_llm_prompt(portfolio: Portfolio, rules: Rules, leaderboard_rows: Optional[List[Dict[str, object]]]) -> str:
+    """Build a shared prompt string for all LLM providers."""
+
+    leaderboard_rows = leaderboard_rows or []
+    return (
+        "You are a trading assistant. Review the provided portfolio, rules, and recent leaderboard performance. "
+        "Decide whether to buy, sell, or hold a single ticker today. "
+        "ONLY respond with JSON containing keys: action, ticker, shares.\n"
+        f"Portfolio JSON: {json.dumps(portfolio)}\n"
+        f"Rules JSON: {json.dumps(rules)}\n"
+        f"Last 3 leaderboard rows: {json.dumps(leaderboard_rows)}\n"
+        "Buy, sell, or hold? Respond in pure JSON with keys action, ticker, shares."
+    )
+
+
+def _parse_llm_json(content: Optional[str], provider_label: str, portfolio: Portfolio) -> Portfolio:
+    """Parse an LLM JSON response safely and apply the trade."""
+
+    if not content:
+        logging.warning("No content returned from %s model; using baseline strategy", provider_label)
+        return run_baseline_strategy(portfolio)
+
+    try:
+        trade_decision = json.loads(content)
+    except json.JSONDecodeError:
+        logging.warning("%s response was not valid JSON: %s", provider_label, content)
+        return run_baseline_strategy(portfolio)
+
+    if not isinstance(trade_decision, dict) or not {"action", "ticker", "shares"}.issubset(trade_decision.keys()):
+        logging.warning("%s response missing required keys: %s", provider_label, trade_decision)
+        return run_baseline_strategy(portfolio)
+
+    return _apply_trade(portfolio, trade_decision)
+
+
 # ---------------------------------------------------------------------------
 # Strategy implementations
 # ---------------------------------------------------------------------------
 
-def run_baseline_strategy(portfolio: Portfolio, rules: Optional[Rules] = None, leaderboard_rows: Optional[List[Dict[str, object]]] = None) -> Portfolio:  # noqa: D417 - optional args unused for parity
+
+def run_baseline_strategy(
+    portfolio: Portfolio,
+    rules: Optional[Rules] = None,
+    leaderboard_rows: Optional[List[Dict[str, object]]] = None,
+) -> Portfolio:  # noqa: D417 - optional args unused for parity
     """Return the portfolio unchanged as a trivial baseline."""
 
     return {
@@ -142,29 +184,21 @@ def run_baseline_strategy(portfolio: Portfolio, rules: Optional[Rules] = None, l
 
 
 def run_llm_strategy(portfolio: Portfolio, rules: Rules, leaderboard_rows: Optional[List[Dict[str, object]]] = None) -> Portfolio:
-    """Call an OpenAI model to decide on a trade and update the portfolio."""
+    """OpenAI-based LLM strategy (backwards-compatible 'llm' / 'openai')."""
+
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        logging.warning("OPENAI_API_KEY not set; falling back to baseline strategy")
+        return run_baseline_strategy(portfolio)
 
     model_name = str(rules.get("model_name", "")).strip()
     if not model_name:
         logging.warning("No model_name specified in rules; falling back to baseline strategy")
         return run_baseline_strategy(portfolio)
 
-    leaderboard_rows = leaderboard_rows or []
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    client = OpenAI(api_key=api_key)
 
-    prompt = {
-        "role": "user",
-        "content": (
-            "You are a trading assistant. Review the provided portfolio, rules, and recent leaderboard performance. "
-            "Decide whether to buy, sell, or hold a single ticker today. "
-            "ONLY respond with JSON containing action, ticker, shares.\n"
-            f"Portfolio JSON: {json.dumps(portfolio)}\n"
-            f"Rules JSON: {json.dumps(rules)}\n"
-            f"Last 3 leaderboard rows: {json.dumps(leaderboard_rows)}\n"
-            "Buy, sell, or hold? Respond in pure JSON with keys action, ticker, shares."
-        ),
-    }
-
+    prompt = _build_llm_prompt(portfolio, rules, leaderboard_rows)
     try:
         response = client.chat.completions.create(
             model=model_name,
@@ -173,7 +207,7 @@ def run_llm_strategy(portfolio: Portfolio, rules: Rules, leaderboard_rows: Optio
                     "role": "system",
                     "content": "You are a precise trading bot. Output only valid JSON with keys action, ticker, shares.",
                 },
-                prompt,
+                {"role": "user", "content": prompt},
             ],
             temperature=0.0,
         )
@@ -182,25 +216,92 @@ def run_llm_strategy(portfolio: Portfolio, rules: Rules, leaderboard_rows: Optio
         return run_baseline_strategy(portfolio)
 
     content = response.choices[0].message.content if response.choices else None
-    if not content:
-        logging.warning("No content returned from model; using baseline strategy")
+    return _parse_llm_json(content, "OpenAI", portfolio)
+
+
+def run_deepseek_strategy(
+    portfolio: Portfolio,
+    rules: Rules,
+    leaderboard_rows: Optional[List[Dict[str, object]]] = None,
+) -> Portfolio:
+    """DeepSeek strategy using DeepSeek's OpenAI-compatible API."""
+
+    api_key = os.getenv("DEEPSEEK_API_KEY")
+    if not api_key:
+        logging.warning("DEEPSEEK_API_KEY not set; falling back to baseline strategy")
         return run_baseline_strategy(portfolio)
+
+    model_name = str(rules.get("model_name", "")).strip() or "deepseek-chat"
+    # DeepSeek exposes an OpenAI-compatible API with a custom base_url.
+    # See official docs: https://api.deepseek.com :contentReference[oaicite:0]{index=0}
+    client = OpenAI(
+        api_key=api_key,
+        base_url="https://api.deepseek.com",
+    )
+
+    prompt = _build_llm_prompt(portfolio, rules, leaderboard_rows)
+    try:
+        response = client.chat.completions.create(
+            model=model_name,
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a precise trading bot. Output only valid JSON with keys action, ticker, shares.",
+                },
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.0,
+        )
+    except Exception as exc:  # noqa: BLE001
+        logging.error("DeepSeek request failed: %s", exc)
+        return run_baseline_strategy(portfolio)
+
+    content = response.choices[0].message.content if response.choices else None
+    return _parse_llm_json(content, "DeepSeek", portfolio)
+
+
+def run_gemini_strategy(
+    portfolio: Portfolio,
+    rules: Rules,
+    leaderboard_rows: Optional[List[Dict[str, object]]] = None,
+) -> Portfolio:
+    """Gemini strategy using the Google GenAI Python SDK."""
 
     try:
-        trade_decision = json.loads(content)
-    except json.JSONDecodeError:
-        logging.warning("Model response was not valid JSON: %s", content)
+        from google import genai  # type: ignore[import]
+    except ImportError:
+        logging.error("google-genai is not installed; falling back to baseline strategy")
         return run_baseline_strategy(portfolio)
 
-    # Validate expected keys explicitly
-    if not isinstance(trade_decision, dict) or not {"action", "ticker", "shares"}.issubset(trade_decision.keys()):
-        logging.warning("Model response missing required keys: %s", trade_decision)
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        logging.warning("GEMINI_API_KEY not set; falling back to baseline strategy")
         return run_baseline_strategy(portfolio)
 
-    return _apply_trade(portfolio, trade_decision)
+    model_name = str(rules.get("model_name", "")).strip() or "gemini-2.5-flash"
+
+    # Official SDK example uses genai.Client() and GEMINI_API_KEY env var. :contentReference[oaicite:1]{index=1}
+    client = genai.Client(api_key=api_key)
+
+    prompt = _build_llm_prompt(portfolio, rules, leaderboard_rows)
+    try:
+        response = client.models.generate_content(
+            model=model_name,
+            contents=prompt,
+        )
+    except Exception as exc:  # noqa: BLE001
+        logging.error("Gemini request failed: %s", exc)
+        return run_baseline_strategy(portfolio)
+
+    content = getattr(response, "text", None)
+    return _parse_llm_json(content, "Gemini", portfolio)
 
 
-def run_rule_based_strategy(portfolio: Portfolio, rules: Rules, leaderboard_rows: Optional[List[Dict[str, object]]] = None) -> Portfolio:  # noqa: D417 - leaderboard_rows reserved for future use
+def run_rule_based_strategy(
+    portfolio: Portfolio,
+    rules: Rules,
+    leaderboard_rows: Optional[List[Dict[str, object]]] = None,
+) -> Portfolio:  # noqa: D417 - leaderboard_rows reserved for future use
     """Placeholder for future rule-based strategies.
 
     Currently mirrors the baseline behaviour. Implement custom logic here when a
@@ -215,25 +316,31 @@ def run_rule_based_strategy(portfolio: Portfolio, rules: Rules, leaderboard_rows
 # Dispatcher
 # ---------------------------------------------------------------------------
 
+
 def run_strategy(portfolio: Portfolio, rules: Rules, leaderboard_rows: Optional[List[Dict[str, object]]] = None) -> Portfolio:
     """Dispatch to the correct strategy implementation.
 
     Supported types today:
         - baseline
-        - llm
+        - llm (alias for OpenAI)
+        - openai
+        - deepseek
+        - gemini
         - rule_based (placeholder)
     """
 
-    strategy_type = rules.get("model_type", "baseline")
-    strategy_type = str(strategy_type).lower()
+    strategy_type = str(rules.get("model_type", "baseline")).lower()
 
     if strategy_type == "baseline":
         return run_baseline_strategy(portfolio, rules, leaderboard_rows)
-    elif strategy_type == "llm":
+    elif strategy_type in ("llm", "openai"):
         return run_llm_strategy(portfolio, rules, leaderboard_rows)
+    elif strategy_type == "deepseek":
+        return run_deepseek_strategy(portfolio, rules, leaderboard_rows)
+    elif strategy_type == "gemini":
+        return run_gemini_strategy(portfolio, rules, leaderboard_rows)
     elif strategy_type == "rule_based":
         return run_rule_based_strategy(portfolio, rules, leaderboard_rows)
 
     logging.info("Unknown model_type '%s'; falling back to baseline", strategy_type)
     return run_baseline_strategy(portfolio, rules, leaderboard_rows)
-
