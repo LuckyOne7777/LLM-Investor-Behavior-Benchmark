@@ -1,4 +1,7 @@
 {
   "name": "Microcap Division",
-  "market_cap_max": 300000000
+  "market_cap_max": 300000000,
+  "model_type": "none",
+  "model_name": "",
+  "benchmark": "IWM"
 }

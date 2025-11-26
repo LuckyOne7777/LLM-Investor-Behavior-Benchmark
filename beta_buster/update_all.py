@@ -17,6 +17,8 @@ from typing import Dict, Tuple
 import pandas as pd
 import yfinance as yf
 
+from baseline import compute_baseline_value, initialize_baseline_if_missing
+from strategy import load_rules, run_strategy
 from utils import append_leaderboard_row, init_leaderboard, list_divisions, load_portfolio, save_portfolio
 
 # Configure basic logging for visibility when running from automation
@@ -94,14 +96,44 @@ def update_division(division_path: Path) -> None:
         # Define important file paths
         portfolio_path = division_path / "portfolio.csv"
         leaderboard_path = division_path / "leaderboard.csv"
+        rules_path = division_path / "rules.json"
+        baseline_path = division_path / "baseline.json"
 
         # Ensure leaderboard exists with correct columns
         init_leaderboard(leaderboard_path)
+
+        # Load division rules
+        rules = load_rules(rules_path)
 
         # Load current portfolio
         portfolio = load_portfolio(portfolio_path)
         cash = float(portfolio.get("cash", 0.0))
         positions: Dict[str, float] = portfolio.get("positions", {})  # type: ignore[assignment]
+
+        # Ensure baseline exists
+        baseline = initialize_baseline_if_missing(portfolio, rules, baseline_path)
+        benchmark_ticker = str(rules.get("benchmark", "")).strip()
+
+        # Fetch benchmark price and compute value
+        benchmark_price = 0.0
+        try:
+            data = yf.download(tickers=[benchmark_ticker], period="2d", progress=False, auto_adjust=False)
+            close_series = data["Close"]
+            benchmark_price = float(close_series.iloc[-1])
+        except Exception as exc:  # noqa: BLE001
+            logging.error("Failed to fetch benchmark price for %s: %s", benchmark_ticker, exc)
+
+        benchmark_value = compute_baseline_value(baseline, benchmark_price) if benchmark_price else 0.0
+
+        # Collect recent leaderboard context for strategies
+        leaderboard_df = pd.read_csv(leaderboard_path) if leaderboard_path.exists() else pd.DataFrame()
+        leaderboard_rows = leaderboard_df.tail(3).to_dict(orient="records") if not leaderboard_df.empty else []
+
+        # Execute trading strategy before price calculations
+        portfolio = run_strategy(portfolio, rules, leaderboard_rows)
+        cash = float(portfolio.get("cash", 0.0))
+        positions = portfolio.get("positions", {})  # type: ignore[assignment]
+        save_portfolio(portfolio_path, portfolio)
 
         # Fetch latest prices for held tickers
         prices = fetch_prices(positions)
@@ -109,11 +141,15 @@ def update_division(division_path: Path) -> None:
         # Compute total value
         total_value, _ = calculate_portfolio_value(cash, positions, prices)
 
+        alpha = total_value - benchmark_value
+
         # Prepare leaderboard row
         today = dt.date.today().isoformat()
         row = {
             "date": today,
             "portfolio_value": round(total_value, 2),
+            "benchmark_value": round(benchmark_value, 2),
+            "alpha": round(alpha, 2),
             "cash": round(cash, 2),
             "positions_json": json.dumps(positions),
         }
