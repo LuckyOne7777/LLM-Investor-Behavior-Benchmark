@@ -2,6 +2,7 @@
   "name": "Midcap Division",
   "market_cap_min": 2000000000,
   "market_cap_max": 10000000000,
-  "model_name": "gpt-4.1-mini",
-  "model_type": "llm"
+  "model_type": "none",
+  "model_name": "",
+  "benchmark": "MDY"
 }

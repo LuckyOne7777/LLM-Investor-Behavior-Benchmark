@@ -74,12 +74,21 @@ def save_portfolio(path: Path, portfolio: Portfolio) -> None:
 
 
 def init_leaderboard(path: Path) -> None:
-    """Create an empty leaderboard CSV with the correct columns if it does not exist."""
+    """Create or upgrade a leaderboard CSV to the current schema."""
+
+    columns = ["date", "portfolio_value", "benchmark_value", "alpha", "cash", "positions_json"]
 
     if path.exists():
+        df = pd.read_csv(path)
+        missing = [col for col in columns if col not in df.columns]
+        if missing:
+            for col in missing:
+                df[col] = None
+            df = df[columns]
+            df.to_csv(path, index=False)
         return
 
-    df = pd.DataFrame(columns=["date", "portfolio_value", "cash", "positions_json"])
+    df = pd.DataFrame(columns=columns)
     path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(path, index=False)
 
@@ -87,8 +96,10 @@ def init_leaderboard(path: Path) -> None:
 def append_leaderboard_row(path: Path, row: Dict[str, object]) -> None:
     """Append a single row to the leaderboard CSV."""
 
-    df = pd.read_csv(path) if path.exists() else pd.DataFrame(columns=["date", "portfolio_value", "cash", "positions_json"])
+    columns = ["date", "portfolio_value", "benchmark_value", "alpha", "cash", "positions_json"]
+    df = pd.read_csv(path) if path.exists() else pd.DataFrame(columns=columns)
     df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
+    df = df[columns]
     df.to_csv(path, index=False)
 
 

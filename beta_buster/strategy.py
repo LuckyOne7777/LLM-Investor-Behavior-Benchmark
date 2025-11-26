@@ -171,15 +171,6 @@ def run_baseline_strategy(portfolio: Portfolio) -> Portfolio:
 
 
 def run_strategy(portfolio: Portfolio, rules: Rules, leaderboard_rows: Optional[List[Dict[str, object]]] = None) -> Portfolio:
-    """Select and execute the strategy defined by the division rules."""
-    model_type = str(rules.get("model_type", "none")).lower()
+    """For now, return the portfolio unchanged."""
 
-    if model_type == "none":
-        return run_baseline_strategy(portfolio)
-    if model_type == "baseline":
-        return run_baseline_strategy(portfolio)
-    if model_type == "llm":
-        return run_llm_strategy(portfolio, rules, leaderboard_rows)
-
-    logging.warning("Unknown model_type '%s'; leaving portfolio unchanged", model_type)
     return run_baseline_strategy(portfolio)
