@@ -117,7 +117,8 @@ def run_llm_strategy(portfolio: Portfolio, rules: Rules, leaderboard_rows: Optio
         return portfolio
 
     leaderboard_rows = leaderboard_rows or []
-    client = OpenAI()
+    import os
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
     prompt = {
         "role": "user",
@@ -171,6 +172,15 @@ def run_baseline_strategy(portfolio: Portfolio) -> Portfolio:
 
 
 def run_strategy(portfolio: Portfolio, rules: Rules, leaderboard_rows: Optional[List[Dict[str, object]]] = None) -> Portfolio:
-    """For now, return the portfolio unchanged."""
+    """Dispatch to the correct strategy."""
+    model_type = str(rules.get("model_type", "baseline")).lower()
 
+    if model_type == "baseline":
+        return run_baseline_strategy(portfolio)
+
+    if model_type == "llm":
+        return run_llm_strategy(portfolio, rules, leaderboard_rows)
+
+    # fallback safety
     return run_baseline_strategy(portfolio)
+
