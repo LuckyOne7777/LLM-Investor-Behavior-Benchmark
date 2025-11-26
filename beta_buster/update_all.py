@@ -17,6 +17,7 @@ from typing import Dict, Tuple
 import pandas as pd
 import yfinance as yf
 
+from strategy import load_rules, run_strategy
 from utils import append_leaderboard_row, init_leaderboard, list_divisions, load_portfolio, save_portfolio
 
 # Configure basic logging for visibility when running from automation
@@ -94,14 +95,28 @@ def update_division(division_path: Path) -> None:
         # Define important file paths
         portfolio_path = division_path / "portfolio.csv"
         leaderboard_path = division_path / "leaderboard.csv"
+        rules_path = division_path / "rules.json"
 
         # Ensure leaderboard exists with correct columns
         init_leaderboard(leaderboard_path)
+
+        # Load division rules
+        rules = load_rules(rules_path)
 
         # Load current portfolio
         portfolio = load_portfolio(portfolio_path)
         cash = float(portfolio.get("cash", 0.0))
         positions: Dict[str, float] = portfolio.get("positions", {})  # type: ignore[assignment]
+
+        # Collect recent leaderboard context for strategies
+        leaderboard_df = pd.read_csv(leaderboard_path) if leaderboard_path.exists() else pd.DataFrame()
+        leaderboard_rows = leaderboard_df.tail(3).to_dict(orient="records") if not leaderboard_df.empty else []
+
+        # Execute trading strategy before price calculations
+        portfolio = run_strategy(portfolio, rules, leaderboard_rows)
+        cash = float(portfolio.get("cash", 0.0))
+        positions = portfolio.get("positions", {})  # type: ignore[assignment]
+        save_portfolio(portfolio_path, portfolio)
 
         # Fetch latest prices for held tickers
         prices = fetch_prices(positions)
