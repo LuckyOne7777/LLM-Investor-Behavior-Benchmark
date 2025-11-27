@@ -2,7 +2,7 @@ name: Update Leaderboards
 
 on:
   schedule:
-    - cron: "30 23 * * 1-5" # 5:30 PM CST is 23:30 UTC during standard time
+    - cron: "30 23 * * 1-5"  # 5:30 PM CST
   workflow_dispatch:
 
 jobs:
@@ -26,6 +26,9 @@ jobs:
           pip install -r beta_buster/requirements.txt
 
       - name: Run updater
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: |
           cd beta_buster
           python update_all.py

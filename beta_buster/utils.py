@@ -17,6 +17,34 @@ import pandas as pd
 Portfolio = Dict[str, object]
 Positions = Dict[str, float]
 
+def ensure_generic_portfolio(path: Path, default_cash: float = 10000.0) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    columns = ["cash", "positions_json"]
+    if not path.exists():
+        df = pd.DataFrame([[default_cash, json.dumps({})]], columns=columns)
+        df.to_csv(path, index=False)
+        return
+    df = pd.read_csv(path)
+    for col in columns:
+        if col not in df.columns:
+            df[col] = default_cash if col == "cash" else json.dumps({})
+    df = df[columns]
+    df.to_csv(path, index=False)
+
+
+def ensure_generic_leaderboard(path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    columns = ["date", "portfolio_value", "benchmark_value", "alpha", "cash", "positions_json"]
+    if not path.exists():
+        pd.DataFrame(columns=columns).to_csv(path, index=False)
+        return
+    df = pd.read_csv(path)
+    for col in columns:
+        if col not in df.columns:
+            df[col] = None
+    df = df[columns]
+    df.to_csv(path, index=False)
+
 
 # ---------------------------------------------------------------------------
 # JSON helpers
