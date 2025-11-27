@@ -1,88 +1,116 @@
-
 # Beta Buster
 
-Beta Buster is a minimal open-source benchmark for daily AI trading experiments.
-This MVP tracks portfolio performance for separate divisions (stock universes)
-and updates their leaderboards automatically.
+Beta Buster is an automated AI trading benchmark. Each division represents a market universe and runs multiple independent trading models (OpenAI, DeepSeek, Gemini, etc.) head to head against the same benchmark index. All portfolios update daily using GitHub Actions.
 
-## Divisions included
-- **Microcap**: market cap below $300M.
-- **Midcap**: market cap between $2B and $10B.
+Beta Buster is designed for simplicity, reliability, and extensibility. New models and new divisions can be added without modifying core logic.
 
-Each division lives under `divisions/` and now contains separate portfolio and
-leaderboard files for each trading model.
+## Features
 
-## How it works
-- `update_all.py` loads every division, pulls prices from Yahoo Finance, updates
-  two independent portfolios (baseline and LLM), and appends a new daily row to
-  each leaderboard.
-- The updater automatically creates any missing files so GitHub Actions can run
-  reliably without manual intervention.
+- Multiple AI models per division.
+- Baseline benchmark tracking for every division.
+- Automatic daily updates via GitHub Actions.
+- Price data from Yahoo Finance.
+- Robust file handling. Missing files are created automatically.
+- Modular strategy system with provider-specific logic.
+- All state stored in CSV and JSON files.
 
-## Supported model types today
-- `baseline`
-- `llm`
-- `rule_based` (placeholder for future expansion)
+## How It Works
 
-## How to add new trading models
-1. Add or update `model_type` in the division's `rules.json` (e.g.
-   `"model_type": "rule_based"`).
-2. Implement a new function in `strategy.py` that performs the strategy logic.
-   Use the existing `run_llm_strategy` and `run_rule_based_strategy` as
-   templates for structure and error handling.
-3. Register the new strategy in `run_strategy()` by adding another branch that
-   dispatches to your function.
-4. Extend `rules.json` with any additional fields your strategy needs.
-5. If the new model requires extra packages, add them to `requirements.txt` so
-   GitHub Actions can install them automatically.
+Each division contains:
 
-## Division folder structure
-Each division folder under `divisions/` should contain:
+1. A baseline portfolio that tracks the benchmark index using scaled units.
+2. One portfolio per AI model listed in division_models.json.
+3. A leaderboard CSV for each portfolio.
+4. A rules.json file that defines the division's market universe and benchmark.
 
+Daily update cycle:
+
+1. Fetch latest prices for all held tickers.
+2. Update the baseline benchmark value.
+3. For each model:
+   - Build a prompt including the portfolio, rules, and recent leaderboard rows.
+   - Call the model provider's API.
+   - Parse the model's JSON trade instruction.
+   - Apply buy, sell, or hold.
+4. Save updated portfolios back to disk.
+5. Append a new row to each leaderboard.
+
+## File Structure
 ```
-rules.json
-baseline.json
-portfolio_baseline.csv
-leaderboard_baseline.csv
-portfolio_llm.csv
-leaderboard_llm.csv
+beta_buster/
+    update_all.py
+    strategy.py
+    baseline.py
+    utils.py
+    division_models.json
+    divisions/
+        microcap/
+            rules.json
+            baseline.json
+            portfolio_baseline.csv
+            leaderboard_baseline.csv
+            portfolio_openai.csv
+            leaderboard_openai.csv
+            portfolio_deepseek.csv
+            leaderboard_deepseek.csv
+        midcap/
+            rules.json
+            baseline.json
+            portfolio_baseline.csv
+            leaderboard_baseline.csv
+            portfolio_openai.csv
+            leaderboard_openai.csv
 ```
+## Division Configuration (rules.json)
 
-## How to create a new division from scratch
-1. Create a new directory under `divisions/` (e.g., `divisions/new_division`).
-2. Add a `rules.json` file with at least a `benchmark` ticker and
-   `model_type`. Example:
-   ```json
-   {
-     "name": "New Division",
-     "benchmark": "SPY",
-     "model_type": "llm",
-     "model_name": "gpt-4o-mini"
-   }
-   ```
-3. Run `python update_all.py`. The script will automatically create the
-   baseline/LLM portfolio and leaderboard CSV files plus `baseline.json` if they
-   are missing.
+Each division contains a simple rules.json file defining the market universe and benchmark. Models are not defined here.
 
-## Safe automatic file creation
-- `update_all.py` calls helpers in `utils.py` to ensure every required file is
-  present. Missing CSVs are created with default cash and empty positions, while
-  missing leaderboards are created with the correct columns.
-- `baseline.json` is automatically initialized using the division's benchmark
-  price and starting cash, storing scaled benchmark units that track the
-  benchmark over time.
+Example:
+```
+{
+  "name": "Microcap Division",
+  "market_cap_max": 300000000,
+  "benchmark": "IWM"
+}
+```
+## Global Model Configuration (division_models.json)
 
-## Quickstart
-1. Create a Python environment and install requirements:
-   ```bash
-   pip install -r requirements.txt
-   ```
-2. Run the updater:
-   ```bash
-   python update_all.py
-   ```
+All AI traders are defined globally in division_models.json.
+
+Example:
+```
+{
+  "models": [
+    {
+      "id": "openai",
+      "model_type": "openai",
+      "model_name": "gpt-5.1"
+    },
+    {
+      "id": "deepseek",
+      "model_type": "deepseek",
+      "model_name": "deepseek-chat"
+    },
+    {
+      "id": "gemini",
+      "model_type": "gemini",
+      "model_name": "gemini-2.5-flash"
+    }
+  ]
+}
+```
+Each model creates its own portfolio and leaderboard inside every division.
+
+## Running the Updater Manually
+
+Install requirements:
+```bash
+pip install -r requirements.txt
+```
+Run the updater:
+
+python update_all.py
 
 ## Automation
-A GitHub Actions workflow (`.github/workflows/update.yml`) runs daily after
-market close. It installs dependencies, runs `update_all.py`, and commits any
-changed CSV files back to the repo.
+
+A GitHub Actions workflow runs update_all.py daily after market close. It installs dependencies, executes the updater, and commits any changed CSV files back to the repository.
