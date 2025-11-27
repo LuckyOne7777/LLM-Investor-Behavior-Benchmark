@@ -4,8 +4,9 @@ on:
   schedule:
     - cron: "30 23 * * 1-5"  # 5:30 PM CST 
   workflow_dispatch:
+
 permissions:
-    contents: write
+  contents: write
 
 jobs:
   update:
@@ -16,6 +17,25 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Skip if market holiday or weekend
+        run: |
+          python - << 'EOF'
+          import sys
+          from datetime import datetime
+          import pandas_market_calendars as mcal
+
+          nyse = mcal.get_calendar('NYSE')
+          today = datetime.utcnow().date()
+
+          schedule = nyse.schedule(start_date=today, end_date=today)
+
+          if schedule.empty:
+              print("NYSE is closed today — holiday or weekend. Skipping workflow.")
+              sys.exit(0)
+          else:
+              print("Market open — continuing workflow.")
+          EOF
 
       - name: Set up Python
         uses: actions/setup-python@v5
