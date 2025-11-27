@@ -2,8 +2,10 @@ name: Update Leaderboards
 
 on:
   schedule:
-    - cron: "30 23 * * 1-5"  # 5:30 PM CST
+    - cron: "30 23 * * 1-5"  # 5:30 PM CST 
   workflow_dispatch:
+permissions:
+    contents: write
 
 jobs:
   update:
