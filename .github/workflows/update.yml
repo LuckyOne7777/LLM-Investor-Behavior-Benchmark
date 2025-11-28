@@ -18,6 +18,17 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r beta_buster/requirements.txt
+          pip install pandas-market-calendars
+
       - name: Skip if market holiday or weekend
         run: |
           python - << 'EOF'
@@ -32,21 +43,10 @@ jobs:
 
           if schedule.empty:
               print("NYSE is closed today — holiday or weekend. Skipping workflow.")
-              sys.exit(0)
+              sys.exit(78)
           else:
               print("Market open — continuing workflow.")
           EOF
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r beta_buster/requirements.txt
-          pip install pandas-market-calendars
 
 
       - name: Run updater
