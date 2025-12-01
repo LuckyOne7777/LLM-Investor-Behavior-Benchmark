@@ -3,6 +3,17 @@ import numpy as np
 from pysentiment2 import LM
 import pdfplumber
 
+def pdf_to_text(path):
+    text = ""
+    with pdfplumber.open(path) as pdf:
+        for page in pdf.pages:
+            text += page.extract_text() + "\n"
+    return text
+
+text = pdf_to_text("Week 23.pdf")
+lm = LM()
+tokens = lm.tokenize(text)
+score = lm.get_score(tokens)
 
 def risk_aversion(df_equity, df_trades):
     """
