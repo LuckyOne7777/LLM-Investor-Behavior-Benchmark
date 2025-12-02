@@ -3,10 +3,21 @@ import json
 import os
 from typing import Tuple
 from datetime import date
-
+from typing import TypedDict, Literal, List, Optional
 TRADE_LOG = "trade_log.csv"
 PENDING_LOG = "pending_orders.csv"
 
+class Order(TypedDict):
+    action: Literal["buy", "sell", "u"]            # "u" = update stop-loss
+    ticker: str
+    shares: int                                    # required for buy/sell, ignored for update
+    order_type: Literal["limit", "market", "update"]
+    limit_price: Optional[float]                   # None or numeric; always None for "market" and "update"
+    time_in_force: Optional[str]                   # "DAY" or None for stop-loss update
+    date: str                                      # YYYY-MM-DD
+    stop_loss: Optional[float]                     # required for buy or stoploss update, None for sell
+    rationale: str
+    confidence: float                              # 0–1
 def load_df(path: str) -> pd.DataFrame:
     if not os.path.exists(path):
         return pd.DataFrame()
@@ -27,11 +38,12 @@ def process_ai_order(
 
     action = order["action"]
     ticker = order["ticker"].upper()
-    shares = int(order["shares"])
+    shares = float(order["shares"])
     limit_price = float(order["limit_price"]) if order["limit_price"] not in (None, "NA") else None
-    stop_loss = order["stop_loss"]
+    stop_loss = float(order["stop_loss"])
     rationale = order["rationale"]
     today = order["date"]
+    confidence = order["confidence"]
 
     # -------------------------------
     # UPDATE STOP LOSS
