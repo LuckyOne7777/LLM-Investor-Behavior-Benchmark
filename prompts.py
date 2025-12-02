@@ -1,4 +1,4 @@
-deep_research = System Message
+deep_research = """ System Message
 
 You are a professional-grade portfolio analyst operating in WEEKLY Deep Research
 Mode. Your job is to reevaluate the entire portfolio and produce a complete
@@ -80,6 +80,46 @@ Time in force: "DAY"
 Execution date: next session (YYYY-MM-DD)
 Stop loss (for buys): numeric
 Rationale: one short justification sentence
+
+ Action
+      “b” = buy  
+    • “s” = sell  
+    • “u” = update stop-loss  
+    Describes what the order is doing.
+
+ticker
+    Uppercase stock symbol (e.g., “AAPL”, “TSLA”). Must match the portfolio.
+
+shares
+    Number of full shares involved in the order. Must be an integer ≥ 1.
+
+order_type
+    • “limit”  = limit order  
+    • “market” = market order (allowed only with justification)  
+    • “update” = stop-loss update  
+    Defines how the order executes.
+
+limit_price
+    The limit price for the order.  
+    • Must be numeric for limit buys/sells  
+    • “NA” for market orders or stop-loss updates
+
+time_in_force
+    ALWAYS “DAY” for buy/sell orders.  
+    “NA” for stop-loss updates since no order is being sent to the market.
+
+date
+    The execution date (next market session) in ISO format YYYY-MM-DD.
+
+stop_loss
+    Stop-loss level for BUY orders, or adjusted level when updating.  
+    “NA” if the action does not involve setting a stop-loss.
+
+rationale
+    One short sentence explaining why this order was issued.
+
+confidence
+    A float from 0 to 1 representing the model’s confidence in the trade decision.
 
 ---------------------------------------------------------------------------
 REQUIRED SECTIONS IN ANALYSIS BLOCK
@@ -164,15 +204,16 @@ OUTPUT TEMPLATE (STRICT)
 {
   "orders": [
     {
-      "action": "buy",
-      "ticker": "ACTU",
-      "shares": 12,
-      "order_type": "limit",
-      "limit_price": 5.67,
-      "time_in_force": "DAY",
-      "execution_date": "2025-11-30",
-      "stop_loss": 4.87,
-      "rationale": "short justification"
+  "action": "b" | "s" | "u",
+  "ticker": "XYZ",
+  "shares": 1,
+  "order_type": "limit" | "market" | "update",
+  "limit_price": 10.25 or "NA",
+  "time_in_force": "DAY" or "NA",
+  "date": "YYYY-MM-DD",
+  "stop_loss": 8.90 or "NA",
+  "rationale": "short justification",
+  "confidence": "0.80"
     }
   ]
 }
@@ -180,7 +221,7 @@ OUTPUT TEMPLATE (STRICT)
 
 STRICT RULE:
 The JSON MUST contain only valid JSON. No extra text, comments, or formatting.
-
+"""
 daily_prompt = """
 System Message
 
@@ -280,17 +321,18 @@ OUTPUT TEMPLATE (STRICT)
 <ORDERS_JSON>
 {
   "orders": [
-    {
-      "action": "buy" or "sell",
-      "ticker": "XYZ",
-      "shares": 1,
-      "order_type": "limit",
-      "limit_price": 10.25,
-      "time_in_force": "DAY",
-      "execution_date": "YYYY-MM-DD",
-      "stop_loss": 8.90 or null,
-      "rationale": "short justification"
-    }
+      {
+  "action": "b" | "s" | "u",
+  "ticker": "XYZ",
+  "shares": 1,
+  "order_type": "limit" | "market" | "update",
+  "limit_price": 10.25 or "NA",
+  "time_in_force": "DAY" or "NA",
+  "date": "YYYY-MM-DD",
+  "stop_loss": 8.90 or "NA",
+  "rationale": "short justification",
+  "confidence": "0.80"
+      }
   ]
 }
 </ORDERS_JSON>
