@@ -1003,7 +1003,7 @@ If this is a mistake, enter 1, or hit Enter to confirm."""
 # Reporting / Metrics
 # ------------------------------
 
-def daily_results(chatgpt_portfolio: pd.DataFrame, cash: float) -> None:
+def daily_results(chatgpt_portfolio: pd.DataFrame, cash: float, starting_equity: float=10_000) -> None:
     """Print daily price updates and performance metrics (incl. CAPM)."""
     portfolio_dict: list[dict[Any, Any]] = chatgpt_portfolio.to_dict(orient="records")
     today = check_weekend()
@@ -1169,14 +1169,9 @@ def daily_results(chatgpt_portfolio: pd.DataFrame, cash: float) -> None:
     )
     spx_norm = spx_norm_fetch.df
     spx_value = np.nan
-    starting_equity = np.nan  # Ensure starting_equity is always defined
     if not spx_norm.empty:
         initial_price = float(spx_norm["Close"].iloc[0])
         price_now = float(spx_norm["Close"].iloc[-1])
-        try:
-            starting_equity = float(input("what was your starting equity? "))
-        except Exception:
-            print("Invalid input for starting equity. Defaulting to NaN.")
         spx_value = (starting_equity / initial_price) * price_now if not np.isnan(starting_equity) else np.nan
 
     # -------- Pretty Printing --------
