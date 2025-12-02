@@ -2,22 +2,24 @@ import pandas as pd
 import json
 import os
 from typing import Tuple
-from datetime import date
 from typing import TypedDict, Literal, List, Optional
+
 TRADE_LOG = "trade_log.csv"
 PENDING_LOG = "pending_orders.csv"
 
 class Order(TypedDict):
-    action: Literal["buy", "sell", "u"]            # "u" = update stop-loss
+    action: Literal["buy", "sell", "u"]     # "u" = update stop-loss
     ticker: str
-    shares: int                                    # required for buy/sell, ignored for update
+    shares: int
     order_type: Literal["limit", "market", "update"]
-    limit_price: Optional[float]                   # None or numeric; always None for "market" and "update"
-    time_in_force: Optional[str]                   # "DAY" or None for stop-loss update
-    date: str                                      # YYYY-MM-DD
-    stop_loss: Optional[float]                     # required for buy or stoploss update, None for sell
+    limit_price: Optional[float]
+    time_in_force: Optional[str]
+    date: str                               # YYYY-MM-DD
+    stop_loss: Optional[float]
     rationale: str
-    confidence: float                              # 0–1
+    confidence: float                       # 0–1
+
+
 def load_df(path: str) -> pd.DataFrame:
     if not os.path.exists(path):
         return pd.DataFrame()
@@ -30,69 +32,95 @@ def append_log(path: str, row: dict):
     df.to_csv(path, index=False)
 
 
-def process_ai_order(
+def process_orders(
     portfolio_df: pd.DataFrame,
     cash: float,
-    order: dict
+    order: Order
 ) -> Tuple[pd.DataFrame, float]:
-
+    """Process orders, update portfolio and output results to 'trade_log.csv'. """
     action = order["action"]
     ticker = order["ticker"].upper()
     shares = float(order["shares"])
-    limit_price = float(order["limit_price"]) if order["limit_price"] not in (None, "NA") else None
-    stop_loss = float(order["stop_loss"])
+    limit_price = None if order["limit_price"] in (None, "NA") else float(order["limit_price"])
+    stop_loss = order["stop_loss"]
     rationale = order["rationale"]
     today = order["date"]
-    confidence = order["confidence"]
+    confidence = float(order["confidence"])
 
-    # -------------------------------
-    # UPDATE STOP LOSS
-    # -------------------------------
+    # ---------------------------------------
+    # STOP-LOSS UPDATE
+    # ---------------------------------------
     if action == "u":
         if ticker not in portfolio_df["ticker"].values:
             append_log(TRADE_LOG, {
                 "Date": today,
                 "Ticker": ticker,
-                "Action": "UPDATE FAILED",
-                "Reason": f"Stop-loss update failed: {ticker} not in portfolio",
-                "Rationale": rationale
+                "Action": "UPDATE_STOPLOSS",
+                "Shares": 0,
+                "Price": "",
+                "Cost Basis": "",
+                "PnL": "",
+                "Rationale": rationale,
+                "Confidence": confidence,
+                "Status": "FAILED",
+                "Reason": f"{ticker} not in portfolio"
             })
             return portfolio_df, cash
 
+        # update stop
         portfolio_df.loc[portfolio_df["ticker"] == ticker, "stop_loss"] = float(stop_loss)
 
         append_log(TRADE_LOG, {
             "Date": today,
             "Ticker": ticker,
-            "Action": "UPDATE STOPLOSS",
-            "New Stop Loss": stop_loss,
-            "Rationale": rationale
+            "Action": "UPDATE_STOPLOSS",
+            "Shares": 0,
+            "Price": "",
+            "Cost Basis": "",
+            "PnL": "",
+            "Rationale": rationale,
+            "Confidence": confidence,
+            "Status": "FILLED",
+            "Reason": ""
         })
 
         return portfolio_df, cash
 
-    # -------------------------------
+    # ---------------------------------------
     # BUY ORDER
-    # -------------------------------
-    if action == "b":
-
+    # ---------------------------------------
+    if action == "buy":
+        if limit_price is None:
+            raise ValueError("Buy order missing limit price.")
 
         cost = shares * limit_price
+
+        # Rejection — insufficient cash
         if cost > cash:
             append_log(TRADE_LOG, {
                 "Date": today,
                 "Ticker": ticker,
-                "Action": "BUY FAILED",
-                "Reason": "Insufficient cash",
-                "Rationale": rationale
+                "Action": "BUY",
+                "Shares": shares,
+                "Price": limit_price,
+                "Cost Basis": "",
+                "PnL": "",
+                "Rationale": rationale,
+                "Confidence": confidence,
+                "Status": "FAILED",
+                "Reason": "Insufficient cash"
             })
             return portfolio_df, cash
 
-        # Success — update portfolio
+        # SUCCESS — update portfolio
         if ticker in portfolio_df["ticker"].values:
             idx = portfolio_df.index[portfolio_df["ticker"] == ticker][0]
-            portfolio_df.loc[idx, "shares"] += shares
-            portfolio_df.loc[idx, "cost_basis"] += cost
+            old_shares = float(portfolio_df.loc[idx, "shares"])
+            old_cost = float(portfolio_df.loc[idx, "cost_basis"])
+
+            portfolio_df.loc[idx, "shares"] = old_shares + shares
+            portfolio_df.loc[idx, "cost_basis"] = old_cost + cost
+
         else:
             new_row = {
                 "ticker": ticker,
@@ -110,49 +138,68 @@ def process_ai_order(
             "Ticker": ticker,
             "Action": "BUY",
             "Shares": shares,
-            "Exec Price": limit_price,
-            "Cost": cost,
-            "Rationale": rationale
+            "Price": limit_price,
+            "Cost Basis": cost,
+            "PnL": "",
+            "Rationale": rationale,
+            "Confidence": confidence,
+            "Status": "FILLED",
+            "Reason": ""
         })
 
         return portfolio_df, cash
 
-    # -------------------------------
+    # ---------------------------------------
     # SELL ORDER
-    # -------------------------------
-    if action == "s":
+    # ---------------------------------------
+    if action == "sell":
         if ticker not in portfolio_df["ticker"].values:
             append_log(TRADE_LOG, {
                 "Date": today,
                 "Ticker": ticker,
-                "Action": "SELL FAILED",
-                "Reason": "No position",
-                "Rationale": rationale
+                "Action": "SELL",
+                "Shares": shares,
+                "Price": limit_price,
+                "Cost Basis": "",
+                "PnL": "",
+                "Rationale": rationale,
+                "Confidence": confidence,
+                "Status": "FAILED",
+                "Reason": "No position"
             })
             return portfolio_df, cash
 
         idx = portfolio_df.index[portfolio_df["ticker"] == ticker][0]
-        cur = portfolio_df.loc[idx]
+        row = portfolio_df.loc[idx]
 
-        if shares > cur["shares"]:
+        if shares > row["shares"]:
             append_log(TRADE_LOG, {
                 "Date": today,
                 "Ticker": ticker,
-                "Action": "SELL FAILED",
-                "Reason": "Insufficient shares",
-                "Rationale": rationale
+                "Action": "SELL",
+                "Shares": shares,
+                "Price": limit_price,
+                "Cost Basis": "",
+                "PnL": "",
+                "Rationale": rationale,
+                "Confidence": confidence,
+                "Status": "FAILED",
+                "Reason": "Insufficient shares"
             })
             return portfolio_df, cash
 
         proceeds = shares * limit_price
+        buy_price = float(row.get("buy_price", limit_price))
+        cost_basis_used = buy_price * shares
+        pnl = proceeds - cost_basis_used
 
-        # Update position
-        new_shares = cur["shares"] - shares
-        if new_shares == 0:
+        # update shares
+        remaining = row["shares"] - shares
+        if remaining == 0:
             portfolio_df = portfolio_df.drop(idx).reset_index(drop=True)
         else:
-            portfolio_df.loc[idx, "shares"] = new_shares
-            portfolio_df.loc[idx, "cost_basis"] = cur["cost_basis"] * (new_shares / cur["shares"])
+            portfolio_df.loc[idx, "shares"] = remaining
+            portfolio_df.loc[idx, "cost_basis"] = buy_price * remaining
 
         cash += proceeds
 
@@ -160,12 +207,19 @@ def process_ai_order(
             "Date": today,
             "Ticker": ticker,
             "Action": "SELL",
-            "Exec Price": limit_price,
-            "Shares Sold": shares,
-            "Proceeds": proceeds,
-            "Rationale": rationale
+            "Shares": shares,
+            "Price": limit_price,
+            "Cost Basis": cost_basis_used,
+            "PnL": pnl,
+            "Rationale": rationale,
+            "Confidence": confidence,
+            "Status": "FILLED",
+            "Reason": ""
         })
 
         return portfolio_df, cash
 
+    # ---------------------------------------
+    # Unknown
+    # ---------------------------------------
     raise ValueError(f"Unknown action: {action}")
