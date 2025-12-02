@@ -1,3 +1,0 @@
-date,portfolio_value,benchmark_value,alpha,cash,positions_json
-2025-11-28,10000.0,10000.0,0.0,3945.2,"{""MDY"": 10.0}"
-2025-12-01,9967.2,0.0,9967.2,21.37,"{""MDY"": 16.51582269038558}"
