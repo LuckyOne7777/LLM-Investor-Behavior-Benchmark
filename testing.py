@@ -1,8 +1,11 @@
 import yfinance as yf
 
-def get_macro_news():
+def get_macro_news(n: int = 5):
     ticker = yf.Ticker("^GSPC")
     news_headlines = ticker.news
-    return news_headlines
+    titles = [item["content"].get("title") for item in news_headlines]
+    return "\n".join(titles[:n])
 news = get_macro_news()
 print(news)
+
+
