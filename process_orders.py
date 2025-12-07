@@ -3,9 +3,7 @@ import json
 import os
 from typing import Tuple
 from typing import TypedDict, Literal, List, Optional
-
-TRADE_LOG = "trade_log.csv"
-PENDING_LOG = "pending_orders.csv"
+from pathlib import Path
 
 class Order(TypedDict):
     action: Literal["buy", "sell", "u"]     # "u" = update stop-loss
@@ -17,7 +15,7 @@ class Order(TypedDict):
     date: str                               # YYYY-MM-DD
     stop_loss: Optional[float]
     rationale: str
-    confidence: float                       # 0–1
+    confidence: float                       # 0-1
 
 
 def load_df(path: str) -> pd.DataFrame:
@@ -33,9 +31,10 @@ def append_log(path: str, row: dict):
 
 
 def process_logic(
+    order: Order,
+    model: str,
     portfolio_df: pd.DataFrame,
     cash: float,
-    order: Order
 ) -> Tuple[pd.DataFrame, float]:
     """Process orders, update portfolio and output results to 'trade_log.csv'. """
     action = order["action"]
@@ -46,7 +45,8 @@ def process_logic(
     rationale = order["rationale"]
     today = order["date"]
     confidence = float(order["confidence"])
-
+    TRADE_LOG = Path(f"models/{model}/trade_log.csv")
+    
     # ---------------------------------------
     # STOP-LOSS UPDATE
     # ---------------------------------------
@@ -223,3 +223,6 @@ def process_logic(
     # Unknown
     # ---------------------------------------
     raise ValueError(f"Unknown action: {action}")
+
+def process_orders(model: str, ):
+    return

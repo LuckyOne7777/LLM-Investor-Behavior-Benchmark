@@ -31,11 +31,6 @@ def save_daily_updates(txt: str, model: str):
     file.write(txt)
     file.close()
     return
-import json
-import re
-
-import re
-import json
 
 def parse_orders_json(text: str):
     # Extract the <ORDERS_JSON>...</ORDERS_JSON> section
@@ -52,5 +47,7 @@ def parse_orders_json(text: str):
 
     return json.loads(json_str)
 
-def load_json():
-    
+def load_orders(model_name: str):
+    ORDERS_FILE_NAME = f"pending_trades.csv"
+    path = Path(f"models/{model_name}") / ORDERS_FILE_NAME
+    return pd.read_csv(path)
