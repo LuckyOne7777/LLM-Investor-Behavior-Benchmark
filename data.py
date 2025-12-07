@@ -1,5 +1,7 @@
 import pandas as pd 
 from pathlib import Path
+import json
+import re 
 def portfolio_exists(model_name: str):
     PORTFOLIO_FILE_NAME = f"{model_name}/portfolio.csv"
     path = Path("models") / PORTFOLIO_FILE_NAME
@@ -29,4 +31,14 @@ def save_daily_updates(txt: str, model: str):
     file.write(txt)
     file.close()
     return
-save_deep_research("ahh", "gpt-5")
+import json
+import re
+
+def extract_json(text: str):
+    # Find the first {...} block using regex
+    match = re.search(r"\{.*\}", text, flags=re.DOTALL)
+    if not match:
+        raise ValueError("No JSON object found.")
+
+    json_str = match.group(0)
+    return json.loads(json_str)
