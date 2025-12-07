@@ -42,3 +42,14 @@ def extract_json(text: str):
 
     json_str = match.group(0)
     return json.loads(json_str)
+
+def safe_parse_json(text: str):
+    try:
+        return extract_json(text)
+    except Exception:
+        # Fix common issues
+        cleaned = text.replace("```json", "").replace("```", "")
+        cleaned = cleaned.replace("\n", " ").strip()
+
+        # Try again
+        return json.loads(re.search(r"\{.*\}", cleaned, flags=re.DOTALL).group(0))
