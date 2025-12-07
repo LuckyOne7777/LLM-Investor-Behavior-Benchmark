@@ -32,7 +32,7 @@ def append_log(path: str, row: dict):
     df.to_csv(path, index=False)
 
 
-def process_orders(
+def process_logic(
     portfolio_df: pd.DataFrame,
     cash: float,
     order: Order

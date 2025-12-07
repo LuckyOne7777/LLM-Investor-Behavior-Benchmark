@@ -51,3 +51,6 @@ def parse_orders_json(text: str):
     json_str = re.sub(r",\s*}", "}", json_str)
 
     return json.loads(json_str)
+
+def load_json():
+    
