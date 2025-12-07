@@ -20,3 +20,13 @@ def save_deep_research(txt: str, model: str):
     file.write(txt)
     file.close()
     return
+def save_daily_updates(txt: str, model: str):
+
+    DAILY_UPDATES_FILE_NAME = Path(f"Daily Update - {pd.Timestamp.now().date()}.txt")
+    path_to_daily_updates = Path(f"models/{model}/Research/Daily Updates")
+    full_path = path_to_daily_updates / DAILY_UPDATES_FILE_NAME
+    file = open(full_path, "w")
+    file.write(txt)
+    file.close()
+    return
+save_deep_research("ahh", "gpt-5")
