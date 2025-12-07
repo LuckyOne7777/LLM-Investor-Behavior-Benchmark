@@ -3,8 +3,8 @@ from pathlib import Path
 import json
 import re 
 def portfolio_exists(model_name: str):
-    PORTFOLIO_FILE_NAME = f"{model_name}/portfolio.csv"
-    path = Path("models") / PORTFOLIO_FILE_NAME
+    PORTFOLIO_FILE_NAME = f"portfolio.csv"
+    path = Path(f"models/{model_name}") / PORTFOLIO_FILE_NAME
     try:
         portfolio = pd.read_csv(path)
         if portfolio.empty:
@@ -34,22 +34,20 @@ def save_daily_updates(txt: str, model: str):
 import json
 import re
 
-def extract_json(text: str):
-    # Find the first {...} block using regex
-    match = re.search(r"\{.*\}", text, flags=re.DOTALL)
+import re
+import json
+
+def parse_orders_json(text: str):
+    # Extract the <ORDERS_JSON>...</ORDERS_JSON> section
+    match = re.search(r"<ORDERS_JSON>\s*(\{.*?\})\s*</ORDERS_JSON>", 
+                      text, flags=re.DOTALL)
+    
     if not match:
-        raise ValueError("No JSON object found.")
+        raise ValueError("No ORDERS_JSON block found.")
 
-    json_str = match.group(0)
+    json_str = match.group(1)
+
+    # Optional: fix trailing commas
+    json_str = re.sub(r",\s*}", "}", json_str)
+
     return json.loads(json_str)
-
-def safe_parse_json(text: str):
-    try:
-        return extract_json(text)
-    except Exception:
-        # Fix common issues
-        cleaned = text.replace("```json", "").replace("```", "")
-        cleaned = cleaned.replace("\n", " ").strip()
-
-        # Try again
-        return json.loads(re.search(r"\{.*\}", cleaned, flags=re.DOTALL).group(0))
