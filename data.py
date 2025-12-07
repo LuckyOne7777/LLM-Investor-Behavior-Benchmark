@@ -11,3 +11,12 @@ def portfolio_exists(model_name: str):
             return(True)
     except:
         return(False)
+def save_deep_research(txt: str, model: str):
+
+    DEEP_RESEARCH_FILE_NAME = Path(f"Deep Research - {pd.Timestamp.now().date()}.txt")
+    path_to_deep_research = Path(f"models/{model}/Research/Deep Research")
+    full_path = path_to_deep_research / DEEP_RESEARCH_FILE_NAME
+    file = open(full_path, "w")
+    file.write(txt)
+    file.close()
+    return
