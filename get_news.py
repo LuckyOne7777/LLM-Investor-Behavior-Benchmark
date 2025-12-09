@@ -19,6 +19,6 @@ def recent_execution_logs(model_name: str, look_back: int = 5):
     TODAY = pd.Timestamp.now().date()
     time_range = TODAY - datetime.timedelta(days=look_back)
     trade_log = pd.read_csv(TRADE_LOG_PATH)
-    trade_log = pd.to_datetime(trade_log["Date"]).datetime.date
-    return trade_log[trade_log["date"] >= time_range]
+    trade_log["Date"] = pd.to_datetime(trade_log["Date"]).dt.date
+    return trade_log[trade_log["Date"] >= time_range]
 
