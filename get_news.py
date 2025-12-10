@@ -4,9 +4,16 @@ from pathlib import Path
 import pandas as pd
 def get_macro_news(n: int = 5):
     ticker = yf.Ticker("^GSPC")
-    news_headlines = ticker.news
-    titles = [item["content"].get("title") for item in news_headlines]
-    return "\n".join(titles[:n])
+    news_headlines = ticker.news[:n]
+    output = []
+    for item in news_headlines:
+        content = item.get("content", {})
+        titles = content.get("title", "").strip()
+        summaries = content.get("summary", "").strip()
+        output.append(f"{titles} - {summaries}")
+    return "\n".join(output)
+x = get_macro_news()
+print(x)
 
 def get_ticker_news(ticker_symbol: str, n: int = 3):
     ticker = yf.Ticker(ticker_symbol)
