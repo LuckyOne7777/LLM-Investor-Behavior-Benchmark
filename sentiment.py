@@ -9,11 +9,11 @@ def pdf_to_text(path):
         for page in pdf.pages:
             text += page.extract_text() + "\n"
     return text
-
-text = pdf_to_text("Week 23.pdf")
-lm = LM()
-tokens = lm.tokenize(text)
-score = lm.get_score(tokens)
+def get_score(text: str):
+    lm = LM()
+    tokens = lm.tokenize(text)
+    score = lm.get_score(tokens)
+    return score
 
 def risk_aversion(df_equity, df_trades):
     """

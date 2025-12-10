@@ -39,8 +39,6 @@ def get_ticker_news(ticker_symbol: str, n: int = 3, summary_limit: int = 150):
         output.append(f"{titles} - {summaries}")
     return "\n".join(output)
 
-x = get_ticker_news("NVDA")
-print(x)
 
 def recent_execution_logs(model_name: str, look_back: int = 5):
     TRADE_LOG_PATH = Path(f"models/{model_name}/trade_log.csv")
