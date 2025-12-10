@@ -52,7 +52,7 @@ def save_orders(json_str: str, model_name: str):
     path = Path(f"models/{model_name}") / ORDERS_FILE_NAME
     f = open(path, "w")
     f.write(json_str)
-    f.close
+    f.close()
     return
 
 def load_orders(model_name: str):
