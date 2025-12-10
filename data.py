@@ -55,6 +55,12 @@ def save_orders(json_str: str, model_name: str):
     f.close()
     return
 
+def delete_orders(model_name: str):
+    ORDERS_FILE_NAME = f"pending_trades.csv"
+    path = Path(f"models/{model_name}") / ORDERS_FILE_NAME
+    f = open(path, "w")
+    f.close()
+    return
 def load_orders(model_name: str):
     ORDERS_FILE_NAME = f"pending_trades.csv"
     path = Path(f"models/{model_name}") / ORDERS_FILE_NAME
