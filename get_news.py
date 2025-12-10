@@ -22,14 +22,25 @@ def get_macro_news(n: int = 5, summary_limit: int = 200):
         summaries = truncate(raw_summary, summary_limit)
         output.append(f"{titles} - {summaries}")
     return "\n".join(output)
-x = get_macro_news()
-print(x)
 
-def get_ticker_news(ticker_symbol: str, n: int = 3):
+def get_ticker_news(ticker_symbol: str, n: int = 3, summary_limit: int = 150):
     ticker = yf.Ticker(ticker_symbol)
-    news_headlines = ticker.news
-    titles = [item["content"].get("title") for item in news_headlines]
-    return "\n".join(titles[:n])
+    news_headlines = ticker.news[:n]
+    output = []
+    for item in news_headlines:
+        content = item.get("content", {})
+        titles = content.get("title", "").strip()
+        raw_summary = (
+            content.get("summary")
+            or item.get("summary")
+            or ""  # Fallback if neither exists
+        )
+        summaries = truncate(raw_summary, summary_limit)
+        output.append(f"{titles} - {summaries}")
+    return "\n".join(output)
+
+x = get_ticker_news("NVDA")
+print(x)
 
 def recent_execution_logs(model_name: str, look_back: int = 5):
     TRADE_LOG_PATH = Path(f"models/{model_name}/trade_log.csv")
