@@ -1,6 +1,7 @@
 
 MODELS = []
 # to be done on friday after trading
+# following is a basic skeleton, file names and parameters may be incorrect
 def weekly_workflow():
     for model in MODELS:
         # process_orders = (model, portfolio, orders)
