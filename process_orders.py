@@ -224,5 +224,11 @@ def process_logic(
     # ---------------------------------------
     raise ValueError(f"Unknown action: {action}")
 
-def process_orders(model: str, ):
+def process_orders(model: str):
+    orders_dict = load_file(model)
+    portfolio_df = load_portfolio(model)
+    cash = portfolio_df["cash"]
+    for order in orders_dict:
+        portfolio_df, cash = process_logic(order, model, portfolio_df, cash)
+    save_portfolio_df(portfolio_df)
     return

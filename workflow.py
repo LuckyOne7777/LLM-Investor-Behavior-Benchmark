@@ -9,6 +9,7 @@ def weekly_workflow():
         # save_deep_research(report)
         # json = parse_json(report)
         # save_orders(json)
+        # update_leaderboard
         return
 
 def daily_flow():
@@ -18,4 +19,5 @@ def daily_flow():
         # json = parse_json(report)
         # save_orders(json)
         # process_orders = (model, portfolio, orders)
+        # update_leaderboard()
         return
