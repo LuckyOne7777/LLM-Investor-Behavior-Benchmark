@@ -51,9 +51,8 @@ def parse_orders_json(text: str):
 
     return json.loads(json_str)
 
-def save_orders(orders_json: str, model_name: str):
+def save_orders(orders_dict: str, model_name: str):
     path = Path(f"models/{model_name}") / ORDERS_FILE_NAME
-    orders_dict = json.loads(orders_json)
     f = open(path, "w")
     f.write(orders_dict)
     f.close()
