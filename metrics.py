@@ -87,3 +87,36 @@ def compute_capm(returns: pd.Series, market_returns: pd.Series, rf_daily: float)
     r2 = float(np.corrcoef(x, y)[0, 1] ** 2)
 
     return float(beta), float(alpha_annual), r2
+
+def total_calculations(
+    returns: pd.Series,
+    equity_series: pd.Series,
+    market_returns: pd.Series,
+    rf_daily: float
+):
+    # ----- Risk & Return -----
+    volatility = compute_volatility(returns)
+    sharpe_period, sharpe_annual = compute_sharpe(returns)
+    sortino_period, sortino_annual = compute_sortino(returns)
+
+    # ----- Max Drawdown -----
+    max_drawdown, max_drawdown_date = compute_max_drawdown(equity_series)
+
+    # ----- CAPM -----
+    beta, alpha_annual, r2 = compute_capm(returns, market_returns, rf_daily)
+
+    # ----- Compile all metrics -----
+    metrics_log = {
+        "volatility": volatility,
+        "sharpe_period": sharpe_period,
+        "sharpe_annual": sharpe_annual,
+        "sortino_period": sortino_period,
+        "sortino_annual": sortino_annual,
+        "max_drawdown": max_drawdown,
+        "max_drawdown_date": str(max_drawdown_date),
+        "beta": beta,
+        "alpha_annual": alpha_annual,
+        "r2": r2,
+    }
+
+    return metrics_log
