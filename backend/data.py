@@ -3,9 +3,9 @@ from pathlib import Path
 import json
 import re 
 
-DAILY_UPDATES_FILE_NAME = Path(f"Daily Update - {pd.Timestamp.now().date()}.txt")
+DAILY_UPDATES_FILE_NAME = Path(f"daily_update - {pd.Timestamp.now().date()}.txt")
 PORTFOLIO_FILE_NAME = f"portfolio.csv"
-DEEP_RESEARCH_FILE_NAME = Path(f"Deep Research - {pd.Timestamp.now().date()}.txt")
+DEEP_RESEARCH_FILE_NAME = Path(f"deep_research - {pd.Timestamp.now().date()}.txt")
 ORDERS_FILE_NAME = f"pending_trades.csv"
 
 def portfolio_exists(model_name: str):
@@ -21,7 +21,7 @@ def portfolio_exists(model_name: str):
         return(False)
 def save_deep_research(txt: str, model: str):
 
-    path_to_deep_research = Path(f"models/{model}/Research/Deep Research")
+    path_to_deep_research = Path(f"models/{model}/research/deep_research")
     full_path = path_to_deep_research / DEEP_RESEARCH_FILE_NAME
     file = open(full_path, "w")
     file.write(txt)
@@ -29,7 +29,7 @@ def save_deep_research(txt: str, model: str):
     return
 def save_daily_updates(txt: str, model: str):
 
-    path_to_daily_updates = Path(f"models/{model}/Research/Daily Updates")
+    path_to_daily_updates = Path(f"models/{model}/research/daily_updates")
     full_path = path_to_daily_updates / DAILY_UPDATES_FILE_NAME
     file = open(full_path, "w")
     file.write(txt)
