@@ -45,9 +45,9 @@ def recent_execution_logs(trade_log_path: str, look_back: int = 5):
     time_range = TODAY - datetime.timedelta(days=look_back)
     trade_log = pd.read_csv(trade_log_path)
     trade_log["Date"] = pd.to_datetime(trade_log["Date"]).dt.date
-    if trade_log[trade_log["Date"] >= time_range] is not None:
+    if trade_log[trade_log["Date"] >= time_range].empty == False:
         return trade_log[trade_log["Date"] >= time_range]
-    else: return None
+    else: return f"No execution data for the past {look_back} days."
 
 l = LIBBmodel("models/gpt-5")
 x = recent_execution_logs(l.trade_log_path)
