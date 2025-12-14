@@ -45,7 +45,7 @@ class LIBBmodel:
         if path.exists():
             with open(path, "r") as f:
                 return json.load(f)
-            return {}
+        return {}
 
     def process_orders(self):
         for _, order in self.pending_trades.iterrows():

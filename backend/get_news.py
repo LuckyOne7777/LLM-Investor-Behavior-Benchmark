@@ -2,7 +2,7 @@ import yfinance as yf
 import datetime
 from pathlib import Path
 import pandas as pd
-from .LIBB import LIBBmodel
+from execution.LIBB import LIBBmodel
 def truncate(text: str, limit: int):
     text = text.strip()
     return text if len(text) <= limit else text[:limit].rsplit(" ", 1)[0] + "..."
