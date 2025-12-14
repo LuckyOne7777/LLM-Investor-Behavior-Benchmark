@@ -1,4 +1,6 @@
-deep_research = """ System Message
+def create_deep_research_prompt(portfolio, portfolio_news, us_news, thesis_summary, execution_log):
+
+  deep_research_prompt = f""" System Message
 
 You are a professional-grade portfolio analyst operating in WEEKLY Deep Research
 Mode. Your job is to reevaluate the entire portfolio and produce a complete
@@ -163,16 +165,19 @@ CONTEXT PROVIDED TO YOU
 ---------------------------------------------------------------------------
 
 • Current Portfolio State:
-  {{HOLDINGS, SNAPSHOT, CAPM, RISK & RETURN}}
+  [{portfolio}]
 
 • Last Analyst Thesis:
-  {{LAST_THESIS_SUMMARY}}
+  [{thesis_summary}]
+
+• Portfolio News (if any):
+  [{portfolio_news}]
 
 • US Macro Headlines (if any):
-  {{US_NEWS}}
+  [{us_news}]
 
 • Execution Log from Previous Week (including failed orders):
-  {{EXECUTION_LOG}}
+  [{execution_log}]
 
 ---------------------------------------------------------------------------
 WHAT YOU MUST OUTPUT (THREE BLOCKS)
@@ -222,3 +227,5 @@ OUTPUT TEMPLATE (STRICT)
 STRICT RULE:
 The JSON MUST contain only valid JSON. No extra text, comments, or formatting.
 """
+
+  return deep_research_prompt

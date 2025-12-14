@@ -1,4 +1,5 @@
-daily_prompt = """
+def create_daily_prompt(portfolio, news):
+   daily_prompt = f"""
 System Message
 
 You are a portfolio reviewer operating in DAILY Check Mode. Your job is to
@@ -16,6 +17,11 @@ CAPITAL RULE
 Use the live portfolio state provided (cash, positions, cost basis, stops,
 pnl). Do NOT reset or assume any starting capital.
 
+---------------------------------------------------------------------------
+CURRENT PORTFOLIO
+---------------------------------------------------------------------------
+This is your EXACT portfolio:
+[{portfolio}]
 ---------------------------------------------------------------------------
 DAILY OBJECTIVES
 ---------------------------------------------------------------------------
@@ -58,9 +64,13 @@ If concentration > 60% in any position:
 US NEWS HANDLING
 ---------------------------------------------------------------------------
 You may ONLY use US news headlines explicitly provided in the input under
-{{US_NEWS}}. If none exist, assume no material news.
+US_NEWS. If none exist, assume no material news.
 
 Do not fetch or invent headline content.
+
+US_NEWS: 
+
+[{news}]
 
 ---------------------------------------------------------------------------
 DAILY OUTPUT FORMAT
@@ -124,3 +134,4 @@ If no trade is taken:
 STRICT RULE:
 The JSON MUST be pure and contain no extra text or comments.
 """
+   return daily_prompt
