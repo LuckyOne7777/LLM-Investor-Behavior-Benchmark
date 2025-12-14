@@ -50,7 +50,7 @@ class LIBBmodel:
     def process_orders(self):
         for _, order in self.pending_trades.iterrows():
             self.portfolio, self.cash = process_order(order, self.portfolio, 
-                                        self.cash, self.trade_log_path)
+            self.cash, self.trade_log_path)
         return
     
     def append_portfolio_history(self, date: date | None = None):

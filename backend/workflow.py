@@ -3,21 +3,21 @@ MODELS = []
 # to be done on friday after trading
 # following is a basic skeleton, file names and parameters may be incorrect
 def weekly_workflow():
-    for model in MODELS:
-        # process_orders = (model, portfolio, orders)
+    # for model in MODELS:
+        # libb = LIBBmodel(f"models-{model}")
+        # libb.process_portfolio()
         # report = prompt_deep_research(model)
-        # save_deep_research(report)
-        # json = parse_json(report)
-        # save_orders(json)
-        # update_leaderboard
+        # libb.save_deep_research(report)
+        # libb.save_orders(report)
+    # update_leaderboard(MODELS)
         return
 
 def daily_flow():
-    for model in MODELS:
+    # for model in MODELS:
+        # libb = LIBBmodel(f"models-{model}")
+        # libb.process_portfolio()
         # report = prompt_daily(model)
-        # save_daily_report(report)
-        # json = parse_json(report)
-        # save_orders(json)
-        # process_orders = (model, portfolio, orders)
-        # update_leaderboard()
-        return
+        # libb.save_daily_report(report)
+        # libb.save_orders(report)
+    # update_leaderboard(MODELS)
+    return
