@@ -2,7 +2,7 @@ import yfinance as yf
 import datetime
 from pathlib import Path
 import pandas as pd
-
+from .LIBB import LIBBmodel
 def truncate(text: str, limit: int):
     text = text.strip()
     return text if len(text) <= limit else text[:limit].rsplit(" ", 1)[0] + "..."
@@ -40,11 +40,17 @@ def get_ticker_news(ticker_symbol: str, n: int = 3, summary_limit: int = 150):
     return "\n".join(output)
 
 
-def recent_execution_logs(model_name: str, look_back: int = 5):
-    TRADE_LOG_PATH = Path(f"models/{model_name}/trade_log.csv")
+def recent_execution_logs(trade_log_path: str, look_back: int = 5):
     TODAY = pd.Timestamp.now().date()
     time_range = TODAY - datetime.timedelta(days=look_back)
-    trade_log = pd.read_csv(TRADE_LOG_PATH)
+    trade_log = pd.read_csv(trade_log_path)
     trade_log["Date"] = pd.to_datetime(trade_log["Date"]).dt.date
-    return trade_log[trade_log["Date"] >= time_range]
+    if trade_log[trade_log["Date"] >= time_range] is not None:
+        return trade_log[trade_log["Date"] >= time_range]
+    else: return None
+
+l = LIBBmodel("models/gpt-5")
+x = recent_execution_logs(l.trade_log_path)
+print(x)
+
 
