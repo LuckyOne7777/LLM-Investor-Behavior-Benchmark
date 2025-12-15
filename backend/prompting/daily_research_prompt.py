@@ -1,4 +1,10 @@
-def create_daily_prompt(portfolio, news):
+import get_news
+
+# TODO: what if postions are 0 but cash != starting cash?
+def create_daily_prompt(portfolio, starting_cash):
+   if portfolio.empty:
+      portfolio = F"Create your portfolio. Your starting cash is {starting_cash}."
+   news = get_news.get_macro_news()
    daily_prompt = f"""
 System Message
 
