@@ -14,6 +14,10 @@ class LIBBmodel:
         self.portfolio_dir = self.root / "portfolio"
         self.metrics_dir = self.root / "metrics"
         self.research_dir = self.root / "research"
+
+        for dir in [self.root, self.portfolio_dir, self.metrics_dir, self.research_dir]:
+            self.ensure_dir(dir)
+
         # paths in portfolio
         self.portfolio_history_path = self.portfolio_dir / "portfolio_history.csv"
         self.pending_trades_path = self.portfolio_dir / "pending_trades.csv"
@@ -35,6 +39,9 @@ class LIBBmodel:
         self.performance = self._load_json(self.metrics_dir / "performance.json")
         self.behavior = self._load_json(self.metrics_dir / "behavior.json")
         self.sentiment = self._load_json(self.metrics_dir / "sentiment.json")
+
+    def ensure_dir(self, path: Path):
+            path.mkdir(parents=True, exist_ok=True)
 
     def _load_csv(self, path: Path) -> pd.DataFrame:
         if path.exists():
