@@ -4,9 +4,9 @@ import os
 def prompt_orchestration(model_path, text):
     model = model_path.replace("models/", "")
     if model == "deepseek":
-        prompt_deepseek(text)
+        return prompt_deepseek(text)
     elif model == "gpt-5":
-        prompt_chatgpt(text)
+        return prompt_chatgpt(text)
 
 def prompt_deepseek(text, model="deepseek-chat"):
     client = OpenAI(api_key=os.environ.get("DEEPSEEK_API_KEY"),
