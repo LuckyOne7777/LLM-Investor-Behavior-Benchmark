@@ -193,6 +193,10 @@ WHAT YOU MUST OUTPUT (THREE BLOCKS)
 3. ORDERS_JSON  
    Pure JSON containing ONLY the orders. No markdown. No extra text.
 
+4. CONFIDENCE_LVL
+
+  Float between 0.0 (little) and 1.0 (high) rating confidence about future portfolio performance. 
+
 ---------------------------------------------------------------------------
 OUTPUT TEMPLATE (STRICT)
 ---------------------------------------------------------------------------
@@ -224,6 +228,9 @@ OUTPUT TEMPLATE (STRICT)
 }
 </ORDERS_JSON>
 
+<CONFIDENCE_LVL>
+0.65
+</CONFIDENCE_LVL>
 STRICT RULE:
 The JSON MUST contain only valid JSON. No extra text, comments, or formatting.
 """

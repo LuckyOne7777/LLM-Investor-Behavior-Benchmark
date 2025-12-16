@@ -98,6 +98,9 @@ You MUST output exactly three blocks:
 3. ORDERS_JSON  
    Pure JSON array of orders OR empty list.
 
+4. CONFIDENCE_LVL
+   Float between 0.0 (little) and 1.0 (high) rating confidence about future portfolio performance. 
+
 ---------------------------------------------------------------------------
 OUTPUT TEMPLATE (STRICT)
 ---------------------------------------------------------------------------
@@ -136,6 +139,10 @@ If no trade is taken:
   "orders": []
 }
 </ORDERS_JSON>
+
+<CONFIDENCE_LVL>
+0.65
+</CONFIDENCE_LVL>
 
 STRICT RULE:
 The JSON MUST be pure and contain no extra text or comments.
