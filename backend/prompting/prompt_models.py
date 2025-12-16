@@ -2,7 +2,7 @@ from openai import OpenAI
 import os
 
 def prompt_orchestration(model_path, text):
-    model = model_path.replace("models/")
+    model = model_path.replace("models/", "")
     if model == "deepseek":
         prompt_deepseek(text)
     elif model == "gpt-5":
