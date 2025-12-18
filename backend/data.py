@@ -36,10 +36,10 @@ def save_daily_updates(txt: str, model: str):
     file.close()
     return
 
-def parse_orders_json(text: str):
-    # Extract the <ORDERS_JSON>...</ORDERS_JSON> section
-    match = re.search(r"<ORDERS_JSON>\s*(\{.*?\})\s*</ORDERS_JSON>", 
-                      text, flags=re.DOTALL)
+def parse_json(text: str, tag: str):
+    # Extract the block from given section
+    pattern = rf"<{re.escape(tag)}>\s*(\{{.*?\}})\s*</{re.escape(tag)}>"
+    match = re.search(pattern, text, flags=re.DOTALL)
     
     if not match:
         raise ValueError("No ORDERS_JSON block found.")
