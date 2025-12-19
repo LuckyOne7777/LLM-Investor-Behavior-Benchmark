@@ -3,11 +3,12 @@ import numpy as np
 from pysentiment2 import LM
 import pdfplumber
 
-def pdf_to_text(path):
+def file_to_text(path):
     text = ""
-    with pdfplumber.open(path) as pdf:
-        for page in pdf.pages:
-            text += page.extract_text() + "\n"
+    with open(path, "r") as f:
+        text = f.read()
+        f.close()
+    
     return text
 def get_score(text: str):
     lm = LM()

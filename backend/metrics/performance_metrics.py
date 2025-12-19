@@ -88,7 +88,7 @@ def compute_capm(returns: pd.Series, market_returns: pd.Series, rf_daily: float)
 
     return float(beta), float(alpha_annual), r2
 
-def total_calculations(
+def total_performance_calculations(
     returns: pd.Series,
     equity_series: pd.Series,
     market_returns: pd.Series,
