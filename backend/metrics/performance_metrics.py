@@ -117,6 +117,7 @@ def total_performance_calculations(
         "beta": beta,
         "alpha_annual": alpha_annual,
         "r2": r2,
+        "date": pd.Timestamp.now().date()
     }
 
     return metrics_log

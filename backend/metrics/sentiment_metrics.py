@@ -28,7 +28,8 @@ def evaluate_sentiment(score, tokens, report_type):
         "positive_count": score['Positive'],
         "negative_count": score['Negative'],
         "token_count": word_count,
-        "report_type": report_type
+        "report_type": report_type,
+        "date": pd.Timestamp.now().date(),
     }
     return log
 
