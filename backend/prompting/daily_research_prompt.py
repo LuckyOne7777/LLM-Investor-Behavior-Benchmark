@@ -1,4 +1,4 @@
-import backend.get_prompt_data as get_prompt_data
+import backend.prompting.get_prompt_data as get_prompt_data
 
 # TODO: what if postions are 0 but cash != starting cash?
 def create_daily_prompt(portfolio, starting_cash):

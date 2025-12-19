@@ -76,6 +76,7 @@ class LIBBmodel:
         last_total_equity = self.portfolio_history["equity"].iloc[-1]
         if last_total_equity is None:
             return_pct = None
+            last_total_equity = None
         else:
             return_pct = (present_total_equity / last_total_equity) - 1
         log = pd.DataFrame([{
