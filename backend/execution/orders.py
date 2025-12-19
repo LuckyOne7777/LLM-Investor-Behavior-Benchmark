@@ -8,10 +8,10 @@ def process_order(order, portfolio_df, cash, trade_log):
     action = order["action"]
     ticker = order["ticker"].upper()
 
-    if action == "buy":
+    if action == "b":
         return process_buy(order, portfolio_df, cash, trade_log)
 
-    if action == "sell":
+    if action == "s":
         return process_sell(order, portfolio_df, cash, trade_log)
 
     if action == "u":
@@ -28,4 +28,4 @@ def process_order(order, portfolio_df, cash, trade_log):
         })
         return portfolio_df, cash
 
-    raise ValueError(f"Unknown action {action}")
+    raise ValueError(f"Unknown action: {action}")
