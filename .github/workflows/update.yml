@@ -1,4 +1,4 @@
-name: Update Leaderboards
+name: Run Workflow
 
 on:
   schedule:
@@ -26,8 +26,10 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r beta_buster/requirements.txt
+          pip install -r requirements.txt
           pip install pandas-market-calendars
+      - name: Set today's date
+        run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
       - name: Skip if market holiday or weekend
         run: |
@@ -49,20 +51,18 @@ jobs:
           EOF
 
 
-      - name: Run updater
+      - name: Run Workflow File
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-        run: |
-          cd beta_buster
-          python update_all.py
+        run: python backend/workflow.py
 
       - name: Commit and push changes
         if: ${{ success() }}
         run: |
-          cd beta_buster
+
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add divisions/*/*.csv
-          git commit -m "chore: update leaderboards" || echo "No changes to commit"
+          git commit -m "chore: Update models for today ($TODAY)" || echo "No changes to commit"
           git push
