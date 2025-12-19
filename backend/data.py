@@ -26,7 +26,7 @@ def save_deep_research(txt: str, model: str):
     file = open(full_path, "w")
     file.write(txt)
     file.close()
-    return
+    return full_path
 def save_daily_updates(txt: str, model: str):
 
     path_to_daily_updates = Path(f"models/{model}/research/daily_updates")
@@ -34,7 +34,7 @@ def save_daily_updates(txt: str, model: str):
     file = open(full_path, "w")
     file.write(txt)
     file.close()
-    return
+    return full_path
 
 def parse_json(text: str, tag: str):
     # Extract the block from given section
