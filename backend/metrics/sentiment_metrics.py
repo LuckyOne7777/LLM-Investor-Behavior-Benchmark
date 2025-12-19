@@ -5,9 +5,14 @@ import pdfplumber
 
 def file_to_text(path):
     text = ""
-    with open(path, "r") as f:
-        text = f.read()
-        f.close()
+    try:
+        with open(path, "r") as f:
+            text = f.read()
+            f.close()
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Could not find file path for {path}")
+
+
     
     return text
 def get_score(text: str):
