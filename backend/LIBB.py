@@ -1,9 +1,10 @@
 from pathlib import Path 
 import pandas as pd
 import json
-from .types import Order
+from .execution.types_file import Order
 from datetime import date
-from .orders import  process_order
+from .execution.orders import  process_order
+import yfinance as yf
 
 class LIBBmodel:
     def __init__(self, model_path, starting_cash = 10_000):
