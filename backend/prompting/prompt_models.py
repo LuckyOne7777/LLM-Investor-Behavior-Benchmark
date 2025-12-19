@@ -2,7 +2,7 @@ from openai import OpenAI
 import os
 
 def prompt_orchestration(model_path, text):
-    model = model_path.replace("models/", "")
+    model = model_path.replace("runs/run_v1", "")
     if model == "deepseek":
         return prompt_deepseek(text)
     elif model == "gpt-4.1":
