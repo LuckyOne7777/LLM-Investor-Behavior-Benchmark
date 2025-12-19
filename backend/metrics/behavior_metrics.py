@@ -13,14 +13,25 @@ def risk_aversion(df_equity, df_trades):
 
 def loss_aversion(df_trades):
     """
-    Computes λ = avg loss magnitude / avg gain magnitude.
-    Input:
-        df_trades: realized PnL data
-    Output:
-        float (>1 = loss averse)
+    Computes loss aversion λ = avg loss magnitude / avg gain magnitude.
+    Returns None if undefined.
     """
-    # TODO: implement
-    return 0.0
+    if df_trades.empty or "PnL" not in df_trades.columns:
+        return None
+
+    losses = df_trades[df_trades["PnL"] < 0]["PnL"]
+    gains = df_trades[df_trades["PnL"] > 0]["PnL"]
+
+    if losses.empty or gains.empty:
+        return None
+
+    avg_loss = abs(losses.mean())
+    avg_gain = gains.mean()
+
+    if avg_gain == 0:
+        return None
+
+    return avg_loss / avg_gain
 
 
 def concentration_ratio(df_positions, df_equity):
