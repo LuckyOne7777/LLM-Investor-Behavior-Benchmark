@@ -87,7 +87,7 @@ class LIBBmodel:
         }])
         try:
              log.to_csv(self.portfolio_history_path, mode="a", header= not 
-            self.portfolio_history.exists(), index=False)
+            self.portfolio_history_path.exists(), index=False)
         except Exception as e:
             raise SystemError(f"Error saving to portfolio_history for {self.model_path}. {e}")
         return
