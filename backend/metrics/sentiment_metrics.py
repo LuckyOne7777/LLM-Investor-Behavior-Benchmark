@@ -11,15 +11,28 @@ def file_to_text(path):
             f.close()
     except FileNotFoundError:
         raise FileNotFoundError(f"Could not find file path for {path}")
-
-
     
     return text
 def get_score(text: str):
     lm = LM()
     tokens = lm.tokenize(text)
     score = lm.get_score(tokens)
-    return score
+    return score, tokens
+
+def evaluate_sentiment(score, tokens, report_type):
+    word_count = max(len(tokens), 1)
+
+    log = {
+        "subjectivity": score['Subjectivity'],
+        "polarity": score['Polarity'],
+        "positive_count": score['Positive'],
+        "negative_count": score['Negative'],
+        "token_count": word_count,
+        "report_type": report_type
+    }
+    return log
+
+
 
 
 def narrative_drift(weekly_summaries):
