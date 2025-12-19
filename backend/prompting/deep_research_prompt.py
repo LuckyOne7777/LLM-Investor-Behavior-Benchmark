@@ -108,7 +108,7 @@ limit_price
 
 time_in_force
     ALWAYS “DAY” for buy/sell orders.  
-    “NA” for stop-loss updates since no order is being sent to the market.
+    null for stop-loss updates since no order is being sent to the market.
 
 date
     The execution date (next market session) in ISO format YYYY-MM-DD.
@@ -217,12 +217,12 @@ OUTPUT TEMPLATE (STRICT)
   "ticker": "XYZ",
   "shares": 1,
   "order_type": "limit" | "market" | "update",
-  "limit_price": 10.25 or "NA",
-  "time_in_force": "DAY" or "NA",
+  "limit_price": 10.25 | null,
+  "time_in_force": "DAY" | null,
   "date": "YYYY-MM-DD",
-  "stop_loss": 8.90 or "NA",
+  "stop_loss": 8.90 | null,
   "rationale": "short justification",
-  "confidence": "0.80"
+  "confidence": 0.80
     }
   ]
 }
