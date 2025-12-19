@@ -40,19 +40,6 @@ def loss_aversion(df_trades):
     return 0.0
 
 
-def beta(df_equity, df_market):
-    """
-    Computes systematic risk (beta vs SPY/IWM/etc).
-    Input:
-        df_equity: portfolio equity
-        df_market: benchmark index data
-    Output:
-        float
-    """
-    # TODO: replace with your existing beta calculation
-    return 0.0
-
-
 def concentration_ratio(df_positions, df_equity):
     """
     Computes average portfolio concentration.
