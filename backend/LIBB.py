@@ -93,3 +93,7 @@ class LIBBmodel:
         except Exception as e:
             raise SystemError(f"Error saving to portfolio_history for {self.model_path}. {e}")
         return
+    def proccess_portfolio(self):
+        self.process_orders()
+        self.append_portfolio_history()
+    

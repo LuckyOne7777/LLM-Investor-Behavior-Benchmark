@@ -1,7 +1,7 @@
 from pathlib import Path
 from .portfolio import add_or_update_position
 from .io import append_log
-from .update_data import get_market_value
+from .update_data import get_market_data
 
 
 def process_buy(order, portfolio_df, cash, trade_log):
@@ -11,7 +11,7 @@ def process_buy(order, portfolio_df, cash, trade_log):
     limit_price = float(order["limit_price"])
     stop_loss = order.get("stop_loss")
 
-    ticker_data = get_market_value(ticker)
+    ticker_data = get_market_data(ticker)
     low = ticker_data["Low"]
     open_price = ticker_data["Open"]
 
