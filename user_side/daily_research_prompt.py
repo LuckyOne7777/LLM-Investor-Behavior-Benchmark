@@ -43,6 +43,7 @@ Each day you must:
 • All orders must be LIMIT DAY.
 • Execution_date = next trading day.
 • If no trade is justified, return an empty order array.
+• you MUST have at least 1 ticker in your portfolio at all times.
 
 Daily mode should be conservative. HOLD is the most common outcome.
 

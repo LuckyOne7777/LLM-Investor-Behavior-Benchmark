@@ -39,6 +39,7 @@ CORE RULES (HARD CONSTRAINTS)
 • All tickers MUST be uppercase.
 • All dates MUST be valid ISO format (YYYY-MM-DD).
 • All orders MUST be DAY orders—no GTC allowed.
+• you MUST have at least 1 ticker in your portfolio at all times.
 
 ---------------------------------------------------------------------------
 CONCENTRATION RULE (HARD)
