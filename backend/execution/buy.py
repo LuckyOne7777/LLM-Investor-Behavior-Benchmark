@@ -1,40 +1,92 @@
 from pathlib import Path
 from .portfolio import add_or_update_position
 from .io import append_log
+from .update_data import get_market_value
+
 
 def process_buy(order, portfolio_df, cash, trade_log):
     ticker = order["ticker"].upper()
+    order_type = order["order_type"]
     shares = float(order["shares"])
-    price = float(order["limit_price"])
-    stop_loss = order["stop_loss"]
+    limit_price = float(order["limit_price"])
+    stop_loss = order.get("stop_loss")
 
-    cost = shares * price
+    ticker_data = get_market_value(ticker)
+    low = ticker_data["Low"]
+    open_price = ticker_data["Open"]
 
-    if cost > cash:
+    # ---------- LIMIT BUY ----------
+    if order_type == "limit":
+        # limit buy fails if price never trades at or below limit
+        if low > limit_price:
+            append_log(trade_log, {
+                "Date": order["date"],
+                "Ticker": ticker,
+                "Action": "BUY",
+                "Status": "FAILED",
+                "Reason": f"limit price of {limit_price} not met. (Low: {low})"
+            })
+            return portfolio_df, cash
+
+        # realistic fill price
+        fill_price = open_price if open_price <= limit_price else limit_price
+        cost = shares * fill_price
+
+        if cost > cash:
+            append_log(trade_log, {
+                "Date": order["date"],
+                "Ticker": ticker,
+                "Action": "BUY",
+                "Status": "FAILED",
+                "Reason": "Insufficient cash"
+            })
+            return portfolio_df, cash
+
+        portfolio_df = add_or_update_position(
+            portfolio_df, ticker, shares, fill_price, stop_loss
+        )
+        cash -= cost
+
         append_log(trade_log, {
             "Date": order["date"],
             "Ticker": ticker,
             "Action": "BUY",
             "Shares": shares,
-            "Price": price,
-            "Status": "FAILED",
-            "Reason": "Insufficient cash"
+            "Price": fill_price,
+            "Status": "FILLED",
+            "Reason": ""
         })
-        return portfolio_df, cash
 
-    portfolio_df = add_or_update_position(
-        portfolio_df, ticker, shares, price, stop_loss
-    )
-    cash -= cost
+    # ---------- MARKET BUY ----------
+    elif order_type == "market":
+        cost = shares * open_price
 
-    append_log(trade_log, {
-        "Date": order["date"],
-        "Ticker": ticker,
-        "Action": "BUY",
-        "Shares": shares,
-        "Price": price,
-        "Status": "FILLED",
-        "Reason": ""
-    })
+        if cost > cash:
+            append_log(trade_log, {
+                "Date": order["date"],
+                "Ticker": ticker,
+                "Action": "BUY",
+                "Status": "FAILED",
+                "Reason": "Insufficient cash"
+            })
+            return portfolio_df, cash
+
+        portfolio_df = add_or_update_position(
+            portfolio_df, ticker, shares, open_price, stop_loss
+        )
+        cash -= cost
+
+        append_log(trade_log, {
+            "Date": order["date"],
+            "Ticker": ticker,
+            "Action": "BUY",
+            "Shares": shares,
+            "Price": open_price,
+            "Status": "FILLED",
+            "Reason": ""
+        })
+
+    else:
+        raise RuntimeError(f"Order type not recognized for buys. ({order_type})")
 
     return portfolio_df, cash
