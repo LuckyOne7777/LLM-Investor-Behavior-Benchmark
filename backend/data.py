@@ -19,22 +19,6 @@ def portfolio_exists(model_name: str):
             return(True)
     except:
         return(False)
-def save_deep_research(txt: str, model: str):
-
-    path_to_deep_research = Path(f"models/{model}/research/deep_research")
-    full_path = path_to_deep_research / DEEP_RESEARCH_FILE_NAME
-    file = open(full_path, "w")
-    file.write(txt)
-    file.close()
-    return full_path
-def save_daily_updates(txt: str, model: str):
-
-    path_to_daily_updates = Path(f"models/{model}/research/daily_updates")
-    full_path = path_to_daily_updates / DAILY_UPDATES_FILE_NAME
-    file = open(full_path, "w")
-    file.write(txt)
-    file.close()
-    return full_path
 
 def parse_json(text: str, tag: str):
     # Extract the block from given section

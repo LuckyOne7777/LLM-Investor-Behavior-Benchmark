@@ -16,6 +16,9 @@ class LIBBmodel:
         self.metrics_dir = self.root / "metrics"
         self.research_dir = self.root / "research"
 
+        self.deep_research_file_path = self.research_dir / "deep_research"
+        self.daily_reports_file_path = self.research_dir / "daily_reports"
+
         for dir in [self.root, self.portfolio_dir, self.metrics_dir, self.research_dir]:
             self.ensure_dir(dir)
 
@@ -96,4 +99,21 @@ class LIBBmodel:
     def proccess_portfolio(self):
         self.process_orders()
         self.append_portfolio_history()
+
+
+    def save_deep_research(self, txt: str):
+        deep_research_name = Path(f"deep_research - {pd.Timestamp.now().date()}.txt")
+        full_path =  self.deep_research_file_path / deep_research_name
+        file = open(full_path, "w")
+        file.write(txt)
+        file.close()
+        return full_path
+    
+    def save_daily_updates(self, txt: str):
+        DAILY_UPDATES_FILE_NAME = Path(f"daily_update - {pd.Timestamp.now().date()}.txt")
+        full_path = self.daily_reports_file_path / DAILY_UPDATES_FILE_NAME
+        file = open(full_path, "w")
+        file.write(txt)
+        file.close()
+        return full_path
     
