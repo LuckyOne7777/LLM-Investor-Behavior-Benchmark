@@ -1,11 +1,17 @@
-from pathlib import Path
 from .portfolio import reduce_position
 from .io import append_log
+from .update_data import get_market_data
 
 def process_sell(order, portfolio_df, cash, trade_log):
     ticker = order["ticker"].upper()
+    order_type = order["order_type"]
+    ticker_data = get_market_data(ticker)
+
+    high = ticker_data["High"]
+    open_price = ticker_data["Open"]
+
     shares = float(order["shares"])
-    price = float(order["limit_price"])
+    limit_price = float(order["limit_price"])
 
     if ticker not in portfolio_df["ticker"].values:
         append_log(trade_log, {
@@ -27,22 +33,54 @@ def process_sell(order, portfolio_df, cash, trade_log):
             "Reason": "Insufficient shares"
         })
         return portfolio_df, cash
+    if order_type == "limit" and high < limit_price:
 
-    proceeds = shares * price
-    portfolio_df, buy_price = reduce_position(portfolio_df, ticker, shares)
-    cash += proceeds
+        append_log(trade_log, {
+            "Date": order["date"],
+            "Ticker": ticker,
+            "Action": "SELL",
+            "Status": "FAILED",
+            "Reason": f"limit price of {order['limit_price']} not met. (High: {high})"
+        })
+        return portfolio_df, cash
 
-    pnl = proceeds - (buy_price * shares)
+    elif order_type == "limit":
+        fill_price = open_price if open_price >= limit_price else limit_price
+        proceeds = shares * fill_price
+        portfolio_df, buy_price = reduce_position(portfolio_df, ticker, shares)
+        cash += proceeds
 
-    append_log(trade_log, {
-        "Date": order["date"],
-        "Ticker": ticker,
-        "Action": "SELL",
-        "Shares": shares,
-        "Price": price,
-        "PnL": pnl,
-        "Status": "FILLED",
-        "Reason": ""
+        pnl = proceeds - (buy_price * shares)
+
+        append_log(trade_log, {
+                "Date": order["date"],
+                "Ticker": ticker,
+                "Action": "SELL",
+                "Shares": shares,
+                "Price": fill_price,
+                "PnL": pnl,
+                "Status": "FILLED",
+                "Reason": ""
     })
+            
+    elif order_type == "market":
+        proceeds = shares * open_price
+        portfolio_df, buy_price = reduce_position(portfolio_df, ticker, shares)
+        cash += proceeds
+
+        pnl = proceeds - (buy_price * shares)
+        append_log(trade_log, {
+                "Date": order["date"],
+                "Ticker": ticker,
+                "Action": "SELL",
+                "Shares": shares,
+                "Price": open_price,
+                "PnL": pnl,
+                "Status": "FILLED",
+                "Reason": ""
+        })
+    else:
+         raise RuntimeError(f"Order type not recognized for sells. ({order_type})")
+
 
     return portfolio_df, cash
