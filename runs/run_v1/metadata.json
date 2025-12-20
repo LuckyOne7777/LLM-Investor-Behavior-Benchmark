@@ -1,8 +1,0 @@
-{
-  "run_id": "run_v1",
-  "control_model": "gpt-4.1",
-  "description": "First ever run",
-  "report_types": ["daily", "deep_research"],
-  "start_date": "",
-  "end_date": ""
-}
