@@ -187,14 +187,10 @@ WHAT YOU MUST OUTPUT (THREE BLOCKS)
 1. ANALYSIS_BLOCK  
    Full weekly analysis in natural language.
 
-2. SUMMARY  
-   1–3 paragraphs summarizing reasoning, macro environment, thesis drivers, and
-   key risks. Natural text only.
-
-3. ORDERS_JSON  
+2. ORDERS_JSON  
    Pure JSON containing ONLY the orders. No markdown. No extra text.
 
-4. CONFIDENCE_LVL
+3. CONFIDENCE_LVL
 
   Float between 0.0 (little) and 1.0 (high) rating confidence about future portfolio performance. 
 
@@ -205,10 +201,6 @@ OUTPUT TEMPLATE (STRICT)
 <ANALYSIS_BLOCK>
 ...full weekly research analysis...
 </ANALYSIS_BLOCK>
-
-<SUMMARY>
-...1–3 paragraphs in natural language...
-</SUMMARY>
 
 <ORDERS_JSON>
 {

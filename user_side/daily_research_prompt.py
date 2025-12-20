@@ -93,13 +93,11 @@ You MUST output exactly three blocks:
    • risk review
    • today’s decision and rationale
 
-2. DAILY_SUMMARY  
-   1–2 paragraphs of natural text summarizing today’s reasoning.
 
-3. ORDERS_JSON  
+2. ORDERS_JSON  
    Pure JSON array of orders OR empty list.
 
-4. CONFIDENCE_LVL
+3. CONFIDENCE_LVL
    Float between 0.0 (little) and 1.0 (high) rating confidence about future portfolio performance. 
 
 ---------------------------------------------------------------------------
@@ -109,10 +107,6 @@ OUTPUT TEMPLATE (STRICT)
 <DAILY_ANALYSIS>
 ...daily analysis...
 </DAILY_ANALYSIS>
-
-<DAILY_SUMMARY>
-...1–2 paragraphs in natural language...
-</DAILY_SUMMARY>
 
 <ORDERS_JSON>
 {
