@@ -136,3 +136,12 @@ class LIBBmodel:
             }
         with open(path, "a", encoding="utf-8") as f:
             f.write(json.dumps(log) + "\n")
+
+    def save_additonal_log(self, file_name, text, folder="additional_logs", append=False):
+        path = Path(self.research_dir / folder / file_name)
+        path.parent.mkdir(exist_ok=True, parents=True)
+        mode = "w" if not append else "a"
+        with open(path, mode, encoding="utf-8") as file:
+            file.write(text)
+            file.close()
+        return
