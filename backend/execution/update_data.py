@@ -19,7 +19,7 @@ def update_market_value_column(portfolio):
 
         ticker_data = get_market_data(ticker)
         close_price = ticker_data["Close"]
-
+        portfolio.at[i, "market_price"] = close_price
         portfolio.at[i, "market_value"] = close_price * shares
 
     return portfolio
