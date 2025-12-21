@@ -5,6 +5,7 @@ from .execution.types_file import Order
 from datetime import date
 from .execution.orders import  process_order
 import yfinance as yf
+import os
 
 class LIBBmodel:
     def __init__(self, model_path, starting_cash = 10_000):
@@ -27,6 +28,7 @@ class LIBBmodel:
         self.pending_trades_path = self.portfolio_dir / "pending_trades.csv"
         self.portfolio_path = self.portfolio_dir / "portfolio.csv"
         self.trade_log_path = self.portfolio_dir / "trade_log.csv"
+        self.raw_outputs_path = self.research_dir / "raw_outputs.json"
         # paths in metrics
         self.behavior_path = self.metrics_dir / "behavior.json"
         self.performance_path = self.metrics_dir / "performance.json"
@@ -117,3 +119,13 @@ class LIBBmodel:
         file.close()
         return full_path
     
+    def save_output(self, txt, report_type):
+        path = Path(self.raw_outputs_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        log = {
+                "date": pd.Timestamp.now().date(),
+                "report_type": report_type,
+                "output": txt
+            }
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(log) + "\n")
