@@ -114,16 +114,17 @@ class LIBBmodel:
     def save_daily_updates(self, txt: str):
         DAILY_UPDATES_FILE_NAME = Path(f"daily_update - {pd.Timestamp.now().date()}.txt")
         full_path = self.daily_reports_file_path / DAILY_UPDATES_FILE_NAME
-        file = open(full_path, "w")
-        file.write(txt)
-        file.close()
+        with open(full_path, "w") as file:
+            file.write(txt)
+            file.close()
         return full_path
     
     def save_orders(self, json_block: str):
         # override orders each day
-        file = open(self.pending_trades_path, "w")
-        file.write(json_block)
-        file.close()
+        with open(self.pending_trades_path, "w") as file:
+            file = open(self.pending_trades_path, "w")
+            file.write(json_block)
+            file.close()
         return
     
     def save_output(self, txt, report_type):
