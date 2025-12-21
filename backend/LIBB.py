@@ -119,6 +119,13 @@ class LIBBmodel:
         file.close()
         return full_path
     
+    def save_orders(self, json_block: str):
+        # override orders each day
+        file = open(self.pending_trades_path, "w")
+        file.write(json_block)
+        file.close()
+        return
+    
     def save_output(self, txt, report_type):
         path = Path(self.raw_outputs_path)
         path.parent.mkdir(parents=True, exist_ok=True)
