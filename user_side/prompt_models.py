@@ -7,7 +7,7 @@ from .daily_research_prompt import create_daily_prompt
 day_of_week = datetime.weekday()
 
 def prompt_orchestration(model_path):
-    model = model_path.replace("runs/run_v1", "")
+    model = model_path.replace("runs/run_v1/", "")
     if model == "deepseek":
         return prompt_deepseek()
     elif model == "gpt-4.1":
