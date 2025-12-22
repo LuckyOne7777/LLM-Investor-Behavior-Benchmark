@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import json
 from pysentiment2 import LM
 
 
@@ -119,5 +120,6 @@ def total_performance_calculations(
         "r2": r2,
         "date": pd.Timestamp.now().date()
     }
+    metrics_log = json.load(metrics_log)
 
     return metrics_log
