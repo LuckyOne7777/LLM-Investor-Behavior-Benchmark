@@ -2,6 +2,8 @@ from backend.LIBB import LIBBmodel
 from .prompt_models import prompt_daily_report, prompt_deep_research
 from .parse import parse_json
 
+
+
 MODELS = ["deepseek", "gpt-4.1"]
 
 def weekly_workflow():
@@ -10,7 +12,7 @@ def weekly_workflow():
         libb = LIBBmodel(f"runs/run_v1/{model}")
         libb.process_portfolio()
         report = prompt_deep_research(libb)
-        libb.analyze_report(report)
+        libb.analyze_sentiment(report)
 
         orders_json = parse_json(report, "ORDERS_JSON")
 
@@ -24,7 +26,7 @@ def daily_flow():
         libb = LIBBmodel(f"runs/run_v1/{model}")
         libb.process_portfolio()
         report = prompt_daily_report(libb)
-        libb.analyze_report(report)
+        libb.analyze_sentiment(report)
 
         orders_json = parse_json(report, "ORDERS_JSON")
 

@@ -4,6 +4,7 @@ import json
 from .execution.types_file import Order
 from datetime import date
 from .execution.orders import  process_order
+from .metrics.sentiment_metrics import analyze_sentiment
 import yfinance as yf
 import os
 
@@ -126,17 +127,6 @@ class LIBBmodel:
             file.write(json_block)
             file.close()
         return
-    
-    def save_output(self, txt, report_type):
-        path = Path(self.raw_outputs_path)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        log = {
-                "date": pd.Timestamp.now().date(),
-                "report_type": report_type,
-                "output": txt
-            }
-        with open(path, "a", encoding="utf-8") as f:
-            f.write(json.dumps(log) + "\n")
 
     def save_additonal_log(self, file_name, text, folder="additional_logs", append=False):
         path = Path(self.research_dir / folder / file_name)
@@ -146,3 +136,6 @@ class LIBBmodel:
             file.write(text)
             file.close()
         return
+    
+    def analyze_sentiment(self, text, report_type="Unknown"):
+        return analyze_sentiment(text, report_type=report_type)

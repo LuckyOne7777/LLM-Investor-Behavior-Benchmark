@@ -19,7 +19,7 @@ def get_score(text: str):
     score = lm.get_score(tokens)
     return score, tokens
 
-def evaluate_sentiment(score, tokens, report_type):
+def evaluate_sentiment(score, tokens, report_type="Unknown"):
     word_count = max(len(tokens), 1)
 
     log = {
@@ -32,6 +32,10 @@ def evaluate_sentiment(score, tokens, report_type):
         "date": pd.Timestamp.now().date(),
     }
     return log
+
+def analyze_sentiment(text, report_type="Unknown"):
+    score, tokens = get_score(text)
+    return evaluate_sentiment(score, tokens, report_type=report_type)
 
 
 
