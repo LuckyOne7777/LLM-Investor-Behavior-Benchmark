@@ -21,10 +21,9 @@ def prompt_chatgpt(text, model="gpt-4.1-mini"):
         stream=False)
     return response.choices[0].message.content
 
-#TODO: pass parameters for creating prompts
 def prompt_deep_research(libb):
     model = libb.model_path.replace("runs/run_v1/", "")
-    text = create_daily_prompt()
+    text = create_deep_research_prompt(libb)
     if model == "deepseek":
         return prompt_deepseek(text)
     elif model == "gpt-4.1":
@@ -32,9 +31,9 @@ def prompt_deep_research(libb):
     else:
         raise RuntimeError(f"Unidentified model: {model}")
 
-def prompt_deep_research(libb):
+def prompt_daily_report(libb):
     model = libb.model_path.replace("runs/run_v1/", "")
-    text = create_daily_prompt()
+    text = create_daily_prompt(libb)
     if model == "deepseek":
         return prompt_deepseek(text)
     elif model == "gpt-4.1":

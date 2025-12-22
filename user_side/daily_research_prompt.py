@@ -1,10 +1,13 @@
 import user_side.get_prompt_data as get_prompt_data
 
 # TODO: what if postions are 0 but cash != starting cash?
-def create_daily_prompt(portfolio, starting_cash):
+def create_daily_prompt(libb):
+   portfolio = libb.portfolio
+   starting_cash = libb.starting_cash
+   news = get_prompt_data.get_macro_news()
    if portfolio.empty:
       portfolio = F"Create your portfolio. Your starting cash is {starting_cash}."
-   news = get_prompt_data.get_macro_news()
+
    daily_prompt = f"""
 System Message
 

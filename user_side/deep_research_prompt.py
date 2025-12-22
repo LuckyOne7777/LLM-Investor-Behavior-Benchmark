@@ -1,4 +1,9 @@
-def create_deep_research_prompt(portfolio, portfolio_news, us_news, thesis_summary, execution_log):
+import get_prompt_data as data
+
+def create_deep_research_prompt(libb):
+  portfolio_news = data.get_portfolio_news(libb.portfolio)
+  execution_log = data.recent_execution_logs(libb.trade_log_path)
+  us_news = data.get_macro_news()
 
   deep_research_prompt = f""" System Message
 
@@ -166,10 +171,7 @@ CONTEXT PROVIDED TO YOU
 ---------------------------------------------------------------------------
 
 • Current Portfolio State:
-  [{portfolio}]
-
-• Last Analyst Thesis:
-  [{thesis_summary}]
+  [{libb.portfolio}]
 
 • Portfolio News (if any):
   [{portfolio_news}]
