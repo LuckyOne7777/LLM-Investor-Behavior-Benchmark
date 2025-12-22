@@ -115,9 +115,9 @@ class LIBBmodel:
     def save_deep_research(self, txt: str):
         deep_research_name = Path(f"deep_research - {pd.Timestamp.now().date()}.txt")
         full_path =  self.deep_research_file_path / deep_research_name
-        file = open(full_path, "w")
-        file.write(txt)
-        file.close()
+        with open(full_path, "w") as file:
+            file.write(txt)
+            file.close()
         return full_path
     
     def save_daily_updates(self, txt: str):
@@ -131,7 +131,6 @@ class LIBBmodel:
     def save_orders(self, json_block: str):
         # override orders each day
         with open(self.pending_trades_path, "w") as file:
-            file = open(self.pending_trades_path, "w")
             file.write(json_block)
             file.close()
         return
