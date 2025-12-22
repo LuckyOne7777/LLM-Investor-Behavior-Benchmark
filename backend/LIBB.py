@@ -29,7 +29,8 @@ class LIBBmodel:
         self.pending_trades_path = self.portfolio_dir / "pending_trades.csv"
         self.portfolio_path = self.portfolio_dir / "portfolio.csv"
         self.trade_log_path = self.portfolio_dir / "trade_log.csv"
-        self.raw_outputs_path = self.research_dir / "raw_outputs.json"
+        self.position_history_path = self.portfolio_dir / "position_history.csv"
+
         # paths in metrics
         self.behavior_path = self.metrics_dir / "behavior.json"
         self.performance_path = self.metrics_dir / "performance.json"
@@ -65,6 +66,13 @@ class LIBBmodel:
         for _, order in self.pending_trades.iterrows():
             self.portfolio, self.cash = process_order(order, self.portfolio, 
             self.cash, self.trade_log_path)
+        return
+    
+    def append_position_history(self):
+        portfolio_copy = self.portfolio.copy()
+        portfolio_copy["date"] = pd.Timestamp.now().date()
+        portfolio_copy.to_csv(self.position_history_path, mode="a", header= not 
+            self.position_history_path.exists(), index=False)
         return
     
     def append_portfolio_history(self, date: date | None = None):
