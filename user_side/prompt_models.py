@@ -4,16 +4,8 @@ from datetime import datetime
 from .deep_research_prompt import create_deep_research_prompt
 from .daily_research_prompt import create_daily_prompt
 
-day_of_week = datetime.weekday()
-
-def prompt_orchestration(model_path):
-    model = model_path.replace("runs/run_v1/", "")
-    if model == "deepseek":
-        return prompt_deepseek()
-    elif model == "gpt-4.1":
-        return prompt_chatgpt()
-
 def prompt_deepseek(text, model="deepseek-chat"):
+
     client = OpenAI(api_key=os.environ.get("DEEPSEEK_API_KEY"),
                     base_url="https://api.deepseek.com")
     
@@ -28,3 +20,24 @@ def prompt_chatgpt(text, model="gpt-4.1-mini"):
         model=model, messages=[{"role": "user", "content": text}], temperature=0.0,
         stream=False)
     return response.choices[0].message.content
+
+#TODO: pass parameters for creating prompts
+def prompt_deep_research(libb):
+    model = libb.model_path.replace("runs/run_v1/", "")
+    text = create_daily_prompt()
+    if model == "deepseek":
+        return prompt_deepseek(text)
+    elif model == "gpt-4.1":
+        return prompt_chatgpt(text)
+    else:
+        raise RuntimeError(f"Unidentified model: {model}")
+
+def prompt_deep_research(libb):
+    model = libb.model_path.replace("runs/run_v1/", "")
+    text = create_daily_prompt()
+    if model == "deepseek":
+        return prompt_deepseek(text)
+    elif model == "gpt-4.1":
+        return prompt_chatgpt(text)
+    else:
+        raise RuntimeError(f"Unidentified model: {model}")
