@@ -120,7 +120,7 @@ class LIBBmodel:
             file.close()
         return full_path
     
-    def save_daily_updates(self, txt: str):
+    def save_daily_update(self, txt: str):
         DAILY_UPDATES_FILE_NAME = Path(f"daily_update - {pd.Timestamp.now().date()}.txt")
         full_path = self.daily_reports_file_path / DAILY_UPDATES_FILE_NAME
         with open(full_path, "w") as file:

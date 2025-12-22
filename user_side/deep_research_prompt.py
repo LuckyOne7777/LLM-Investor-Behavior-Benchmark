@@ -1,9 +1,9 @@
-import get_prompt_data as data
+from .get_prompt_data import get_portfolio_news, recent_execution_logs, get_macro_news
 
 def create_deep_research_prompt(libb):
-  portfolio_news = data.get_portfolio_news(libb.portfolio)
-  execution_log = data.recent_execution_logs(libb.trade_log_path)
-  us_news = data.get_macro_news()
+  portfolio_news = get_portfolio_news(libb.portfolio)
+  execution_log = recent_execution_logs(libb.trade_log_path)
+  us_news = get_macro_news()
 
   deep_research_prompt = f""" System Message
 

@@ -1,12 +1,11 @@
 from backend.LIBB import LIBBmodel
 from .prompt_models import prompt_daily_report, prompt_deep_research
 from .parse import parse_json
-
-
+from datetime import date
 
 MODELS = ["deepseek", "gpt-4.1"]
 
-def weekly_workflow():
+def weekly_flow():
 
     for model in MODELS:
         libb = LIBBmodel(f"runs/run_v1/{model}")
@@ -16,7 +15,7 @@ def weekly_workflow():
 
         orders_json = parse_json(report, "ORDERS_JSON")
 
-        libb.save_deep_research(report)
+        deep_research_path = libb.save_deep_research(report)
         libb.save_orders(orders_json)
 
     return
@@ -30,7 +29,16 @@ def daily_flow():
 
         orders_json = parse_json(report, "ORDERS_JSON")
 
-        libb.save_daily_report(report)
+        daily_path = libb.save_daily_update(report)
         libb.save_orders(orders_json)
     return
 
+today = date.today()
+day_num = today.weekday()
+
+if day_num  == 4: # Friday
+    weekly_flow()
+elif day_num < 5: # Mon-Friday
+    weekly_flow()
+else:  # Weekend
+    pass
