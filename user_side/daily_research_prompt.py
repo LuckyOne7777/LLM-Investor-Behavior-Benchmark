@@ -3,10 +3,36 @@ import user_side.get_prompt_data as get_prompt_data
 # TODO: what if postions are 0 but cash != starting cash?
 def create_daily_prompt(libb):
    portfolio = libb.portfolio
-   starting_cash = libb.starting_cash
+   starting_cash = libb.STARTING_CASH
    news = get_prompt_data.get_macro_news()
    if portfolio.empty:
       portfolio = F"Create your portfolio. Your starting cash is {starting_cash}."
+   orders_section = """<ORDERS_JSON>
+{
+  "orders": [
+      {
+  "action": "b" | "s" | "u",
+  "ticker": "XYZ",
+  "shares": 1,
+  "order_type": "limit" | "market" | "update",
+  "limit_price": 10.25 | null,
+  "time_in_force": "DAY" | null,
+  "date": "YYYY-MM-DD",
+  "stop_loss": 8.90 | null,
+  "rationale": "short justification",
+  "confidence": 0.80
+      }
+  ]
+}
+</ORDERS_JSON>
+
+If no trade is taken:
+
+<ORDERS_JSON>
+{
+  "orders": []
+}
+</ORDERS_JSON>"""
 
    daily_prompt = f"""
 System Message
@@ -111,32 +137,7 @@ OUTPUT TEMPLATE (STRICT)
 ...daily analysis...
 </DAILY_ANALYSIS>
 
-<ORDERS_JSON>
-{
-  "orders": [
-      {
-  "action": "b" | "s" | "u",
-  "ticker": "XYZ",
-  "shares": 1,
-  "order_type": "limit" | "market" | "update",
-  "limit_price": 10.25 | null,
-  "time_in_force": "DAY" | null,
-  "date": "YYYY-MM-DD",
-  "stop_loss": 8.90 | null,
-  "rationale": "short justification",
-  "confidence": 0.80
-      }
-  ]
-}
-</ORDERS_JSON>
-
-If no trade is taken:
-
-<ORDERS_JSON>
-{
-  "orders": []
-}
-</ORDERS_JSON>
+{orders_section}
 
 <CONFIDENCE_LVL>
 0.65

@@ -4,7 +4,28 @@ def create_deep_research_prompt(libb):
   portfolio_news = get_portfolio_news(libb.portfolio)
   execution_log = recent_execution_logs(libb.trade_log_path)
   us_news = get_macro_news()
+  # due to f-string formatting errors, had to define it seperately 
+  example_orders_json = """
+  <ORDERS_JSON>
+{
+  "orders": [
+    {
+  "action": "b",
+  "ticker": "XYZ",
+  "shares": 1,
+  "order_type": "limit",
+  "limit_price": 10.25,
+  "time_in_force": "DAY",
+  "date": "YYYY-MM-DD",
+  "stop_loss": 8.90,
+  "rationale": "short justification",
+  "confidence": 0.80
+    }
+  ]
+}
 
+</ORDERS_JSON>
+"""
   deep_research_prompt = f""" System Message
 
 You are a professional-grade portfolio analyst operating in WEEKLY Deep Research
@@ -204,24 +225,7 @@ OUTPUT TEMPLATE (STRICT)
 ...full weekly research analysis...
 </ANALYSIS_BLOCK>
 
-<ORDERS_JSON>
-{
-  "orders": [
-    {
-  "action": "b" | "s" | "u",
-  "ticker": "XYZ",
-  "shares": 1,
-  "order_type": "limit" | "market" | "update",
-  "limit_price": 10.25 | null,
-  "time_in_force": "DAY" | null,
-  "date": "YYYY-MM-DD",
-  "stop_loss": 8.90 | null,
-  "rationale": "short justification",
-  "confidence": 0.80
-    }
-  ]
-}
-</ORDERS_JSON>
+{example_orders_json}
 
 <CONFIDENCE_LVL>
 0.65

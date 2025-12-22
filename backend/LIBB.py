@@ -18,15 +18,16 @@ class LIBBmodel:
         self.metrics_dir = self.root / "metrics"
         self.research_dir = self.root / "research"
 
-        self.deep_research_file_path = self.research_dir / "deep_research"
-        self.daily_reports_file_path = self.research_dir / "daily_reports"
+        self.deep_research_file_folder_path = self.research_dir / "deep_research"
+        self.daily_reports_file_folder_path = self.research_dir / "daily_reports"
 
-        for dir in [self.root, self.portfolio_dir, self.metrics_dir, self.research_dir]:
+        for dir in [self.root, self.portfolio_dir, self.metrics_dir, self.research_dir, self.daily_reports_file_folder_path, 
+                    self. deep_research_file_folder_path]:
             self.ensure_dir(dir)
 
         # paths in portfolio
         self.portfolio_history_path = self.portfolio_dir / "portfolio_history.csv"
-        self.pending_trades_path = self.portfolio_dir / "pending_trades.csv"
+        self.pending_trades_path = self.portfolio_dir / "pending_trades.json"
         self.portfolio_path = self.portfolio_dir / "portfolio.csv"
         self.trade_log_path = self.portfolio_dir / "trade_log.csv"
         self.position_history_path = self.portfolio_dir / "position_history.csv"
@@ -35,6 +36,19 @@ class LIBBmodel:
         self.behavior_path = self.metrics_dir / "behavior.json"
         self.performance_path = self.metrics_dir / "performance.json"
         self.sentiment_path = self.metrics_dir / "sentiment.json"
+
+        # portfolio files
+        self.ensure_file(self.portfolio_history_path, "date,equity,cash,positions_value,return_pct")
+        self.ensure_file(self.pending_trades_path, "date,ticker,action,shares,exec_price,status,reason,stop_loss,cash_after,model_id")
+        self.ensure_file(self.portfolio_path, "ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl,cash")
+        self.ensure_file(self.trade_log_path, "Date,Ticker,Action,Shares,Price,Cost Basis,PnL,Rationale,Confidence,Status,Reason")
+        self.ensure_file(self.position_history_path, "date,ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl,cash")
+
+        # metrics files
+        self.ensure_file(self.behavior_path, "{}")
+        self.ensure_file(self.performance_path, "{}")
+        self.ensure_file(self.sentiment_path, "{}")
+
 
 
         self.portfolio = self._load_csv(self.portfolio_dir / "portfolio.csv")
@@ -50,6 +64,12 @@ class LIBBmodel:
 
     def ensure_dir(self, path: Path):
             path.mkdir(parents=True, exist_ok=True)
+
+    def ensure_file(self, path: Path, default_content: str = ""):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if not path.exists():
+            path.write_text(default_content, encoding="utf-8")
+
 
     def _load_csv(self, path: Path) -> pd.DataFrame:
         if path.exists():
@@ -76,11 +96,17 @@ class LIBBmodel:
         return
     
     def append_portfolio_history(self, date: date | None = None):
-        required_cols = {"ticker", "shares", "buy_price", "cost_basis", "stop_loss"}
-        missing = required_cols - set(self.portfolio.columns)
+        defaults = {
+            "ticker": "",
+            "shares": 0,
+            "buy_price": 0.0,
+            "cost_basis": 0.0,
+            "stop_loss": 0.0,
+                }
 
-        if missing:
-            raise RuntimeError(f"Portfolio schema invalid, missing: {missing}")
+        for col, default in defaults.items():
+            if col not in self.portfolio.columns:
+                self.portfolio[col] = default
 
         if date is None:
             date = pd.Timestamp.now().date()
@@ -88,11 +114,12 @@ class LIBBmodel:
             raise RuntimeError("market_value not computed before portfolio history update")
         market_equity = self.portfolio["market_value"].sum()
         present_total_equity = market_equity + self.cash
-        last_total_equity = self.portfolio_history["equity"].iloc[-1]
-        if last_total_equity is None:
+        if self.portfolio_history.empty:
             return_pct = None
             last_total_equity = None
         else:
+            print(self.portfolio_history)
+            last_total_equity = self.portfolio_history["equity"].iloc[-1]
             return_pct = (present_total_equity / last_total_equity) - 1
         log = pd.DataFrame([{
         "date": date,
@@ -107,14 +134,15 @@ class LIBBmodel:
         except Exception as e:
             raise SystemError(f"Error saving to portfolio_history for {self.model_path}. {e}")
         return
-    def proccess_portfolio(self):
+    def process_portfolio(self):
         self.process_orders()
         self.append_portfolio_history()
+        self.append_position_history()
 
 
     def save_deep_research(self, txt: str):
         deep_research_name = Path(f"deep_research - {pd.Timestamp.now().date()}.txt")
-        full_path =  self.deep_research_file_path / deep_research_name
+        full_path =  self.deep_research_file_folder_path / deep_research_name
         with open(full_path, "w") as file:
             file.write(txt)
             file.close()
@@ -122,7 +150,7 @@ class LIBBmodel:
     
     def save_daily_update(self, txt: str):
         DAILY_UPDATES_FILE_NAME = Path(f"daily_update - {pd.Timestamp.now().date()}.txt")
-        full_path = self.daily_reports_file_path / DAILY_UPDATES_FILE_NAME
+        full_path = self.daily_reports_file_folder_path / DAILY_UPDATES_FILE_NAME
         with open(full_path, "w") as file:
             file.write(txt)
             file.close()
@@ -131,7 +159,7 @@ class LIBBmodel:
     def save_orders(self, json_block: str):
         # override orders each day
         with open(self.pending_trades_path, "w") as file:
-            file.write(json_block)
+            json.dump(json_block, file, indent=2)
             file.close()
         return
 

@@ -38,7 +38,8 @@ day_num = today.weekday()
 
 if day_num  == 4: # Friday
     weekly_flow()
-elif day_num < 5: # Mon-Friday
-    weekly_flow()
+elif day_num < 4:
+    daily_flow() # Mon-Thursday
 else:  # Weekend
     pass
+print("Success!")
