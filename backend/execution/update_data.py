@@ -1,6 +1,5 @@
 import pandas as pd 
 import yfinance as yf
-from datetime import date
 
 #TODO: ticker range fails on weekends
 #TODO: graceful error handling for ticker downloading

@@ -1,7 +1,5 @@
 import pandas as pd
-import numpy as np
 from pysentiment2 import LM
-import pdfplumber
 
 def file_to_text(path):
     text = ""

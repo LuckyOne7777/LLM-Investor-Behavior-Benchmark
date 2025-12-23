@@ -4,9 +4,7 @@ import json
 from datetime import date
 from .execution.orders import  process_order
 from .metrics.sentiment_metrics import analyze_sentiment
-import yfinance as yf
 from shutil import rmtree
-import os
 
 class LIBBmodel:
     def __init__(self, model_path, starting_cash = 10_000):

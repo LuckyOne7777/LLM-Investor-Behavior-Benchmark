@@ -1,4 +1,3 @@
-from pathlib import Path
 from .portfolio import add_or_update_position
 from .io import append_log
 from .update_data import get_market_data
