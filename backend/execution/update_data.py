@@ -3,8 +3,8 @@ import yfinance as yf
 from datetime import date
 
 #TODO: ticker range fails on weekends
-#TODO: error handling for ticker downloading
-def get_market_data(ticker):
+#TODO: graceful error handling for ticker downloading
+def get_market_data(ticker: str) -> dict:
         yesterdays_market_date = pd.Timestamp.now().date()
         todays_market_date = pd.Timestamp.now().date() + pd.Timedelta(days=1)
         try:
@@ -23,7 +23,7 @@ def get_market_data(ticker):
         }
         return ticker_data
 
-def update_market_value_column(portfolio):
+def update_market_value_column(portfolio: pd.DataFrame) -> pd.DataFrame:
     portfolio = portfolio.copy()
 
     for i, row in portfolio.iterrows():
