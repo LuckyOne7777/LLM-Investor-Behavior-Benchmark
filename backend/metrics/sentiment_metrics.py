@@ -23,13 +23,13 @@ def evaluate_sentiment(score, tokens, report_type="Unknown"):
     word_count = max(len(tokens), 1)
 
     log = {
-        "subjectivity": score['Subjectivity'],
-        "polarity": score['Polarity'],
-        "positive_count": score['Positive'],
-        "negative_count": score['Negative'],
-        "token_count": word_count,
+        "subjectivity": float(score['Subjectivity']),
+        "polarity": float(score['Polarity']),
+        "positive_count": int(score['Positive']),
+        "negative_count": int(score['Negative']),
+        "token_count": int(word_count),
         "report_type": report_type,
-        "date": pd.Timestamp.now().date(),
+        "date": str(pd.Timestamp.now().date()),
     }
     return log
 
