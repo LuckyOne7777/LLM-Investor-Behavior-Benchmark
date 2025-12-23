@@ -12,7 +12,6 @@ def get_market_data(ticker: str) -> dict:
              raise RuntimeError(f"Error downloading {ticker}'s data: {e}")
         if isinstance(ticker_data.columns, pd.MultiIndex):
              ticker_data.columns = ticker_data.columns.get_level_values(0)
-        print(type(ticker_data))
         ticker_data = {
             "Low": float(ticker_data["Low"].iloc[0]),
             "High": float(ticker_data["High"].iloc[0]),

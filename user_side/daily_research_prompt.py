@@ -7,6 +7,8 @@ def create_daily_prompt(libb):
    news = get_prompt_data.get_macro_news()
    if portfolio.empty:
       portfolio = F"Create your portfolio. Your starting cash is {starting_cash}."
+      
+   # because of the string formatting, the json block must be passed in
    orders_section = """<ORDERS_JSON>
 {
   "orders": [

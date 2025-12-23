@@ -99,7 +99,7 @@ class LIBBmodel:
         for order in orders:
             self.portfolio, self.cash = process_order(order, self.portfolio, 
             self.cash, self.trade_log_path)
-        # orders are overwritten later, so this is a safety check 
+        # orders are overwritten later, but this is a safety check 
         self.pending_trades = {}
         self.save_orders("{}")
 
@@ -135,7 +135,6 @@ class LIBBmodel:
             return_pct = None
             last_total_equity = None
         else:
-            print(self.portfolio_history)
             last_total_equity = self.portfolio_history["equity"].iloc[-1]
             return_pct = (present_total_equity / last_total_equity) - 1
         log = pd.DataFrame([{
@@ -156,7 +155,6 @@ class LIBBmodel:
         self.process_orders()
         self.append_portfolio_history()
         self.append_position_history()
-
 
     def save_deep_research(self, txt: str):
         deep_research_name = Path(f"deep_research - {pd.Timestamp.now().date()}.txt")
