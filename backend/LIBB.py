@@ -36,6 +36,7 @@ class LIBBmodel:
                      if not self.portfolio.empty else self.STARTING_CASH)
         self.portfolio_history = self._load_csv(self.portfolio_dir / "portfolio_history.csv")
         self.trade_log = self._load_csv(self.portfolio_dir / "trade_log.csv")
+
         self.pending_trades = self._load_json(self.portfolio_dir / "pending_trades.json")
 
         self.performance = self._load_json(self.metrics_dir / "performance.json")
@@ -92,7 +93,9 @@ class LIBBmodel:
         return {}
 
     def process_orders(self):
-        for _, order in self.pending_trades.iterrows():
+        if not self.pending_trades:
+            return
+        for order in self.pending_trades:
             self.portfolio, self.cash = process_order(order, self.portfolio, 
             self.cash, self.trade_log_path)
         return
