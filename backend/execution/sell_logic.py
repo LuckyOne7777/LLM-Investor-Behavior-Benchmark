@@ -1,4 +1,4 @@
-from .portfolio import reduce_position
+from .portfolio_editing import reduce_position
 from .io import append_log
 from .update_data import get_market_data
 

@@ -2,7 +2,7 @@ from pathlib import Path
 import pandas as pd
 import json
 from datetime import date
-from .execution.orders import  process_order
+from .execution.process_order import  process_order
 from .metrics.sentiment_metrics import analyze_sentiment
 from shutil import rmtree
 
