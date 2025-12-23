@@ -33,6 +33,18 @@ class LIBBmodel:
         self.performance_path = self.metrics_dir / "performance.json"
         self.sentiment_path = self.metrics_dir / "sentiment.json"
 
+        self.portfolio = self._load_csv(self.portfolio_dir / "portfolio.csv")
+        self.cash = (float(self.portfolio["cash"].iloc[0]) 
+                     if not self.portfolio.empty else self.STARTING_CASH)
+        self.portfolio_history = self._load_csv(self.portfolio_dir / "portfolio_history.csv")
+        self.trade_log = self._load_csv(self.portfolio_dir / "trade_log.csv")
+        self.pending_trades = self._load_json(self.portfolio_dir / "pending_trades.json")
+
+        self.performance = self._load_json(self.metrics_dir / "performance.json")
+        self.behavior = self._load_json(self.metrics_dir / "behavior.json")
+        self.sentiment = self._load_json(self.metrics_dir / "sentiment.json")
+
+    def ensure_file_system(self):
         for dir in [self.root, self.portfolio_dir, self.metrics_dir, self.research_dir, self.daily_reports_file_folder_path, 
                     self. deep_research_file_folder_path]:
             self.ensure_dir(dir)
@@ -48,20 +60,8 @@ class LIBBmodel:
         self.ensure_file(self.behavior_path, "{}")
         self.ensure_file(self.performance_path, "{}")
         self.ensure_file(self.sentiment_path, "{}")
-
-
-
-        self.portfolio = self._load_csv(self.portfolio_dir / "portfolio.csv")
-        self.cash = (float(self.portfolio["cash"].iloc[0]) 
-                     if not self.portfolio.empty else self.STARTING_CASH)
-        self.portfolio_history = self._load_csv(self.portfolio_dir / "portfolio_history.csv")
-        self.trade_log = self._load_csv(self.portfolio_dir / "trade_log.csv")
-        self.pending_trades = self._load_json(self.portfolio_dir / "pending_trades.json")
-
-        self.performance = self._load_json(self.metrics_dir / "performance.json")
-        self.behavior = self._load_json(self.metrics_dir / "behavior.json")
-        self.sentiment = self._load_json(self.metrics_dir / "sentiment.json")
-
+        return
+    
     def reset_run(self):
         if self.root in (Path("/"), Path("C:/")): 
             raise RuntimeError("Not deleting your system.")
