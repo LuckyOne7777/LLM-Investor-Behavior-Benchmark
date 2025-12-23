@@ -49,11 +49,11 @@ class LIBBmodel:
             self.ensure_dir(dir)
 
         # portfolio files
-        self.ensure_file(self.portfolio_history_path, "date,equity,cash,positions_value,return_pct")
+        self.ensure_file(self.portfolio_history_path, "date,equity,cash,positions_value,return_pct\n")
         self.ensure_file(self.pending_trades_path, "{}")
-        self.ensure_file(self.portfolio_path, "ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl,cash")
-        self.ensure_file(self.trade_log_path, "Date,Ticker,Action,Shares,Price,Cost Basis,PnL,Rationale,Confidence,Status,Reason")
-        self.ensure_file(self.position_history_path, "date,ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl,cash")
+        self.ensure_file(self.portfolio_path, "ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl,cash\n")
+        self.ensure_file(self.trade_log_path, "Date,Ticker,Action,Shares,Price,Cost Basis,PnL,Rationale,Confidence,Status,Reason\n")
+        self.ensure_file(self.position_history_path, "date,ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl,cash\n")
 
         # metrics files
         self.ensure_file(self.behavior_path, "{}")
