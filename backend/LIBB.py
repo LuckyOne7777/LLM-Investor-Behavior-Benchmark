@@ -64,7 +64,7 @@ class LIBBmodel:
         self.root
 
         if not (self.root / ".run_root").exists():
-            raise RuntimeError(f"The root given {self.root} is not a run directory".)
+            raise RuntimeError(f"The root given {self.root} is not a run directory.")
 
         for child in self.root.iterdir():
             if child.is_dir():
@@ -144,6 +144,7 @@ class LIBBmodel:
         except Exception as e:
             raise SystemError(f"Error saving to portfolio_history for {self.model_path}. {e}")
         return
+    
     def process_portfolio(self):
         self.process_orders()
         self.append_portfolio_history()
