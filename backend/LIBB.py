@@ -1,11 +1,11 @@
 from pathlib import Path 
 import pandas as pd
 import json
-from .execution.types_file import Order
 from datetime import date
 from .execution.orders import  process_order
 from .metrics.sentiment_metrics import analyze_sentiment
 import yfinance as yf
+from shutil import rmtree
 import os
 
 class LIBBmodel:
@@ -21,10 +21,6 @@ class LIBBmodel:
         self.deep_research_file_folder_path = self.research_dir / "deep_research"
         self.daily_reports_file_folder_path = self.research_dir / "daily_reports"
 
-        for dir in [self.root, self.portfolio_dir, self.metrics_dir, self.research_dir, self.daily_reports_file_folder_path, 
-                    self. deep_research_file_folder_path]:
-            self.ensure_dir(dir)
-
         # paths in portfolio
         self.portfolio_history_path = self.portfolio_dir / "portfolio_history.csv"
         self.pending_trades_path = self.portfolio_dir / "pending_trades.json"
@@ -36,6 +32,10 @@ class LIBBmodel:
         self.behavior_path = self.metrics_dir / "behavior.json"
         self.performance_path = self.metrics_dir / "performance.json"
         self.sentiment_path = self.metrics_dir / "sentiment.json"
+
+        for dir in [self.root, self.portfolio_dir, self.metrics_dir, self.research_dir, self.daily_reports_file_folder_path, 
+                    self. deep_research_file_folder_path]:
+            self.ensure_dir(dir)
 
         # portfolio files
         self.ensure_file(self.portfolio_history_path, "date,equity,cash,positions_value,return_pct")
@@ -61,6 +61,12 @@ class LIBBmodel:
         self.performance = self._load_json(self.metrics_dir / "performance.json")
         self.behavior = self._load_json(self.metrics_dir / "behavior.json")
         self.sentiment = self._load_json(self.metrics_dir / "sentiment.json")
+
+    def reset_run(self):
+        if self.root in (Path("/"), Path("C:/")): 
+            raise RuntimeError("Not deleting your system.")
+        rmtree(self.root)
+        return
 
     def ensure_dir(self, path: Path):
             path.mkdir(parents=True, exist_ok=True)
