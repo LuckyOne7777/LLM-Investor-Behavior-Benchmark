@@ -40,6 +40,7 @@ def analyze_sentiment(text, report_type="Unknown"):
 
 
 
+
 def narrative_drift(weekly_summaries):
     """
     Measures sentiment volatility between weekly research outputs.
