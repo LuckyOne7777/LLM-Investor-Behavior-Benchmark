@@ -1,0 +1,76 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.vscode
+
+# ======================
+# Virtual environments
+# ======================
+.venv/
+venv/
+env/
+ENV/
+
+# ======================
+# Packaging / build
+# ======================
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ======================
+# Testing / coverage
+# ======================
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+
+# ======================
+# Logs
+# ======================
+*.log
+
+# ======================
+# Runtime / temp files
+# ======================
+*.pid
+*.sock
+*.tmp
+tmp/
+temp/
+
+# ======================
+# Jupyter
+# ======================
+.ipynb_checkpoints/
+
+# ======================
+# IDEs / editors
+# ======================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ======================
+# OS junk
+# ======================
+.DS_Store
+Thumbs.db
+
+# ======================
+# Environment variables
+# ======================
+.env
+.env.*
+
+# ======================
+# Secrets / keys
+# ======================
+*.pem
+*.key
+*.crt
