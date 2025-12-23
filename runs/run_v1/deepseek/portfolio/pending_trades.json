@@ -1,16 +1,1 @@
-{
-  "orders": [
-    {
-      "action": "b",
-      "ticker": "SPY",
-      "shares": 10,
-      "order_type": "limit",
-      "limit_price": 585.09,
-      "time_in_force": "DAY",
-      "date": "2025-12-23",
-      "stop_loss": 526.58,
-      "rationale": "Initial portfolio entry. Diversified exposure to positive market tone.",
-      "confidence": 0.75
-    }
-  ]
-}
+{}

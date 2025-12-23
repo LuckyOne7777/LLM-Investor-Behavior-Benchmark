@@ -4,7 +4,7 @@ from .portfolio_editing import update_stoploss
 from .io import append_log
 
 def process_order(order, portfolio_df, cash, trade_log):
-    action = order["action"]
+    action = str(order["action"])
     ticker = order["ticker"].upper()
 
     if action == "b":
