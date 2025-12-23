@@ -61,10 +61,16 @@ class LIBBmodel:
         return
     
     def reset_run(self):
-        if self.root in (Path("/"), Path("C:/")): 
-            raise RuntimeError("Not deleting your system.")
-        rmtree(self.root)
-        return
+        self.root
+
+        if not (self.root / ".run_root").exists():
+            raise RuntimeError(f"The root given {self.root} is not a run directory".)
+
+        for child in self.root.iterdir():
+            if child.is_dir():
+                rmtree(child)
+            else:
+                child.unlink()
 
     def ensure_dir(self, path: Path):
             path.mkdir(parents=True, exist_ok=True)
