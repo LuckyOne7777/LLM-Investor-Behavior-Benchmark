@@ -93,11 +93,16 @@ class LIBBmodel:
         return {}
 
     def process_orders(self):
-        if not self.pending_trades:
+        orders = self.pending_trades.get("orders", [])
+        if not orders:
             return
-        for order in self.pending_trades:
+        for order in orders:
             self.portfolio, self.cash = process_order(order, self.portfolio, 
             self.cash, self.trade_log_path)
+        # orders are overwritten later, so this is a safety check 
+        self.pending_trades = {}
+        self.save_orders("{}")
+
         return
     
     def append_position_history(self):
