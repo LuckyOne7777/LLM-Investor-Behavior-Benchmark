@@ -61,10 +61,9 @@ class LIBBmodel:
         return
     
     def reset_run(self):
-        self.root
 
-        if not (self.root / ".run_root").exists():
-            raise RuntimeError(f"The root given {self.root} is not a run directory.")
+        if self.root in (Path("/"), Path("C:/")):
+            raise RuntimeError(f"Cannot delete root given: {self.root}")
 
         for child in self.root.iterdir():
             if child.is_dir():
