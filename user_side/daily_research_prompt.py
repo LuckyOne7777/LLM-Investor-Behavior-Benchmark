@@ -6,8 +6,8 @@ def create_daily_prompt(libb):
    starting_cash = libb.STARTING_CASH
    news = get_prompt_data.get_macro_news()
    if portfolio.empty:
-      portfolio = F"Create your portfolio. Your starting cash is {starting_cash}."
-      
+      portfolio = f"You have 0 active positions, create your portfolio. The starting cash is {starting_cash}. You must make at least 1 trade."
+
    # because of the string formatting, the json block must be passed in
    orders_section = """<ORDERS_JSON>
 {

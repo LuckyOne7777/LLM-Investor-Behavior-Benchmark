@@ -1,6 +1,11 @@
 from .get_prompt_data import get_portfolio_news, recent_execution_logs, get_macro_news
 
 def create_deep_research_prompt(libb):
+  portfolio = libb.portfolio
+  starting_cash = libb.STARTING_CASH
+  if portfolio.empty:
+    portfolio = f"You have 0 active positions, create your portfolio. The starting cash is {starting_cash}. You must make at least 1 trade."
+
   portfolio_news = get_portfolio_news(libb.portfolio)
   execution_log = recent_execution_logs(libb.trade_log_path)
   us_news = get_macro_news()
@@ -192,7 +197,7 @@ CONTEXT PROVIDED TO YOU
 ---------------------------------------------------------------------------
 
 • Current Portfolio State:
-  [{libb.portfolio}]
+  [{portfolio}]
 
 • Portfolio News (if any):
   [{portfolio_news}]
