@@ -24,7 +24,10 @@ def add_or_update_position(df, ticker, shares, price, stop_loss):
             "cost_basis": cost,
             "stop_loss": stop_loss,
         }
-        df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+        if not df.empty:
+            df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+        else:
+            new_row = df
 
     return df
 

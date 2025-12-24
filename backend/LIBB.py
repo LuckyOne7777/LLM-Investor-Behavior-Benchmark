@@ -58,9 +58,9 @@ class LIBBmodel:
         self.ensure_file(self.position_history_path, "date,ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl,cash\n")
 
         # metrics files
-        self.ensure_file(self.behavior_path, "{}")
-        self.ensure_file(self.performance_path, "{}")
-        self.ensure_file(self.sentiment_path, "{}")
+        self.ensure_file(self.behavior_path, "[]")
+        self.ensure_file(self.performance_path, "[]")
+        self.ensure_file(self.sentiment_path, "[]")
         return
     
     def reset_run(self):
@@ -95,7 +95,7 @@ class LIBBmodel:
         return {}
 
     def process_orders(self):
-        orders = self.pending_trades.get("orders", [])
+        orders = self.pending_trades.get("orders", {})
         if not orders:
             return
         for order in orders:
@@ -129,7 +129,7 @@ class LIBBmodel:
 
         if date is None:
             date = pd.Timestamp.now().date()
-        if "market_value" not in self.portfolio.columns:
+        if "market_value" not in self.portfolio.columns and not self.portfolio.empty:
             raise RuntimeError("market_value not computed before portfolio history update")
         market_equity = self.portfolio["market_value"].sum()
         present_total_equity = market_equity + self.cash
@@ -192,6 +192,7 @@ class LIBBmodel:
     
     def analyze_sentiment(self, text, report_type="Unknown"):
         log = analyze_sentiment(text, report_type=report_type)
-        with open(self.sentiment_path, "a") as file:
-            json.dump(log, file, indent=2)
+        self.sentiment.append(log)
+        with open(self.sentiment_path, "w") as file:
+            json.dump(self.sentiment, file, indent=2)
         return log

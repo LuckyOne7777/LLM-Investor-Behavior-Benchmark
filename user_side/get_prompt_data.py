@@ -61,7 +61,4 @@ def recent_execution_logs(trade_log_path: str, look_back: int = 5):
     if trade_log[trade_log["Date"] >= time_range].empty:
         return f"No execution data for the past {look_back} days."
     else:
-        return trade_log[trade_log["Date"] >= time_range]
-
-
-
+        return trade_log[trade_log["Date"] >= time_range]    
