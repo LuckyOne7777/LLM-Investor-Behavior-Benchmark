@@ -1,9 +1,10 @@
 import user_side.get_prompt_data as get_prompt_data
-
+import pandas as pd
 # TODO: what if postions are 0 but cash != starting cash?
 def create_daily_prompt(libb):
    portfolio = libb.portfolio
    starting_cash = libb.STARTING_CASH
+   today = pd.Timestamp.now().date()
    news = get_prompt_data.get_macro_news()
    if portfolio.empty:
       portfolio = f"You have 0 active positions, create your portfolio. The starting cash is {starting_cash}. You must make at least 1 trade."
@@ -42,6 +43,7 @@ System Message
 You are a portfolio reviewer operating in DAILY Check Mode. Your job is to
 evaluate the portfolio based ONLY on the data provided (portfolio, prices,
 stop-losses, daily benchmark, and any US news headlines explicitly supplied).
+Today is {today}.
 
 You MUST NOT fabricate news, catalysts, or events. If no US news headlines are
 provided, assume: “No material news today.” Never infer unsent data.

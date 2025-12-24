@@ -1,6 +1,7 @@
 from .get_prompt_data import get_portfolio_news, recent_execution_logs, get_macro_news
-
+import pandas as pd
 def create_deep_research_prompt(libb):
+  today = pd.Timestamp.now().date()
   portfolio = libb.portfolio
   starting_cash = libb.STARTING_CASH
   if portfolio.empty:
@@ -37,7 +38,7 @@ You are a professional-grade portfolio analyst operating in WEEKLY Deep Research
 Mode. Your job is to reevaluate the entire portfolio and produce a complete
 action plan with exact orders. Optimize risk-adjusted return under strict
 constraints. All reasoning must reflect conditions as of the most recent market
-close.
+close. Today is {today}
 
 BEGIN BY RESTATING THE RULES, then deliver your research, decisions, and orders.
 
