@@ -52,7 +52,7 @@ class LIBBmodel:
 
         # portfolio files
         self.ensure_file(self.portfolio_history_path, "date,equity,cash,positions_value,return_pct\n")
-        self.ensure_file(self.pending_trades_path, "{}")
+        self.ensure_file(self.pending_trades_path, '{"orders": []}')
         self.ensure_file(self.portfolio_path, "ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl,cash\n")
         self.ensure_file(self.trade_log_path, "Date,Ticker,Action,Shares,Price,Cost Basis,PnL,Rationale,Confidence,Status,Reason\n")
         self.ensure_file(self.position_history_path, "date,ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl,cash\n")
@@ -95,15 +95,17 @@ class LIBBmodel:
         return {}
 
     def process_orders(self):
-        orders = self.pending_trades.get("orders", {})
+        orders = self.pending_trades.get("orders", [])
+        print("IN MEMORY:", self.pending_trades)
+        print("ON DISK:", self._load_json(self.pending_trades_path))
         if not orders:
             return
         for order in orders:
             self.portfolio, self.cash = process_order(order, self.portfolio, 
             self.cash, self.trade_log_path)
         # orders are overwritten later, but this is a safety check 
-        self.pending_trades = {}
-        self.save_orders("{}")
+        self.pending_trades = {"orders": []}
+        self.save_orders(self.pending_trades)
 
         return
     
