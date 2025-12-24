@@ -6,6 +6,8 @@ from .execution.process_order import  process_order
 from .metrics.sentiment_metrics import analyze_sentiment
 from shutil import rmtree
 
+#TODO: sentiment writing error. output: {}{....
+
 class LIBBmodel:
     def __init__(self, model_path, starting_cash = 10_000):
         self.STARTING_CASH = starting_cash
