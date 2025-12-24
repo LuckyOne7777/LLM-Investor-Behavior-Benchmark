@@ -189,4 +189,7 @@ class LIBBmodel:
         return
     
     def analyze_sentiment(self, text, report_type="Unknown"):
-        return analyze_sentiment(text, report_type=report_type)
+        log = analyze_sentiment(text, report_type=report_type)
+        with open(self.sentiment_path, "a") as file:
+            json.dump(log, file, indent=2)
+        return log
