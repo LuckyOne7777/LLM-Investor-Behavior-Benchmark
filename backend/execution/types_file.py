@@ -11,3 +11,11 @@ class Order(TypedDict):
     stop_loss: Optional[float]
     rationale: str
     confidence: float                       # 0-1
+
+class MarketDataObject(TypedDict):
+     Low: float
+     High: float
+     Close: float
+     Open: float
+     Volume: int
+     Ticker: str

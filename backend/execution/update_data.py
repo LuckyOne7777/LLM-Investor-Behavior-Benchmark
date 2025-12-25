@@ -1,18 +1,10 @@
 import pandas as pd 
 import yfinance as yf
-from typing import TypedDict
+from .types_file import MarketDataObject
 
 #TODO: ticker range fails on weekends
 #TODO: graceful error handling for ticker downloading
 #TODO: Add additional data sources
-
-class MarketDataObject(TypedDict):
-     Low: float
-     High: float
-     Close: float
-     Open: float
-     Volume: int
-     Ticker: str
 
 def get_market_data(ticker: str) -> MarketDataObject:
         yesterdays_market_date = pd.Timestamp.now().date()
