@@ -9,8 +9,11 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
     ticker = order["ticker"].upper()
     order_type = order["order_type"]
     shares = int(order["shares"])
-    limit_price = float(order["limit_price"])
-    stop_loss = order.get("stop_loss")
+    limit_price = order["limit_price"]
+    assert limit_price is not None
+    limit_price = float(limit_price)
+    stop_loss = order["stop_loss"]
+    assert stop_loss is not None
 
     ticker_data = get_market_data(ticker)
     low = ticker_data["Low"]
