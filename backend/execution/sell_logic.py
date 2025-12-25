@@ -3,7 +3,8 @@ from .io import append_log
 from .update_data import get_market_data
 from pathlib import Path
 import pandas as pd
-from .types_file import Order 
+from .types_file import Order
+from typing import cast 
 
 def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log: Path) -> tuple[pd.DataFrame, float]:
     ticker = order["ticker"].upper()
@@ -14,7 +15,7 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
     open_price = ticker_data["Open"]
 
     shares = int(order["shares"])
-    limit_price = float(order["limit_price"])
+    limit_price = float(cast(float, order["limit_price"]))
 
     if ticker not in portfolio_df["ticker"].values:
         append_log(trade_log, {
