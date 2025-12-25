@@ -162,7 +162,8 @@ class LIBBmodel:
              log.to_csv(self.portfolio_history_path, mode="a", header= not 
             self.portfolio_history_path.exists(), index=False)
         except Exception as e:
-            raise SystemError(f"Error saving to portfolio_history for {self.model_path}. {e}")
+            raise SystemError(f"""Error saving to portfolio_history for {self.model_path}. ({e}) 
+                              You may have called 'reset_run()' without calling 'ensure_file_system()' immediately after.""")
         return
     
     def process_portfolio(self) -> None:
