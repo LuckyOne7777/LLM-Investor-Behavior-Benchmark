@@ -61,16 +61,22 @@ class LIBBmodel:
         self.ensure_file(self.sentiment_path, "[]")
         return
     
-    def reset_run(self) -> None:
+    def reset_run(self, cli_check: bool= True) -> None:
+        if cli_check:
+            user_decision = None
+            while user_decision not in {"y", "n"}:
+                user_decision = input(f"Warning: reset_run() is about to delete all files and folders within {self.root}. Proceed? (y/n)")
+        if user_decision == "y":
+            if self.root in (Path("/"), Path("C:/")):
+                raise RuntimeError(f"Cannot delete root given: {self.root}")
 
-        if self.root in (Path("/"), Path("C:/")):
-            raise RuntimeError(f"Cannot delete root given: {self.root}")
-
-        for child in self.root.iterdir():
-            if child.is_dir():
-                rmtree(child)
-            else:
-                child.unlink()
+            for child in self.root.iterdir():
+                if child.is_dir():
+                    rmtree(child)
+                else:
+                    child.unlink()
+        else:
+            raise RuntimeError("Please remove reset_run call from your workflow.")
 
     def ensure_dir(self, path: Path) -> None:
             path.mkdir(parents=True, exist_ok=True)
