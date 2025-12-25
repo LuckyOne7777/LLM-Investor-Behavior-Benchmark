@@ -1,8 +1,10 @@
 from .portfolio_editing import reduce_position
 from .io import append_log
 from .update_data import get_market_data
+from pathlib import Path
+import pandas as pd 
 
-def process_sell(order, portfolio_df, cash, trade_log):
+def process_sell(order, portfolio_df, cash, trade_log: Path) -> tuple[pd.DataFrame, float]:
     ticker = order["ticker"].upper()
     order_type = order["order_type"]
     ticker_data = get_market_data(ticker)

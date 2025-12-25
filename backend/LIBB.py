@@ -6,44 +6,42 @@ from .execution.process_order import  process_order
 from .metrics.sentiment_metrics import analyze_sentiment
 from shutil import rmtree
 
-#TODO: sentiment writing error. output: {}{....
-
 class LIBBmodel:
-    def __init__(self, model_path, starting_cash = 10_000):
-        self.STARTING_CASH = starting_cash
-        self.root = Path(model_path)
-        self.model_path = model_path
+    def __init__(self, model_path: Path | str, starting_cash: float = 10_000):
+        self.STARTING_CASH: float = starting_cash
+        self.root: Path = Path(model_path)
+        self.model_path: str = str(model_path)
         # directories
-        self.portfolio_dir = self.root / "portfolio"
-        self.metrics_dir = self.root / "metrics"
-        self.research_dir = self.root / "research"
+        self.portfolio_dir: Path = self.root / "portfolio"
+        self.metrics_dir: Path = self.root / "metrics"
+        self.research_dir: Path = self.root / "research"
 
-        self.deep_research_file_folder_path = self.research_dir / "deep_research"
-        self.daily_reports_file_folder_path = self.research_dir / "daily_reports"
+        self.deep_research_file_folder_path: Path = self.research_dir / "deep_research"
+        self.daily_reports_file_folder_path: Path = self.research_dir / "daily_reports"
 
         # paths in portfolio
-        self.portfolio_history_path = self.portfolio_dir / "portfolio_history.csv"
-        self.pending_trades_path = self.portfolio_dir / "pending_trades.json"
-        self.portfolio_path = self.portfolio_dir / "portfolio.csv"
-        self.trade_log_path = self.portfolio_dir / "trade_log.csv"
-        self.position_history_path = self.portfolio_dir / "position_history.csv"
+        self.portfolio_history_path: Path = self.portfolio_dir / "portfolio_history.csv"
+        self.pending_trades_path: Path = self.portfolio_dir / "pending_trades.json"
+        self.portfolio_path: Path = self.portfolio_dir / "portfolio.csv"
+        self.trade_log_path: Path = self.portfolio_dir / "trade_log.csv"
+        self.position_history_path: Path = self.portfolio_dir / "position_history.csv"
 
         # paths in metrics
-        self.behavior_path = self.metrics_dir / "behavior.json"
-        self.performance_path = self.metrics_dir / "performance.json"
-        self.sentiment_path = self.metrics_dir / "sentiment.json"
+        self.behavior_path: Path = self.metrics_dir / "behavior.json"
+        self.performance_path: Path = self.metrics_dir / "performance.json"
+        self.sentiment_path: Path = self.metrics_dir / "sentiment.json"
 
-        self.portfolio = self._load_csv(self.portfolio_dir / "portfolio.csv")
-        self.cash = (float(self.portfolio["cash"].iloc[0]) 
+        self.portfolio: pd.DataFrame = self._load_csv(self.portfolio_dir / "portfolio.csv")
+        self.cash: float = (float(self.portfolio["cash"].iloc[0]) 
                      if not self.portfolio.empty else self.STARTING_CASH)
-        self.portfolio_history = self._load_csv(self.portfolio_dir / "portfolio_history.csv")
-        self.trade_log = self._load_csv(self.portfolio_dir / "trade_log.csv")
+        self.portfolio_history: pd.DataFrame = self._load_csv(self.portfolio_dir / "portfolio_history.csv")
+        self.trade_log: pd.DataFrame = self._load_csv(self.portfolio_dir / "trade_log.csv")
 
-        self.pending_trades = self._load_json(self.portfolio_dir / "pending_trades.json")
+        self.pending_trades: dict = self._load_json(self.portfolio_dir / "pending_trades.json")
 
-        self.performance = self._load_json(self.metrics_dir / "performance.json")
-        self.behavior = self._load_json(self.metrics_dir / "behavior.json")
-        self.sentiment = self._load_json(self.metrics_dir / "sentiment.json")
+        self.performance: dict = self._load_json(self.metrics_dir / "performance.json")
+        self.behavior: dict = self._load_json(self.metrics_dir / "behavior.json")
+        self.sentiment: dict = self._load_json(self.metrics_dir / "sentiment.json")
 
     def ensure_file_system(self):
         for dir in [self.root, self.portfolio_dir, self.metrics_dir, self.research_dir, self.daily_reports_file_folder_path, 
@@ -63,7 +61,7 @@ class LIBBmodel:
         self.ensure_file(self.sentiment_path, "[]")
         return
     
-    def reset_run(self):
+    def reset_run(self) -> None:
 
         if self.root in (Path("/"), Path("C:/")):
             raise RuntimeError(f"Cannot delete root given: {self.root}")
@@ -74,10 +72,10 @@ class LIBBmodel:
             else:
                 child.unlink()
 
-    def ensure_dir(self, path: Path):
+    def ensure_dir(self, path: Path) -> None:
             path.mkdir(parents=True, exist_ok=True)
 
-    def ensure_file(self, path: Path, default_content: str = ""):
+    def ensure_file(self, path: Path, default_content: str = "") -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
         if not path.exists():
             path.write_text(default_content, encoding="utf-8")
@@ -94,7 +92,7 @@ class LIBBmodel:
                 return json.load(f)
         return {}
 
-    def process_orders(self):
+    def process_orders(self) -> None:
         orders = self.pending_trades.get("orders", [])
         print("IN MEMORY:", self.pending_trades)
         print("ON DISK:", self._load_json(self.pending_trades_path))
@@ -109,14 +107,14 @@ class LIBBmodel:
 
         return
     
-    def append_position_history(self):
+    def append_position_history(self) -> None:
         portfolio_copy = self.portfolio.copy()
         portfolio_copy["date"] = pd.Timestamp.now().date()
         portfolio_copy.to_csv(self.position_history_path, mode="a", header= not 
             self.position_history_path.exists(), index=False)
         return
     
-    def append_portfolio_history(self, date: date | None = None):
+    def append_portfolio_history(self, date: date | None = None) -> None:
         defaults = {
             "ticker": "",
             "shares": 0,
@@ -155,12 +153,12 @@ class LIBBmodel:
             raise SystemError(f"Error saving to portfolio_history for {self.model_path}. {e}")
         return
     
-    def process_portfolio(self):
+    def process_portfolio(self) -> None:
         self.process_orders()
         self.append_portfolio_history()
         self.append_position_history()
 
-    def save_deep_research(self, txt: str):
+    def save_deep_research(self, txt: str) -> Path:
         deep_research_name = Path(f"deep_research - {pd.Timestamp.now().date()}.txt")
         full_path =  self.deep_research_file_folder_path / deep_research_name
         with open(full_path, "w") as file:
@@ -168,7 +166,7 @@ class LIBBmodel:
             file.close()
         return full_path
     
-    def save_daily_update(self, txt: str):
+    def save_daily_update(self, txt: str) -> Path:
         DAILY_UPDATES_FILE_NAME = Path(f"daily_update - {pd.Timestamp.now().date()}.txt")
         full_path = self.daily_reports_file_folder_path / DAILY_UPDATES_FILE_NAME
         with open(full_path, "w") as file:
@@ -176,14 +174,14 @@ class LIBBmodel:
             file.close()
         return full_path
     
-    def save_orders(self, json_block: str):
+    def save_orders(self, json_block: str) -> None:
         # override orders each day
         with open(self.pending_trades_path, "w") as file:
             json.dump(json_block, file, indent=2)
             file.close()
         return
 
-    def save_additonal_log(self, file_name, text, folder="additional_logs", append=False):
+    def save_additonal_log(self, file_name: str, text: str, folder: str="additional_logs", append: bool=False) -> None:
         path = Path(self.research_dir / folder / file_name)
         path.parent.mkdir(exist_ok=True, parents=True)
         mode = "w" if not append else "a"
@@ -192,7 +190,7 @@ class LIBBmodel:
             file.close()
         return
     
-    def analyze_sentiment(self, text, report_type="Unknown"):
+    def analyze_sentiment(self, text: str, report_type: str="Unknown"):
         log = analyze_sentiment(text, report_type=report_type)
         self.sentiment.append(log)
         with open(self.sentiment_path, "w") as file:

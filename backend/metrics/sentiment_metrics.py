@@ -1,7 +1,8 @@
 import pandas as pd
 from pysentiment2 import LM
+from pathlib import Path
 
-def file_to_text(path):
+def file_to_text(path: Path) -> str:
     text = ""
     try:
         with open(path, "r") as f:
@@ -11,13 +12,13 @@ def file_to_text(path):
         raise FileNotFoundError(f"Could not find file path for {path}")
     
     return text
-def get_score(text: str):
+def get_score(text: str) -> tuple[dict, list]:
     lm = LM()
-    tokens = lm.tokenize(text)
-    score = lm.get_score(tokens)
+    tokens: list = lm.tokenize(text)
+    score:  dict = lm.get_score(tokens)
     return score, tokens
 
-def evaluate_sentiment(score, tokens, report_type="Unknown"):
+def evaluate_sentiment(score: dict, tokens: list, report_type: str="Unknown") -> dict:
     word_count = max(len(tokens), 1)
 
     log = {
@@ -31,13 +32,9 @@ def evaluate_sentiment(score, tokens, report_type="Unknown"):
     }
     return log
 
-def analyze_sentiment(text, report_type="Unknown"):
+def analyze_sentiment(text: str, report_type: str="Unknown") -> dict:
     score, tokens = get_score(text)
     return evaluate_sentiment(score, tokens, report_type=report_type)
-
-
-
-
 
 def narrative_drift(weekly_summaries):
     """

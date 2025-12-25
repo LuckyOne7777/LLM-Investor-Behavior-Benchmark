@@ -69,7 +69,7 @@ def compute_sortino(returns: pd.Series, rf_annual: float = 0.045) -> tuple[float
 # 5. CAPM Beta, Alpha, R²
 # ============================================================
 
-def compute_capm(returns: pd.Series, market_returns: pd.Series, rf_daily: float):
+def compute_capm(returns: pd.Series, market_returns: pd.Series, rf_daily: float) -> tuple[float, float, float]:
     common = returns.index.intersection(market_returns.index)
     if len(common) < 2:
         return float("nan"), float("nan"), float("nan")
@@ -94,7 +94,7 @@ def total_performance_calculations(
     equity_series: pd.Series,
     market_returns: pd.Series,
     rf_daily: float
-):
+) -> dict:
     # ----- Risk & Return -----
     volatility = compute_volatility(returns)
     sharpe_period, sharpe_annual = compute_sharpe(returns)

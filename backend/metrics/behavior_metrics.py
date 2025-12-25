@@ -1,3 +1,5 @@
+import pandas as pd
+
 def risk_aversion(df_equity, df_trades):
     """
     Measures how often the model reduces risk after losses.
@@ -10,17 +12,16 @@ def risk_aversion(df_equity, df_trades):
     # TODO: implement
     return 0.0
 
-
-def loss_aversion(df_trades):
+def loss_aversion(trades_log: pd.DataFrame) -> None | float:
     """
     Computes loss aversion λ = avg loss magnitude / avg gain magnitude.
     Returns None if undefined.
     """
-    if df_trades.empty or "PnL" not in df_trades.columns:
+    if trades_log.empty or "PnL" not in trades_log.columns:
         return None
 
-    losses = df_trades[df_trades["PnL"] < 0]["PnL"]
-    gains = df_trades[df_trades["PnL"] > 0]["PnL"]
+    losses = trades_log[trades_log["PnL"] < 0]["PnL"]
+    gains = trades_log[trades_log["PnL"] > 0]["PnL"]
 
     if losses.empty or gains.empty:
         return None

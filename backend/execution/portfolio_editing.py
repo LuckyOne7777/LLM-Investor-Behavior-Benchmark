@@ -1,6 +1,6 @@
 import pandas as pd
 
-def add_or_update_position(df, ticker, shares, price, stop_loss):
+def add_or_update_position(df: pd.DataFrame, ticker: str, shares: int, price: float, stop_loss: float) -> pd.DataFrame:
     cost = shares * price
 
     if ticker in df["ticker"].values:
@@ -31,7 +31,7 @@ def add_or_update_position(df, ticker, shares, price, stop_loss):
 
     return df
 
-def reduce_position(df, ticker, shares):
+def reduce_position(df: pd.DataFrame, ticker: str, shares: int) -> tuple[pd.DataFrame, float]:
     idx = df.index[df["ticker"] == ticker][0]
     row = df.loc[idx]
 
@@ -46,7 +46,7 @@ def reduce_position(df, ticker, shares):
 
     return df, buy_price
 
-def update_stoploss(df, ticker, stop_loss) -> bool:
+def update_stoploss(df: pd.DataFrame, ticker: str, stop_loss: float) -> bool:
     if ticker not in df["ticker"].values:
         return False
 

@@ -1,12 +1,14 @@
 from .portfolio_editing import add_or_update_position
 from .io import append_log
 from .update_data import get_market_data
+import pandas as pd
+from .types_file import Order
+from pathlib import Path
 
-
-def process_buy(order, portfolio_df, cash, trade_log):
+def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log_path: Path) -> tuple[pd.DataFrame, float]:
     ticker = order["ticker"].upper()
     order_type = order["order_type"]
-    shares = float(order["shares"])
+    shares = int(order["shares"])
     limit_price = float(order["limit_price"])
     stop_loss = order.get("stop_loss")
 
@@ -18,7 +20,7 @@ def process_buy(order, portfolio_df, cash, trade_log):
     if order_type == "limit":
         # limit buy fails if price never trades at or below limit
         if low > limit_price:
-            append_log(trade_log, {
+            append_log(trade_log_path, {
                 "Date": order["date"],
                 "Ticker": ticker,
                 "Action": "BUY",
@@ -32,7 +34,7 @@ def process_buy(order, portfolio_df, cash, trade_log):
         cost = shares * fill_price
 
         if cost > cash:
-            append_log(trade_log, {
+            append_log(trade_log_path, {
                 "Date": order["date"],
                 "Ticker": ticker,
                 "Action": "BUY",
@@ -46,7 +48,7 @@ def process_buy(order, portfolio_df, cash, trade_log):
         )
         cash -= cost
 
-        append_log(trade_log, {
+        append_log(trade_log_path, {
             "Date": order["date"],
             "Ticker": ticker,
             "Action": "BUY",
@@ -61,7 +63,7 @@ def process_buy(order, portfolio_df, cash, trade_log):
         cost = shares * open_price
 
         if cost > cash:
-            append_log(trade_log, {
+            append_log(trade_log_path, {
                 "Date": order["date"],
                 "Ticker": ticker,
                 "Action": "BUY",
@@ -75,7 +77,7 @@ def process_buy(order, portfolio_df, cash, trade_log):
         )
         cash -= cost
 
-        append_log(trade_log, {
+        append_log(trade_log_path, {
             "Date": order["date"],
             "Ticker": ticker,
             "Action": "BUY",
