@@ -12,7 +12,7 @@ def process_sell(order, portfolio_df, cash, trade_log: Path) -> tuple[pd.DataFra
     high = ticker_data["High"]
     open_price = ticker_data["Open"]
 
-    shares = float(order["shares"])
+    shares = int(order["shares"])
     limit_price = float(order["limit_price"])
 
     if ticker not in portfolio_df["ticker"].values:
