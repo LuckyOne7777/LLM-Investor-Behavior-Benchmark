@@ -11,7 +11,6 @@ class LIBBmodel:
         self.STARTING_CASH: float = starting_cash
         self.root: Path = Path(model_path)
         self.model_path: str = str(model_path)
-        self.ensure_file_system()
         # directories
         self.portfolio_dir: Path = self.root / "portfolio"
         self.metrics_dir: Path = self.root / "metrics"
@@ -44,6 +43,8 @@ class LIBBmodel:
         self.behavior: dict = self._load_json(self.metrics_dir / "behavior.json")
         self.sentiment: dict = self._load_json(self.metrics_dir / "sentiment.json")
 
+        self.ensure_file_system()
+
     def ensure_file_system(self):
         for dir in [self.root, self.portfolio_dir, self.metrics_dir, self.research_dir, self.daily_reports_file_folder_path, 
                     self. deep_research_file_folder_path]:
@@ -67,17 +68,16 @@ class LIBBmodel:
             user_decision = None
             while user_decision not in {"y", "n"}:
                 user_decision = input(f"Warning: reset_run() is about to delete all files and folders within {self.root}. Proceed? (y/n)")
-        if user_decision == "y":
-            if self.root in (Path("/"), Path("C:/")):
-                raise RuntimeError(f"Cannot delete root given: {self.root}")
-
-            for child in self.root.iterdir():
-                if child.is_dir():
-                    rmtree(child)
-                else:
-                    child.unlink()
-        else:
-            raise RuntimeError("Please remove reset_run call from your workflow.")
+            if user_decision == "n":
+                raise RuntimeError("Please remove reset_run call from your workflow.")
+        if self.root in (Path("/"), Path("C:/")):
+                    raise RuntimeError(f"Cannot delete root given: {self.root}")
+        for child in self.root.iterdir():
+            if child.is_dir():
+                rmtree(child)
+            else:
+                child.unlink()
+        return
 
     def ensure_dir(self, path: Path) -> None:
             path.mkdir(parents=True, exist_ok=True)
