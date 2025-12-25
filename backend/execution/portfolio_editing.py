@@ -1,13 +1,18 @@
 import pandas as pd
+from typing import cast
 
 def add_or_update_position(df: pd.DataFrame, ticker: str, shares: int, price: float, stop_loss: float) -> pd.DataFrame:
     cost = shares * price
 
     if ticker in df["ticker"].values:
         idx = df.index[df["ticker"] == ticker][0]
+        old_shares = df.loc[idx, "shares"]
+        if pd.isna(old_shares):
+            raise TypeError(f"Old shares for {ticker} is missing.")
+        old_shares = float(cast(float, old_shares))
 
-        old_shares = float(df.loc[idx, "shares"])
-        old_cost = float(df.loc[idx, "cost_basis"])
+        old_cost = df.loc[idx, "cost_basis"]
+        old_cost = float(cast(float, old_cost))
 
         new_shares = old_shares + shares
         new_cost = old_cost + cost
@@ -27,7 +32,7 @@ def add_or_update_position(df: pd.DataFrame, ticker: str, shares: int, price: fl
         if not df.empty:
             df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
         else:
-            df = new_row
+            df = pd.DataFrame(new_row)
 
     return df
 
@@ -46,9 +51,11 @@ def reduce_position(df: pd.DataFrame, ticker: str, shares: int) -> tuple[pd.Data
 
     return df, buy_price
 
+
+
 def update_stoploss(df: pd.DataFrame, ticker: str, stop_loss: float) -> bool:
     if ticker not in df["ticker"].values:
         return False
-
-    df.loc[df["ticker"] == ticker, "stop_loss"] = float(stop_loss)
-    return True
+    else:
+        df.loc[df["ticker"] == ticker, "stop_loss"] = float(stop_loss)
+        return True
