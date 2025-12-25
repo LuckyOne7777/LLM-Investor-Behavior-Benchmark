@@ -94,17 +94,22 @@ class LIBBmodel:
 
     def process_orders(self) -> None:
         orders = self.pending_trades.get("orders", [])
-        print("IN MEMORY:", self.pending_trades)
-        print("ON DISK:", self._load_json(self.pending_trades_path))
+        unexecuted_trades = {"orders": []}
         if not orders:
             return
         for order in orders:
-            self.portfolio, self.cash = process_order(order, self.portfolio, 
-            self.cash, self.trade_log_path)
-        # orders are overwritten later, but this is a safety check 
-        self.pending_trades = {"orders": []}
+            order_date = pd.Timestamp(order["date"]).date()
+            if order_date == pd.Timestamp.now().date():
+                self.portfolio, self.cash = process_order(order, self.portfolio, 
+                self.cash, self.trade_log_path)
+            else:
+                unexecuted_trades["orders"].append(order)
+        # keep any unexecuted trades, completely reset otherwise
+        if not unexecuted_trades["orders"]:
+            self.pending_trades = {"orders": []}
+        else:
+            self.pending_trades = unexecuted_trades
         self.save_orders(self.pending_trades)
-
         return
     
     def append_position_history(self) -> None:
