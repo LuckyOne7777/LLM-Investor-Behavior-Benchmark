@@ -11,6 +11,7 @@ class LIBBmodel:
         self.STARTING_CASH: float = starting_cash
         self.root: Path = Path(model_path)
         self.model_path: str = str(model_path)
+        self.ensure_file_system()
         # directories
         self.portfolio_dir: Path = self.root / "portfolio"
         self.metrics_dir: Path = self.root / "metrics"

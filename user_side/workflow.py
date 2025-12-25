@@ -24,7 +24,6 @@ def daily_flow():
     for model in MODELS:
         libb = LIBBmodel(f"runs/run_v1/{model}")
         libb.reset_run()
-        libb.ensure_file_system()
         libb.process_portfolio()
         report = prompt_daily_report(libb)
         libb.analyze_sentiment(report)
