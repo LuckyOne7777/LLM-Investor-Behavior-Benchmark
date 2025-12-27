@@ -4,6 +4,7 @@ import json
 from datetime import date
 from .execution.process_order import  process_order
 from .metrics.sentiment_metrics import analyze_sentiment
+from .execution.update_data import update_market_value_column
 from shutil import rmtree
 
 class LIBBmodel:
@@ -166,9 +167,13 @@ class LIBBmodel:
             raise SystemError(f"""Error saving to portfolio_history for {self.model_path}. ({e}) 
                               You may have called 'reset_run()' without calling 'ensure_file_system()' immediately after.""")
         return
+    def update_portfolio_market_data(self) -> None:
+        update_market_value_column(self.portfolio, self.cash)
+        return
     
     def process_portfolio(self) -> None:
         self.process_orders()
+        self.update_portfolio_market_data()
         self.append_portfolio_history()
         self.append_position_history()
 
