@@ -124,6 +124,8 @@ class LIBBmodel:
     def append_position_history(self) -> None:
         portfolio_copy = self.portfolio.copy()
         portfolio_copy["date"] = pd.Timestamp.now().date()
+        portfolio_copy["avg_cost"] = portfolio_copy["cost_basis"] / portfolio_copy["shares"]
+        portfolio_copy.drop(columns=["buy_price", "cost_basis"], inplace=True)
         portfolio_copy.to_csv(self.position_history_path, mode="a", header= not 
             self.position_history_path.exists(), index=False)
         return
