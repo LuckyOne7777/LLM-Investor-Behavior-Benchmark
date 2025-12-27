@@ -53,7 +53,8 @@ class LIBBmodel:
         # portfolio files
         self.ensure_file(self.portfolio_history_path, "date,equity,cash,positions_value,return_pct\n")
         self.ensure_file(self.pending_trades_path, '{"orders": []}')
-        self.ensure_file(self.portfolio_path, "ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl,cash\n")
+        self.ensure_file(self.portfolio_path, "ticker,shares,buy_price,cost_basis,stop_loss,market_price,market_value,unrealized_pnl,cash\n")
+        #TODO: make remove capital letters for columns
         self.ensure_file(self.trade_log_path, "Date,Ticker,Action,Shares,Price,Cost Basis,PnL,Rationale,Confidence,Status,Reason\n")
         self.ensure_file(self.position_history_path, "date,ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl,cash\n")
 
@@ -67,7 +68,7 @@ class LIBBmodel:
         if cli_check:
             user_decision = None
             while user_decision not in {"y", "n"}:
-                user_decision = input(f"Warning: reset_run() is about to delete all files and folders within {self.root}. Proceed? (y/n)")
+                user_decision = input(f"Warning: reset_run() is about to delete all files and folders within {self.root}. Proceed? (y/n) ")
             if user_decision == "n":
                 raise RuntimeError("Please remove reset_run call from your workflow.")
         if self.root in (Path("/"), Path("C:/")):

@@ -9,6 +9,9 @@ def weekly_flow():
 
     for model in MODELS:
         libb = LIBBmodel(f"runs/run_v1/{model}")
+        libb.reset_run()
+        libb.ensure_file_system()
+        """
         libb.process_portfolio()
         report = prompt_deep_research(libb)
         libb.analyze_sentiment(report)
@@ -17,6 +20,7 @@ def weekly_flow():
 
         deep_research_path = libb.save_deep_research(report)
         libb.save_orders(orders_json)
+        """
 
     return
 
