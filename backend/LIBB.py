@@ -166,9 +166,6 @@ class LIBBmodel:
             raise SystemError(f"""Error saving to portfolio_history for {self.model_path}. ({e}) 
                               You may have called 'reset_run()' without calling 'ensure_file_system()' immediately after.""")
         return
-    def update_market_values(self) -> None:
-        tickers = self.portfolio["ticker"]
-        for ticker in tickers
     
     def process_portfolio(self) -> None:
         self.process_orders()
