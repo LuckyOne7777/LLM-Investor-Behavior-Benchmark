@@ -32,7 +32,7 @@ def add_or_update_position(df: pd.DataFrame, ticker: str, shares: int, price: fl
         if not df.empty:
             df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
         else:
-            df = pd.DataFrame(new_row)
+            df = pd.DataFrame([new_row])
 
     return df
 
