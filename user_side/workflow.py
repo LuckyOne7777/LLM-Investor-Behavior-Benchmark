@@ -8,39 +8,31 @@ MODELS = ["deepseek", "gpt-4.1"]
 def weekly_flow():
 
     for model in MODELS:
-        libb = LIBBmodel(f"runs/run_v1/{model}", date=today)
-        libb.reset_run()
-        libb.ensure_file_system()
-        """
+        libb = LIBBmodel(f"runs/run_v1/{model}")
         libb.process_portfolio()
         report = prompt_deep_research(libb)
         libb.analyze_sentiment(report)
 
         orders_json = parse_json(report, "ORDERS_JSON")
 
-        deep_research_path = libb.save_deep_research(report)
+        libb.save_deep_research(report)
         libb.save_orders(orders_json)
-        """
     return
 
 def daily_flow():
     for model in MODELS:
-        libb = LIBBmodel(f"runs/run_v1/{model}", date=today)
-        libb.reset_run()
-        libb.ensure_file_system()
-        """
+        libb = LIBBmodel(f"runs/run_v1/{model}")
         libb.process_portfolio()
         report = prompt_daily_report(libb)
         libb.analyze_sentiment(report)
 
         orders_json = parse_json(report, "ORDERS_JSON")
 
-        daily_path = libb.save_daily_update(report)
+        libb.save_daily_update(report)
         libb.save_orders(orders_json)
-        """
     return
 
-today = pd.Timestamp("2025-12-25").date()
+today = pd.Timestamp.now().date()
 day_num = today.weekday()
 
 if day_num  == 4: # Friday
