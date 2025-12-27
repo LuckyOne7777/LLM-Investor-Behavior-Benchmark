@@ -6,9 +6,10 @@ from .execution.process_order import  process_order
 from .metrics.sentiment_metrics import analyze_sentiment
 from .execution.update_data import update_market_value_column
 from shutil import rmtree
+from datetime import datetime
 
 class LIBBmodel:
-    def __init__(self, model_path: Path | str, starting_cash: float = 10_000):
+    def __init__(self, model_path: Path | str, starting_cash: float = 10_000, date: str | date = pd.Timestamp.now().date()):
         self.STARTING_CASH: float = starting_cash
         self.root: Path = Path(model_path)
         self.model_path: str = str(model_path)
