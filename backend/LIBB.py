@@ -4,7 +4,7 @@ import json
 from datetime import date
 from .execution.process_order import  process_order
 from .metrics.sentiment_metrics import analyze_sentiment
-from .execution.update_data import update_market_value_column
+from .execution.update_data import update_market_value_columns
 from shutil import rmtree
 from datetime import date
 
@@ -14,6 +14,7 @@ class LIBBmodel:
             date = pd.Timestamp.now().date()
         else:
             date = pd.Timestamp(date).date()
+
         self.STARTING_CASH: float = starting_cash
         self.root: Path = Path(model_path)
         self.model_path: str = str(model_path)
@@ -50,7 +51,6 @@ class LIBBmodel:
         self.behavior: dict = self._load_json(self.metrics_dir / "behavior.json")
         self.sentiment: dict = self._load_json(self.metrics_dir / "sentiment.json")
 
-        self.ensure_file_system()
 
     def ensure_file_system(self):
         for dir in [self.root, self.portfolio_dir, self.metrics_dir, self.research_dir, self.daily_reports_file_folder_path, 
@@ -174,7 +174,8 @@ class LIBBmodel:
                               You may have called 'reset_run()' without calling 'ensure_file_system()' immediately after.""")
         return
     def update_portfolio_market_data(self) -> None:
-        update_market_value_column(self.portfolio, self.cash)
+        self.portfolio = update_market_value_columns(self.portfolio, self.cash)
+        self.portfolio.to_csv(self.portfolio_path, index=False)
         return
     
     def process_portfolio(self) -> None:
@@ -216,7 +217,7 @@ class LIBBmodel:
         return
     
     def analyze_sentiment(self, text: str, report_type: str="Unknown"):
-        log = analyze_sentiment(text, report_type=report_type)
+        log = analyze_sentiment(text, self.date, report_type=report_type)
         self.sentiment.append(log)
         with open(self.sentiment_path, "w") as file:
             json.dump(self.sentiment, file, indent=2)

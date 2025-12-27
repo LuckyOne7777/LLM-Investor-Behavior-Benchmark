@@ -7,20 +7,20 @@ from pathlib import Path
 
 def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log_path: Path) -> tuple[pd.DataFrame, float]:
     ticker = order["ticker"].upper()
+    date = order["date"]
     order_type = order["order_type"]
     shares = int(order["shares"])
     limit_price = order["limit_price"]
-    assert limit_price is not None
-    limit_price = float(limit_price)
     stop_loss = order["stop_loss"]
-    assert stop_loss is not None
 
-    ticker_data = get_market_data(ticker)
+    ticker_data = get_market_data(ticker, date)
     low = ticker_data["Low"]
     open_price = ticker_data["Open"]
 
     # ---------- LIMIT BUY ----------
     if order_type == "limit":
+        assert limit_price is not None
+        limit_price = float(limit_price)
         # limit buy fails if price never trades at or below limit
         if low > limit_price:
             append_log(trade_log_path, {
