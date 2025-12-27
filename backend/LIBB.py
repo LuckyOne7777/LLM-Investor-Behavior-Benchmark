@@ -6,13 +6,14 @@ from .execution.process_order import  process_order
 from .metrics.sentiment_metrics import analyze_sentiment
 from .execution.update_data import update_market_value_column
 from shutil import rmtree
-from datetime import datetime
+from datetime import date
 
 class LIBBmodel:
     def __init__(self, model_path: Path | str, starting_cash: float = 10_000, date: str | date = pd.Timestamp.now().date()):
         self.STARTING_CASH: float = starting_cash
         self.root: Path = Path(model_path)
         self.model_path: str = str(model_path)
+        self.date = pd.Timestamp(date).date()
         # directories
         self.portfolio_dir: Path = self.root / "portfolio"
         self.metrics_dir: Path = self.root / "metrics"
