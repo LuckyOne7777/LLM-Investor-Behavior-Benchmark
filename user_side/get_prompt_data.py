@@ -3,6 +3,7 @@ import datetime
 from pathlib import Path
 import pandas as pd
 from backend.LIBB import LIBBmodel
+from datetime import datetime, timedelta
 
 def truncate(text: str, limit: int):
     text = text.strip()
@@ -53,9 +54,12 @@ def get_portfolio_news(portfolio, n: int = 2, summary_limit: int = 150):
 
 
 
-def recent_execution_logs(trade_log_path: str, look_back: int = 5):
-    TODAY = pd.Timestamp.now().date()
-    time_range = TODAY - datetime.timedelta(days=look_back)
+def recent_execution_logs(trade_log_path: str, date: None | str | datetime = None, look_back: int = 5):
+    if date is None:
+        TODAY = pd.Timestamp.now().date()
+    else:
+        TODAY = pd.Timestamp(date).date() 
+    time_range = TODAY - timedelta(days=look_back)
     trade_log = pd.read_csv(trade_log_path)
     trade_log["Date"] = pd.to_datetime(trade_log["Date"]).dt.date
     if trade_log[trade_log["Date"] >= time_range].empty:

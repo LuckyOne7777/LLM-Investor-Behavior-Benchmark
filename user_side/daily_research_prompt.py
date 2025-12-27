@@ -4,7 +4,7 @@ import pandas as pd
 def create_daily_prompt(libb):
    portfolio = libb.portfolio
    starting_cash = libb.STARTING_CASH
-   today = pd.Timestamp.now().date()
+   today = libb.date
    news = get_prompt_data.get_macro_news()
    if portfolio.empty:
       portfolio = f"You have 0 active positions, create your portfolio. The starting cash is {starting_cash}. You must make at least 1 trade."

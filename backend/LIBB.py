@@ -9,11 +9,15 @@ from shutil import rmtree
 from datetime import date
 
 class LIBBmodel:
-    def __init__(self, model_path: Path | str, starting_cash: float = 10_000, date: str | date = pd.Timestamp.now().date()):
+    def __init__(self, model_path: Path | str, starting_cash: float = 10_000, date: str | date | None = None):
+        if date is None:
+            date = pd.Timestamp.now().date()
+        else:
+            date = pd.Timestamp(date).date()
         self.STARTING_CASH: float = starting_cash
         self.root: Path = Path(model_path)
         self.model_path: str = str(model_path)
-        self.date = pd.Timestamp(date).date()
+        self.date = date
         # directories
         self.portfolio_dir: Path = self.root / "portfolio"
         self.metrics_dir: Path = self.root / "metrics"
@@ -110,7 +114,7 @@ class LIBBmodel:
             return
         for order in orders:
             order_date = pd.Timestamp(order["date"]).date()
-            if order_date == pd.Timestamp.now().date():
+            if order_date == self.date:
                 self.portfolio, self.cash = process_order(order, self.portfolio, 
                 self.cash, self.trade_log_path)
             else:
@@ -125,14 +129,14 @@ class LIBBmodel:
     
     def append_position_history(self) -> None:
         portfolio_copy = self.portfolio.copy()
-        portfolio_copy["date"] = pd.Timestamp.now().date()
+        portfolio_copy["date"] = self.date
         portfolio_copy["avg_cost"] = portfolio_copy["cost_basis"] / portfolio_copy["shares"]
         portfolio_copy.drop(columns=["buy_price", "cost_basis"], inplace=True)
         portfolio_copy.to_csv(self.position_history_path, mode="a", header= not 
             self.position_history_path.exists(), index=False)
         return
     
-    def append_portfolio_history(self, date: date | None = None) -> None:
+    def append_portfolio_history(self) -> None:
         defaults = {
             "ticker": "",
             "shares": 0,
@@ -145,8 +149,6 @@ class LIBBmodel:
             if col not in self.portfolio.columns:
                 self.portfolio[col] = default
 
-        if date is None:
-            date = pd.Timestamp.now().date()
         if "market_value" not in self.portfolio.columns and not self.portfolio.empty:
             raise RuntimeError("market_value not computed before portfolio history update")
         market_equity = self.portfolio["market_value"].sum()
@@ -158,7 +160,7 @@ class LIBBmodel:
             last_total_equity = self.portfolio_history["equity"].iloc[-1]
             return_pct = (present_total_equity / last_total_equity) - 1
         log = pd.DataFrame([{
-        "date": date,
+        "date": self.date,
         "cash": self.cash,
         "equity": present_total_equity,
         "return_pct": return_pct,
@@ -182,7 +184,7 @@ class LIBBmodel:
         self.append_position_history()
 
     def save_deep_research(self, txt: str) -> Path:
-        deep_research_name = Path(f"deep_research - {pd.Timestamp.now().date()}.txt")
+        deep_research_name = Path(f"deep_research - {self.date}.txt")
         full_path =  self.deep_research_file_folder_path / deep_research_name
         with open(full_path, "w") as file:
             file.write(txt)
@@ -190,7 +192,7 @@ class LIBBmodel:
         return full_path
     
     def save_daily_update(self, txt: str) -> Path:
-        DAILY_UPDATES_FILE_NAME = Path(f"daily_update - {pd.Timestamp.now().date()}.txt")
+        DAILY_UPDATES_FILE_NAME = Path(f"daily_update - {self.date}.txt")
         full_path = self.daily_reports_file_folder_path / DAILY_UPDATES_FILE_NAME
         with open(full_path, "w") as file:
             file.write(txt)

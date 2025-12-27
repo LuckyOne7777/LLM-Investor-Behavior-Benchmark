@@ -1,6 +1,7 @@
 import pandas as pd
 from pysentiment2 import LM
 from pathlib import Path
+from datetime import date
 
 def file_to_text(path: Path) -> str:
     text = ""
@@ -18,7 +19,7 @@ def get_score(text: str) -> tuple[dict, list]:
     score:  dict = lm.get_score(tokens)
     return score, tokens
 
-def evaluate_sentiment(score: dict, tokens: list, report_type: str="Unknown") -> dict:
+def evaluate_sentiment(score: dict, tokens: list, date: date, report_type: str="Unknown") -> dict:
     word_count = max(len(tokens), 1)
 
     log = {
@@ -28,13 +29,13 @@ def evaluate_sentiment(score: dict, tokens: list, report_type: str="Unknown") ->
         "negative_count": int(score['Negative']),
         "token_count": int(word_count),
         "report_type": report_type,
-        "date": str(pd.Timestamp.now().date()),
+        "date": str(date),
     }
     return log
 
-def analyze_sentiment(text: str, report_type: str="Unknown") -> dict:
+def analyze_sentiment(text: str, date: date, report_type: str="Unknown") -> dict:
     score, tokens = get_score(text)
-    return evaluate_sentiment(score, tokens, report_type=report_type)
+    return evaluate_sentiment(score, tokens, date, report_type=report_type)
 
 def narrative_drift(weekly_summaries):
     """

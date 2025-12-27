@@ -1,7 +1,6 @@
 from .get_prompt_data import get_portfolio_news, recent_execution_logs, get_macro_news
-import pandas as pd
 def create_deep_research_prompt(libb):
-  today = pd.Timestamp.now().date()
+  today = libb.date
   portfolio = libb.portfolio
   starting_cash = libb.STARTING_CASH
   if portfolio.empty:

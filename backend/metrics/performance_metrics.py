@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import json
-from pysentiment2 import LM
+from datetime import date
 
 
 # ============================================================
@@ -93,7 +93,8 @@ def total_performance_calculations(
     returns: pd.Series,
     equity_series: pd.Series,
     market_returns: pd.Series,
-    rf_daily: float
+    rf_daily: float,
+    date  | str: = pd.Timestamp.now().date() 
 ) -> dict:
     # ----- Risk & Return -----
     volatility = compute_volatility(returns)

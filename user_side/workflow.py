@@ -1,14 +1,14 @@
 from backend.LIBB import LIBBmodel
 from .prompt_models import prompt_daily_report, prompt_deep_research
 from .parse import parse_json
-from datetime import date
+import pandas as pd
 
 MODELS = ["deepseek", "gpt-4.1"]
 
 def weekly_flow():
 
     for model in MODELS:
-        libb = LIBBmodel(f"runs/run_v1/{model}")
+        libb = LIBBmodel(f"runs/run_v1/{model}", date=today)
         libb.reset_run()
         libb.ensure_file_system()
         """
@@ -21,13 +21,14 @@ def weekly_flow():
         deep_research_path = libb.save_deep_research(report)
         libb.save_orders(orders_json)
         """
-
     return
 
 def daily_flow():
     for model in MODELS:
-        libb = LIBBmodel(f"runs/run_v1/{model}")
+        libb = LIBBmodel(f"runs/run_v1/{model}", date=today)
         libb.reset_run()
+        libb.ensure_file_system()
+        """
         libb.process_portfolio()
         report = prompt_daily_report(libb)
         libb.analyze_sentiment(report)
@@ -36,9 +37,10 @@ def daily_flow():
 
         daily_path = libb.save_daily_update(report)
         libb.save_orders(orders_json)
+        """
     return
 
-today = date.today()
+today = pd.Timestamp("2025-12-25").date()
 day_num = today.weekday()
 
 if day_num  == 4: # Friday
