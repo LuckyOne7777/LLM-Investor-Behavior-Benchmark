@@ -27,16 +27,19 @@ def get_market_data(ticker: str) -> MarketDataObject:
         }
         return data
 
-def update_market_value_column(portfolio: pd.DataFrame) -> pd.DataFrame:
+def update_market_value_column(portfolio: pd.DataFrame, cash: float) -> pd.DataFrame:
     portfolio = portfolio.copy()
 
     for i, row in portfolio.iterrows():
         ticker = row["ticker"]
         shares = row["shares"]
+        cost_basis = portfolio.at[i, "cost_basis"]
 
         ticker_data = get_market_data(ticker)
         close_price = ticker_data["Close"]
         portfolio.at[i, "market_price"] = close_price
         portfolio.at[i, "market_value"] = close_price * shares
+        portfolio.at[i, "unrealized_pnl"] = portfolio.at[i, "market_value"] - cost_basis
+        portfolio.at[i, "cash"] = cash
 
     return portfolio
