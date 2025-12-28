@@ -51,11 +51,11 @@ jobs:
           EOF
 
 
-      - name: Run Workflow File
+      - name: Run Workflow Module
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-        run: python backend/workflow.py
+        run: python -m user_side.workflow
 
       - name: Commit and push changes
         if: ${{ success() }}
