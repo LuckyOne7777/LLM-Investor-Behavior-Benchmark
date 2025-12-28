@@ -3,7 +3,7 @@
 The following notes outline current constraints and assumptions that
 users should be aware of when working with LIBB.
 
-*Please note that these are constraints of the current design and may be addressed by feature updates.*
+*Please note that these are constraints of the current design of Version 1 and will likely addressed in updates.*
 
 ---
 
