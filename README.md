@@ -50,3 +50,21 @@ For each run, the framework:
 Execution scheduling (e.g., daily vs. weekly runs) and model orchestration
 are intentionally left to the user, preserving flexibility while
 maintaining a consistent on-disk state.
+
+## Research Directions
+
+LIBB is an exploratory research framework, and its development is driven
+by ongoing questions rather than a fixed roadmap.
+
+Areas of current interest include:
+
+- Deeper integration of performance analytics into the core workflow
+- Behavioral analysis derived from trading decisions and execution patterns
+- Expansion of sentiment analytics across multiple data sources
+- Improved tooling for comparing runs and strategies over time
+- General design improvements for efficiency and code quality
+
+To see the current roadmap for major features, check out: roadmap.md
+
+These directions reflect current research interests and may evolve,
+change, or be abandoned as the project develops.
