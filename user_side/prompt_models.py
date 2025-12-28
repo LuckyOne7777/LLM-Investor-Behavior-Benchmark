@@ -32,7 +32,7 @@ def prompt_deep_research(libb):
         raise RuntimeError(f"Unidentified model: {model}")
 
 def prompt_daily_report(libb):
-    model = libb.model_path.replace("runs/run_v1/", "")
+    model = libb.model_path.replace("user_side/runs/run_v1/", "")
     text = create_daily_prompt(libb)
     if model == "deepseek":
         return prompt_deepseek(text)
