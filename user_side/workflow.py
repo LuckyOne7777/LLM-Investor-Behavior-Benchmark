@@ -10,25 +10,25 @@ def weekly_flow():
     for model in MODELS:
         libb = LIBBmodel(f"user_side/runs/run_v1/{model}")
         libb.process_portfolio()
-        report = prompt_deep_research(libb)
-        libb.analyze_sentiment(report)
+        deep_research_report = prompt_deep_research(libb)
+        libb.save_deep_research(deep_research_report)
 
-        orders_json = parse_json(report, "ORDERS_JSON")
+        orders_json = parse_json(deep_research_report, "ORDERS_JSON")
 
-        libb.save_deep_research(report)
         libb.save_orders(orders_json)
+        libb.analyze_sentiment(deep_research_report)
     return
 
 def daily_flow():
     for model in MODELS:
         libb = LIBBmodel(f"user_side/runs/run_v1/{model}")
         libb.process_portfolio()
-        report = prompt_daily_report(libb)
-        libb.analyze_sentiment(report)
+        daily_report = prompt_daily_report(libb)
+        libb.analyze_sentiment(daily_report)
+        libb.save_daily_update(daily_report)
 
-        orders_json = parse_json(report, "ORDERS_JSON")
+        orders_json = parse_json(daily_report, "ORDERS_JSON")
 
-        libb.save_daily_update(report)
         libb.save_orders(orders_json)
     return
 
