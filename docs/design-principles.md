@@ -9,6 +9,11 @@ This direction is not intended to be final. Alternative
 approaches, abstractions, or philosophies may be explored as the project
 evolves, and differing perspectives are welcome.
 
+Some of these choices emerged organically during development rather than
+from a fixed plan, but they reflect a direction the project intentionally
+continues to support.
+
+
 If you disagree with any of these choices or have a strong alternative
 idea, feel free to reach out. Anyone interested enough to read the design
 philosophy deserves to have their perspective heard.
