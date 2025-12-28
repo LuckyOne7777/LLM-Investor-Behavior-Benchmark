@@ -1,6 +1,6 @@
-from LIBB.LIBB import LIBBmodel
+from libb.model import LIBBmodel
 from .prompt_models import prompt_daily_report, prompt_deep_research
-from LIBB.other.parse import parse_json
+from libb.other.parse import parse_json
 import pandas as pd
 
 MODELS = ["deepseek", "gpt-4.1"]
