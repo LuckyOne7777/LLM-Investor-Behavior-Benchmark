@@ -10,7 +10,7 @@ This project originally began as a generic benchmark for LLM-based trading in U.
 
 This raised a fundamental question: ***“Why isn’t LLM trading held to the same analytical standards as the rest of finance?”***
 
-Since then, the project has evolved into a high-quality, easy-to-use research framework designed to support more rigorous evaluation of LLM-driven trading systems. The long-term goal is to provide a shared foundation for this work and, ultimately, to establish a community standard for this type of research.
+Since then, the project has evolved into a high-quality, easy-to-use research framework designed to support rigorous evaluation of LLM-driven trading systems. The long-term goal is to provide a shared foundation for this work and, ultimately, to establish a community standard for this type of research.
 
 ## Features
 
