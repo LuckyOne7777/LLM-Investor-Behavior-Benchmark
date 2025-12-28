@@ -2,7 +2,7 @@ import yfinance as yf
 import datetime
 from pathlib import Path
 import pandas as pd
-from backend.LIBB import LIBBmodel
+from LIBB.LIBB import LIBBmodel
 from datetime import datetime, timedelta
 
 def truncate(text: str, limit: int):
