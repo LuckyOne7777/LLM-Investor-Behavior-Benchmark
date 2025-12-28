@@ -51,6 +51,97 @@ Execution scheduling (e.g., daily vs. weekly runs) and model orchestration
 are intentionally left to the user, preserving flexibility while
 maintaining a consistent on-disk state.
 
+## 
+# Getting Started (Commands)
+
+This guide lists the minimum commands required to install and run LIBB.
+No additional setup steps are required.
+
+---
+```bash
+## 1. Clone the Repository
+
+git clone https://github.com/<your-username>/LIBB.git
+cd LIBB
+```
+
+---
+
+## 2. Create a Virtual Environment (Recommended)
+
+### Windows
+
+```bash
+python -m venv .venv
+```
+
+### macOS / Linux
+
+```bash
+python3 -m venv .venv
+```
+
+---
+
+## 3. Activate the Virtual Environment
+
+### Windows
+```bash
+.venv\Scripts\activate
+```
+
+### macOS / Linux
+```bash
+source .venv/bin/activate
+```
+---
+
+## 4. Install Requirements.txt
+
+```bash
+pip install -r requirements.txt
+```
+
+## 5. Install LIBB (Editable Mode)
+
+```bash
+pip install -e .
+```
+
+---
+
+## 6. Verify Installation
+
+```bash
+python -c "import libb; print(libb.file)"
+```
+---
+
+## 7. Run an Example Workflow
+
+```bash
+python user_side/workflow.py
+```
+
+---
+
+## What Gets Created Automatically
+
+- Run directory structure
+- Portfolio files
+- Metrics files
+- Research and report artifacts
+
+No manual file setup is required.
+
+---
+
+## Next Steps
+
+- See `workflow.md` for execution flow
+- See `accessing-state.md` for using model state
+- Read `important-notes.md` before assembling custom workflow
+  
 ## Research Directions
 
 LIBB is an exploratory research framework, and its development is driven
