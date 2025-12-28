@@ -14,8 +14,6 @@ Since then, the project has evolved into a high-quality, easy-to-use research fr
 
 ## Features
 
-## Features
-
 - **Persistent portfolio state**  
   All portfolio data is explicitly stored on disk, enabling inspection,
   reproducibility, and post-hoc analysis across runs.
@@ -37,3 +35,18 @@ Since then, the project has evolved into a high-quality, easy-to-use research fr
   to integrate custom strategies, models, or data sources.
 
 ## How It Works
+
+LIBB operates as a file-backed execution loop where portfolio state,
+analytics, and research artifacts are explicitly persisted to disk.
+
+For each run, the framework:
+
+1. Loads and processes existing portfolio state
+2. Recieves inputs (e.g., via an LLM)
+3. Computes and stores analytical signals (such as sentiment) via explicit user calls
+4. saves execution instructions (orders) by passing JSON block
+5. Persists all outputs for inspection and reuse
+
+Execution scheduling (e.g., daily vs. weekly runs) and model orchestration
+are intentionally left to the user, preserving flexibility while
+maintaining a consistent on-disk state.
