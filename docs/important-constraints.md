@@ -1,4 +1,4 @@
-# Important Notes
+# Important Constraints
 
 The following notes outline current constraints and assumptions that
 users should be aware of when working with LIBB.
