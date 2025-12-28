@@ -55,8 +55,8 @@ increase the likelihood that a contribution is accepted.
 ## Becoming a Maintainer
 
 Contributors who consistently provide high-quality, thoughtful
-contributions—particularly those that improve reliability, research
-value, or design clarity—may be invited to become maintainers.
+contributions, particularly those that improve reliability, research
+value, or design clarity, may be invited to become maintainers.
 
 Maintainers are trusted collaborators who help review contributions,
 shape project direction, and uphold core design principles.
