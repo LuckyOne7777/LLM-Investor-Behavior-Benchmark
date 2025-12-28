@@ -9,7 +9,20 @@ from shutil import rmtree
 from datetime import date
 
 class LIBBmodel:
-    def __init__(self, model_path: Path | str, starting_cash: float = 10_000, date: str | date | None = None):
+    """
+    Stateful trading model that manages portfolio data, metrics, research,
+    and daily execution for a single run date.
+    """
+    def __init__(self, model_path: Path | str, starting_cash: float = 10_000, 
+                 date: str | date | None = None):
+        """
+        Initialize the trading model and load persisted state.
+
+        Args:
+            model_path: Root directory where all model data is stored.
+            starting_cash: Initial cash balance if no portfolio exists.
+            date: Run date for the model. If None, defaults to today.
+        """
         if date is None:
             date = pd.Timestamp.now().date()
         else:
@@ -53,6 +66,7 @@ class LIBBmodel:
 
 
     def ensure_file_system(self):
+        "Create and set up all files/folders needed for processing and metrics. Automatically called during construction."
         for dir in [self.root, self.portfolio_dir, self.metrics_dir, self.research_dir, self.daily_reports_file_folder_path, 
                     self. deep_research_file_folder_path]:
             self.ensure_dir(dir)
@@ -71,7 +85,18 @@ class LIBBmodel:
         self.ensure_file(self.sentiment_path, "[]")
         return
     
-    def reset_run(self, cli_check: bool= True) -> None:
+    def reset_run(self, cli_check: bool = True) -> None:
+        """
+        Delete all files within the given root.
+
+        If ensure_file_system() is not called afterward, processing will
+        silently fail or raise an error.
+
+        Args:
+            cli_check (bool): Require interactive confirmation before deleting files.
+                Defaults to True.
+        """
+        
         if cli_check:
             user_decision = None
             while user_decision not in {"y", "n"}:
@@ -88,26 +113,32 @@ class LIBBmodel:
         return
 
     def ensure_dir(self, path: Path) -> None:
-            path.mkdir(parents=True, exist_ok=True)
+        """Helper for creating folders."""
+        path.mkdir(parents=True, exist_ok=True)
+        return
 
     def ensure_file(self, path: Path, default_content: str = "") -> None:
+        """Helper for creating files and writing default content."""
         path.parent.mkdir(parents=True, exist_ok=True)
         if not path.exists():
             path.write_text(default_content, encoding="utf-8")
 
 
     def _load_csv(self, path: Path) -> pd.DataFrame:
+        """Helper for loading CSV at a given path. Return empty DataFrame for invalid paths."""
         if path.exists():
             return pd.read_csv(path)
         return pd.DataFrame()
 
     def _load_json(self, path: Path) -> dict:
+        "Helper for loading JSON files at a given path. Return empty dict for invalid paths."
         if path.exists():
             with open(path, "r") as f:
                 return json.load(f)
         return {}
 
     def process_orders(self) -> None:
+        "Process all pending orders for the current date."
         orders = self.pending_trades.get("orders", [])
         unexecuted_trades = {"orders": []}
         if not orders:
@@ -128,6 +159,7 @@ class LIBBmodel:
         return
     
     def append_position_history(self) -> None:
+        "Append position history CSV based on portfolio data."
         portfolio_copy = self.portfolio.copy()
         portfolio_copy["date"] = self.date
         portfolio_copy["avg_cost"] = portfolio_copy["cost_basis"] / portfolio_copy["shares"]
@@ -137,6 +169,7 @@ class LIBBmodel:
         return
     
     def append_portfolio_history(self) -> None:
+        "Append portfolio history CSV based on portfolio data."
         defaults = {
             "ticker": "",
             "shares": 0,
@@ -174,17 +207,21 @@ class LIBBmodel:
                               You may have called 'reset_run()' without calling 'ensure_file_system()' immediately after.""")
         return
     def update_portfolio_market_data(self) -> None:
+        """Update market portfolio values and save to disk."""
         self.portfolio = update_market_value_columns(self.portfolio, self.cash)
         self.portfolio.to_csv(self.portfolio_path, index=False)
         return
     
     def process_portfolio(self) -> None:
+        "Wrapper for all portfolio processing."
         self.process_orders()
         self.update_portfolio_market_data()
         self.append_portfolio_history()
         self.append_position_history()
 
     def save_deep_research(self, txt: str) -> Path:
+        """Save given text to 'deep_research' folder. Returns the file path after completion.
+        The File naming format is 'deep_research - {date}.txt'. """
         deep_research_name = Path(f"deep_research - {self.date}.txt")
         full_path =  self.deep_research_file_folder_path / deep_research_name
         with open(full_path, "w") as file:
@@ -193,21 +230,40 @@ class LIBBmodel:
         return full_path
     
     def save_daily_update(self, txt: str) -> Path:
+        """Save the given text to the 'daily_reports' folder.
+
+            Returns the file path after completion.
+            The file naming format is 'daily_update - {date}.txt'.
+        """
         DAILY_UPDATES_FILE_NAME = Path(f"daily_update - {self.date}.txt")
         full_path = self.daily_reports_file_folder_path / DAILY_UPDATES_FILE_NAME
         with open(full_path, "w") as file:
             file.write(txt)
-            file.close()
         return full_path
     
-    def save_orders(self, json_block: str) -> None:
-        # override orders each day
+    def save_orders(self, json_block: dict) -> None:
+        """
+        Save the given JSON-serializable data to 'pending_trades.json'.
+        """
         with open(self.pending_trades_path, "w") as file:
-            json.dump(json_block, file, indent=2)
-            file.close()
+            try:
+                json.dump(json_block, file, indent=2)
+            except Exception as e:
+                raise RuntimeError(f"Error while saving JSON block to 'pending_trades.json'. ({e})")
         return
 
     def save_additonal_log(self, file_name: str, text: str, folder: str="additional_logs", append: bool=False) -> None:
+        """
+    Save text to a log file inside the research directory.
+
+    Args:
+        file_name (str): Name of the file to write to.
+        text (str): Text content to save.
+        folder (str, optional): Subfolder inside research_dir where the file
+            will be stored. Defaults to "additional_logs".
+        append (bool, optional): If True, append to the file; otherwise,
+            overwrite it. Defaults to False.
+        """
         path = Path(self.research_dir / folder / file_name)
         path.parent.mkdir(exist_ok=True, parents=True)
         mode = "w" if not append else "a"
@@ -216,7 +272,21 @@ class LIBBmodel:
             file.close()
         return
     
-    def analyze_sentiment(self, text: str, report_type: str="Unknown"):
+    def analyze_sentiment(self, text: str, report_type: str="Unknown") -> dict:
+        """
+        Analyze sentiment for the given text and persist the result.
+
+        The sentiment log is appended to the in-memory sentiment list
+        and written to disk as JSON.
+
+        Args:
+            text (str): Text to analyze.
+            report_type (str, optional): Type or source of the report.
+                Defaults to "Unknown".
+
+        Returns:
+            dict: Sentiment analysis log for the given text.
+        """
         log = analyze_sentiment(text, self.date, report_type=report_type)
         self.sentiment.append(log)
         with open(self.sentiment_path, "w") as file:
