@@ -14,6 +14,26 @@ Since then, the project has evolved into a high-quality, easy-to-use research fr
 
 ## Features
 
+## Features
 
+- **Persistent portfolio state**  
+  All portfolio data is explicitly stored on disk, enabling inspection,
+  reproducibility, and post-hoc analysis across runs.
+
+- **Sentiment analysis metrics**  
+  Built-in support for sentiment analysis, with results persisted as
+  first-class research artifacts.
+
+- **Performance tracking (in progress)**  
+  Infrastructure for performance metrics is included, with ongoing
+  integration into the core model workflow. Behavioral analytics is still being devolopped.
+
+- **Reproducible run structure**  
+  Each model run follows a consistent on-disk directory layout, making
+  experiments easy to reproduce, compare, and archive.
+
+- **Flexible execution workflows**  
+  Execution logic remains fully user-controlled, allowing researchers
+  to integrate custom strategies, models, or data sources.
 
 ## How It Works
