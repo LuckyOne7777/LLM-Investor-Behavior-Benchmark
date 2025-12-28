@@ -8,7 +8,7 @@ MODELS = ["deepseek", "gpt-4.1"]
 def weekly_flow():
 
     for model in MODELS:
-        libb = LIBBmodel(f"runs/run_v1/{model}")
+        libb = LIBBmodel(f"user_side/runs/run_v1/{model}")
         libb.process_portfolio()
         report = prompt_deep_research(libb)
         libb.analyze_sentiment(report)
@@ -21,7 +21,7 @@ def weekly_flow():
 
 def daily_flow():
     for model in MODELS:
-        libb = LIBBmodel(f"runs/run_v1/{model}")
+        libb = LIBBmodel(f"user_side/runs/run_v1/{model}")
         libb.process_portfolio()
         report = prompt_daily_report(libb)
         libb.analyze_sentiment(report)

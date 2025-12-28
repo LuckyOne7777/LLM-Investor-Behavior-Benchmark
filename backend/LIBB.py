@@ -32,6 +32,7 @@ class LIBBmodel:
         self.root: Path = Path(model_path)
         self.model_path: str = str(model_path)
         self.date = date
+
         # directories
         self.portfolio_dir: Path = self.root / "portfolio"
         self.metrics_dir: Path = self.root / "metrics"
@@ -51,6 +52,8 @@ class LIBBmodel:
         self.behavior_path: Path = self.metrics_dir / "behavior.json"
         self.performance_path: Path = self.metrics_dir / "performance.json"
         self.sentiment_path: Path = self.metrics_dir / "sentiment.json"
+
+        self.ensure_file_system()
 
         self.portfolio: pd.DataFrame = self._load_csv(self.portfolio_dir / "portfolio.csv")
         self.cash: float = (float(self.portfolio["cash"].iloc[0]) 
