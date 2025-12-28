@@ -61,7 +61,7 @@ No additional setup steps are required.
 ```bash
 ## 1. Clone the Repository
 
-git clone https://github.com/<your-username>/LIBB.git
+git clone https://github.com/LuckyOne7777/LLM-Investor-Behavior-Benchmark.git
 cd LIBB
 ```
 
