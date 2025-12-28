@@ -138,9 +138,9 @@ No manual file setup is required.
 
 ## Next Steps
 
-- See `workflow.md` for execution flow
-- See `accessing-state.md` for using model state
-- Read `important-notes.md` before assembling custom workflow
+- See [workflow.md](https://github.com/LuckyOne7777/LLM-Investor-Behavior-Benchmark/blob/main/docs/workflow.md) for execution flow
+- See [accessing-state.md](https://github.com/LuckyOne7777/LLM-Investor-Behavior-Benchmark/blob/main/docs/capabilities/accessing-state.md) for using model state
+- Read [important-constraints.md](https://github.com/LuckyOne7777/LLM-Investor-Behavior-Benchmark/blob/main/docs/important-constraints.md) for caveats
   
 ## Research Directions
 
