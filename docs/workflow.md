@@ -9,8 +9,8 @@ LIBB is designed to be explicit and procedural:
 
 All examples below are taken from the `user_side/` folder.  
 You are encouraged to copy them directly or adapt them as needed.
-Please read the entire file to fully understand risks and required elements.
 
+After reading, you are strongly advised to check out [Important Constraints](https://github.com/LuckyOne7777/LLM-Investor-Behavior-Benchmark/blob/main/docs/important-constraints.md) and [Accessing State](https://github.com/LuckyOne7777/LLM-Investor-Behavior-Benchmark/blob/main/docs/capabilities/accessing-state.md).
 ---
 
 ## Core Workflow Philosophy
