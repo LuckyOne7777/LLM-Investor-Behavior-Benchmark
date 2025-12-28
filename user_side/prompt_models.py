@@ -22,7 +22,7 @@ def prompt_chatgpt(text, model="gpt-4.1-mini"):
     return response.choices[0].message.content
 
 def prompt_deep_research(libb):
-    model = libb.model_path.replace("runs/run_v1/", "")
+    model = libb.model_path.replace("user_side/runs/run_v1/", "")
     text = create_deep_research_prompt(libb)
     if model == "deepseek":
         return prompt_deepseek(text)
