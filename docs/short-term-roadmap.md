@@ -92,6 +92,22 @@ Fallback behavior should be explicit and auditable.
 
 ---
 
+### 7. Fractional Share Support
+
+Add first-class support for fractional share trading across order handling,
+portfolio state, and accounting logic.
+
+Goals:
+- allow non-integer share quantities in orders
+- update position tracking to support fractional holdings
+- ensure cash debits and credits reflect precise fractional execution
+- maintain numerical stability and rounding consistency
+
+This change requires careful treatment of floating-point precision and may
+affect validation logic, logging, and performance calculations.
+
+---
+
 ## Notes
 
 - Ordering reflects current priorities and may change
