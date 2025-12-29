@@ -9,11 +9,12 @@ def load_df(path: Path) -> pd.DataFrame:
 
 def append_log(path: Path, row: dict) -> None:
     df = load_df(path)
+    row_df = pd.DataFrame([row])
     if not df.empty:
-        df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
+        row_df.to_csv(path, index=False, mode="a")
     else:
         df = pd.DataFrame([row])
-    df.to_csv(path, index=False)
+        df.to_csv(path, index=False)
 
 def catch_missing_order_data(order: Order, required_cols: list, trade_log_path: Path) -> bool:
     """Log failures for missing or null data required for order.
