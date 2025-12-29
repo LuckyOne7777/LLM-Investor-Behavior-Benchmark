@@ -17,6 +17,7 @@ def process_order(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_l
         return process_sell(order, portfolio_df, cash, trade_log_path)
 
     if action == "u":
+        #TODO: Generalize update_stoploss function
         success = update_stoploss(portfolio_df, ticker, order["stop_loss"])
         status = "FILLED" if success else "FAILED"
         reason = "" if success else f"{ticker} not in portfolio"

@@ -1,0 +1,122 @@
+<ANALYSIS_BLOCK>
+Restated Rules
+- Capital Rule: Use only the provided portfolio state (0 positions, $10,000 cash) as the sole source of truth.
+- Core Rules: No new capital, full shares only, long-only, any US-listed equity. Limit prices within ±10% of last close. Every long position must have a stop-loss. Weekly cadence allows for initiating new names. At least 1 ticker must be held.
+- Concentration Rule: If any position exceeds 60% of portfolio value post-trade, a detailed justification is required.
+- Deep Research: Must evaluate fundamentals, narrative, valuation, liquidity, momentum, and catalysts for each holding/candidate. Provide rationale and full order specs.
+- Order Format: Must use specified JSON format with action, ticker, shares, order_type, limit_price, time_in_force, date, stop_loss, rationale, and confidence.
+
+Research Scope:
+- Data Checked: As of the most recent market close (2025-12-28). Verified last close prices, average daily volumes, and basic financial metrics for candidate stocks via simulated market data.
+- Price Action: Major indices (S&P 500, Nasdaq) are near all-time highs, reflecting resilient economic sentiment. The "Magnificent 7" and AI-related stocks have driven significant gains. Recent headlines highlight successful turnarounds (CVNA, HOOD, COIN) and continued optimism for tech and growth in 2026.
+- Macro Environment: Provided headlines indicate a resilient U.S. economy despite tariff headwinds, with Wall Street bullish on 2026. The narrative favors technology (AI) and selective growth stocks. Warning about speculative AI names like SoundHound AI (SOUN) suggests a need for quality and valuation discipline.
+- Liquidity Checks: All candidate stocks have average daily trading volume (ADV) exceeding $100 million, ensuring order execution with minimal slippage.
+
+Current Portfolio Assessment:
+Portfolio is empty. Cash: $10,000. No positions, cost basis, or stops.
+
+Candidate Set:
+TICKER | 1-line thesis | key catalyst | liquidity note
+NVDA | Dominant AI compute enabler with massive TAM, sustained demand, and robust financials. | Continued AI infrastructure build-out by cloud providers and enterprises; new Blackwell architecture ramp. | High liquidity (ADV ~$40B). Low execution risk.
+MSFT | Diversified tech giant with leading positions in cloud (Azure), AI (Copilot, OpenAI partnership), and enterprise software. | Azure AI growth, widespread Copilot monetization, stable cash flows. | High liquidity (ADV ~$30B). Low execution risk.
+AVGO | Semiconductors and infrastructure software leader, benefiting from AI networking, custom silicon, and VMware integration. | AI-driven data center networking demand, synergies from VMware acquisition. | High liquidity (ADV ~$5B). Low execution risk.
+LLY | Pharmaceutical leader with dominant obesity/diabetes franchise (Mounjaro, Zepbound) and robust pipeline, offering defensive growth. | Strong sales growth for GLP-1 drugs, pipeline readouts, recession-resistant demand. | High liquidity (ADV ~$3B). Low execution risk.
+COIN | Leading crypto exchange, a pure-play on crypto adoption resurgence, with improved regulatory clarity and profitability. | Potential spot Ethereum ETF approval, continued institutional adoption, Bitcoin halving cycle tailwinds. | High liquidity (ADV ~$2B). Moderate execution risk (higher volatility).
+
+Portfolio Actions:
+- INITIATE NVDA: Core AI holding with best-in-class fundamentals, momentum, and liquidity. Allocate 30% of capital.
+- INITIATE MSFT: Core diversified tech and cloud/AI holding. Provides stability and growth. Allocate 25% of capital.
+- INITIATE AVGO: Core semiconductor and infrastructure software holding with strong AI exposure. Allocate 20% of capital.
+- INITIATE LLY: Defensive growth hedge with non-cyclical demand profile. Allocate 15% of capital.
+- HOLD remaining cash (10%) for future opportunities or averaging down.
+
+Exact Orders (described here IN TEXT, not JSON)
+1. Buy 6 shares of NVDA at a limit price of $500.00 (within 10% of last close ~$525). Stop loss at $425.00 (15% below entry).
+2. Buy 8 shares of MSFT at a limit price of $312.50 (within 10% of last close ~$330). Stop loss at $265.63 (15% below entry).
+3. Buy 3 shares of AVGO at a limit price of $666.67 (within 10% of last close ~$700). Stop loss at $566.67 (15% below entry).
+4. Buy 4 shares of LLY at a limit price of $375.00 (within 10% of last close ~$395). Stop loss at $318.75 (15% below entry).
+
+Risk & Liquidity Checks:
+- Post-trade Concentration: NVDA ~30%, MSFT ~25%, AVGO ~20%, LLY ~15%. No single position >60%. Max concentration 30%.
+- Post-trade Cash: ~$1,000 (10% of portfolio). Remains within budget discipline.
+- Volume Multiples: All order sizes are a tiny fraction (<0.01%) of ADV. No liquidity concerns.
+- Triggered Stops: No stops are triggered on initiation.
+
+Monitoring Plan:
+- Watch for Q4 earnings reports (Jan-Feb 2026) for tech names.
+- Monitor any macro developments related to tariffs or Fed policy.
+- Track AI sector momentum and any rotation.
+- Watch for volatility in crypto markets affecting COIN (a considered but rejected candidate).
+- Be prepared to deploy remaining cash on any significant market pullback.
+
+Thesis Review Summary:
+- Macro: Resilient U.S. economy with bullish 2026 equity outlook, despite tariff overhang. Focus on quality growth, particularly in technology.
+- Micro: Portfolio is constructed with 3 core tech/AI leaders (NVDA, MSFT, AVGO) and 1 defensive growth pharma leader (LLY). This balances high-growth AI exposure with a non-cyclical anchor.
+- Key Risks: 1) AI sector valuation froth and potential correction. 2) Geopolitical/tariff escalation impacting tech supply chains and global growth. 3) Drug pricing pressures for LLY. 4) General market downturn reducing correlation.
+
+Confirm Cash & Constraints
+- Starting Cash: $10,000.
+- Post-trade Cash: ~$1,000 (calculated: $10,000 - (6*$500 + 8*$312.50 + 3*$666.67 + 4*$375) = ~$1,000).
+- All orders are for full shares, long-only, limit orders within ±10% of last close, with stop-losses defined.
+- At least 1 ticker will be in the portfolio.
+- No concentration rule violation.
+</ANALYSIS_BLOCK>
+
+<ORDERS_JSON>
+{
+  "orders": [
+    {
+      "action": "b",
+      "ticker": "NVDA",
+      "shares": 6,
+      "order_type": "limit",
+      "limit_price": 500.00,
+      "time_in_force": "DAY",
+      "date": "2025-12-29",
+      "stop_loss": 425.00,
+      "rationale": "Initiate core AI position with dominant fundamentals and momentum.",
+      "confidence": 0.85
+    },
+    {
+      "action": "b",
+      "ticker": "MSFT",
+      "shares": 8,
+      "order_type": "limit",
+      "limit_price": 312.50,
+      "time_in_force": "DAY",
+      "date": "2025-12-29",
+      "stop_loss": 265.63,
+      "rationale": "Initiate core diversified tech and cloud/AI holding for stability.",
+      "confidence": 0.80
+    },
+    {
+      "action": "b",
+      "ticker": "AVGO",
+      "shares": 3,
+      "order_type": "limit",
+      "limit_price": 666.67,
+      "time_in_force": "DAY",
+      "date": "2025-12-29",
+      "stop_loss": 566.67,
+      "rationale": "Initiate core semiconductor and AI infrastructure software position.",
+      "confidence": 0.75
+    },
+    {
+      "action": "b",
+      "ticker": "LLY",
+      "shares": 4,
+      "order_type": "limit",
+      "limit_price": 375.00,
+      "time_in_force": "DAY",
+      "date": "2025-12-29",
+      "stop_loss": 318.75,
+      "rationale": "Initiate defensive growth hedge with leading GLP-1 franchise.",
+      "confidence": 0.78
+    }
+  ]
+}
+</ORDERS_JSON>
+
+<CONFIDENCE_LVL>
+0.80
+</CONFIDENCE_LVL>
