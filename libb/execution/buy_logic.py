@@ -1,5 +1,5 @@
 from .portfolio_editing import add_or_update_position
-from .io import append_log
+from .io import append_log, catch_missing_order_data
 from .update_data import get_market_data
 import pandas as pd
 from .types_file import Order
@@ -25,18 +25,8 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
             "shares",
             "ticker",
         ]
-        missing_cols = []
-        for col in required_cols:
-            if col not in order or order[col] is None:
-                missing_cols.append(col)
-        if missing_cols:
-            append_log(trade_log_path, {
-                "Date": order["date"],
-                "Ticker": ticker,
-                "Action": "BUY",
-                "Status": "FAILED",
-                "Reason": f"MISSING ORDER INFO: {missing_cols}"
-            })
+        # return portfolio if null order
+        if not catch_missing_order_data(order, required_cols, trade_log_path):
             return portfolio_df, cash
 
         
@@ -84,6 +74,14 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
 
     # ---------- MARKET BUY ----------
     elif order_type == "market":
+
+        required_cols = [
+            "shares",
+            "ticker",
+        ]
+        # return portfolio if null order
+        if not catch_missing_order_data(order, required_cols, trade_log_path):
+            return portfolio_df, cash
         cost = shares * market_open
 
         if cost > cash:
@@ -96,10 +94,6 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
             })
             return portfolio_df, cash
 
-        portfolio_df = add_or_update_position(
-            portfolio_df, ticker, shares, market_open, stop_loss
-        )
-        cash -= cost
 
         append_log(trade_log_path, {
             "Date": order["date"],
@@ -110,6 +104,14 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
             "Status": "FILLED",
             "Reason": ""
         })
+
+        portfolio_df = add_or_update_position(
+            portfolio_df, ticker, shares, market_open, stop_loss
+        )
+
+        cash -= cost
+
+
 
     else:
         append_log(trade_log_path, {
