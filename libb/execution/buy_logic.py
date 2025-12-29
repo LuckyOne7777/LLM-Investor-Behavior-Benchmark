@@ -1,5 +1,5 @@
 from .portfolio_editing import add_or_update_position
-from .io import append_log, catch_missing_order_data
+from .utils import append_log, catch_missing_order_data
 from .update_data import get_market_data
 import pandas as pd
 from .types_file import Order
