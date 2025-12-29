@@ -1,6 +1,6 @@
 import pandas as pd
 from pathlib import Path
-from types_file import Order
+from .types_file import Order
 
 def load_df(path: Path) -> pd.DataFrame:
     if not path.exists():

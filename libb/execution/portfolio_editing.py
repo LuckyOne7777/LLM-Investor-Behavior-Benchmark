@@ -1,8 +1,8 @@
 import pandas as pd
 from typing import cast
-from utils import append_log, catch_missing_order_data
+from .utils import append_log, catch_missing_order_data
 from pathlib import Path
-from types_file import Order
+from .types_file import Order
 
 def add_or_update_position(df: pd.DataFrame, ticker: str, shares: int, price: float, stop_loss: float) -> pd.DataFrame:
     cost = shares * price
