@@ -7,7 +7,7 @@ from datetime import date
 #TODO: graceful error handling for ticker downloading
 #TODO: Add additional data sources
 
-def get_market_data(ticker: str, date: str | date  | None = None) -> MarketDataObject:
+def get_market_data(ticker: str, date: str | date | None = None) -> MarketDataObject:
         
     if date is None:
         date = pd.Timestamp.now().date()
@@ -17,9 +17,10 @@ def get_market_data(ticker: str, date: str | date  | None = None) -> MarketDataO
 
     todays_market_date = yesterdays_market_date + pd.Timedelta(days=1)
     try:
-        ticker_data = yf.download(ticker, start=yesterdays_market_date, end=todays_market_date, auto_adjust=True, progress=False)
+        ticker_data = yf.download(ticker, start=yesterdays_market_date, 
+                                  end=todays_market_date, auto_adjust=True, progress=False)
         if ticker_data is None:
-            raise RuntimeError(f"YahooFinance API returned None for {ticker}. Try running again.")
+            raise RuntimeError(f"YahooFinance API returned None for {ticker}'s data. Try running again.")
     except Exception as e:
             raise RuntimeError(f"Error downloading {ticker}'s data: {e}. Try running again.")
     if isinstance(ticker_data.columns, pd.MultiIndex):

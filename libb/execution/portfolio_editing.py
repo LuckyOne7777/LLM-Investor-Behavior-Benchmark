@@ -1,5 +1,8 @@
 import pandas as pd
 from typing import cast
+from utils import append_log, catch_missing_order_data
+from pathlib import Path
+from types_file import Order
 
 def add_or_update_position(df: pd.DataFrame, ticker: str, shares: int, price: float, stop_loss: float) -> pd.DataFrame:
     cost = shares * price
@@ -53,9 +56,14 @@ def reduce_position(df: pd.DataFrame, ticker: str, shares: int) -> tuple[pd.Data
 
 
 
-def update_stoploss(df: pd.DataFrame, ticker: str, stop_loss: float) -> bool:
-    if ticker not in df["ticker"].values:
+def update_stoploss(df: pd.DataFrame, order: Order, trade_log_path: Path) -> bool:
+    required_cols = ["ticker", "stop_loss"]
+    if not catch_missing_order_data(order, required_cols, trade_log_path):
         return False
-    else:
-        df.loc[df["ticker"] == ticker, "stop_loss"] = float(stop_loss)
-        return True
+    
+    ticker = order["ticker"]
+    stop_loss = order["stop_loss"]
+    assert stop_loss is not None
+        
+    df.loc[df["ticker"] == ticker, "stop_loss"] = float(stop_loss)
+    return True

@@ -18,26 +18,16 @@ def process_order(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_l
 
     if action == "u":
         #TODO: Generalize update_stoploss function
-        success = update_stoploss(portfolio_df, ticker, order["stop_loss"])
-        status = "FILLED" if success else "FAILED"
-        reason = "" if success else f"{ticker} not in portfolio"
-
-        append_log(trade_log_path, {
-            "Date": order["date"],
-            "Ticker": ticker,
-            "Action": "UPDATE_STOPLOSS",
-            "Status": status,
-            "Reason": reason
-        })
+        update_stoploss(portfolio_df, order, trade_log_path)
         return portfolio_df, cash
 
     else:
         append_log(trade_log_path, {
             "Date": order["date"],
             "Ticker": ticker,
-            "Action": "UNKNOWN",
+            "Action": action,
             "Status": "FAILED",
-            "Reason": "UNKNOWN ORDER TYPE"
+            "Reason": "UNKNOWN ORDER ACTION"
         })
         return portfolio_df, cash
 
