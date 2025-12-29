@@ -17,13 +17,15 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
     shares = int(order["shares"])
     limit_price = float(cast(float, order["limit_price"]))
 
+
+
     if ticker not in portfolio_df["ticker"].values:
         append_log(trade_log, {
             "Date": order["date"],
             "Ticker": ticker,
             "Action": "SELL",
             "Status": "FAILED",
-            "Reason": "No position"
+            "Reason": "NO POSITION"
         })
         return portfolio_df, cash
 
@@ -34,9 +36,10 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
             "Ticker": ticker,
             "Action": "SELL",
             "Status": "FAILED",
-            "Reason": "Insufficient shares"
+            "Reason": f"INSUFFICIENT SHARES: REQUESTED {shares}, AVAILABLE {row['shares']}"
         })
         return portfolio_df, cash
+    
     if order_type == "limit" and high < limit_price:
 
         append_log(trade_log, {
@@ -44,7 +47,7 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
             "Ticker": ticker,
             "Action": "SELL",
             "Status": "FAILED",
-            "Reason": f"limit price of {order['limit_price']} not met. (High: {high})"
+            "Reason": f"limit price of {limit_price} not met. (High: {high})"
         })
         return portfolio_df, cash
 
