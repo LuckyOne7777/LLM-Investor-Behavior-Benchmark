@@ -120,7 +120,7 @@ class LIBBmodel:
         path.mkdir(parents=True, exist_ok=True)
         return
 
-    def ensure_file(self, path: Path, default_content: str = "") -> None:
+    def _ensure_file(self, path: Path, default_content: str = "") -> None:
         """Helper for creating files and writing default content."""
         path.parent.mkdir(parents=True, exist_ok=True)
         if not path.exists():
@@ -140,7 +140,7 @@ class LIBBmodel:
                 return json.load(f)
         return {}
 
-    def process_orders(self) -> None:
+    def _process_orders(self) -> None:
         "Process all pending orders for the current date."
         orders = self.pending_trades.get("orders", [])
         unexecuted_trades = {"orders": []}
@@ -161,7 +161,7 @@ class LIBBmodel:
         self.save_orders(self.pending_trades)
         return
     
-    def append_position_history(self) -> None:
+    def _append_position_history(self) -> None:
         "Append position history CSV based on portfolio data."
         portfolio_copy = self.portfolio.copy()
         portfolio_copy["date"] = self.date
@@ -171,7 +171,7 @@ class LIBBmodel:
             self.position_history_path.exists(), index=False)
         return
     
-    def append_portfolio_history(self) -> None:
+    def _append_portfolio_history(self) -> None:
         "Append portfolio history CSV based on portfolio data."
         defaults = {
             "ticker": "",
@@ -209,7 +209,7 @@ class LIBBmodel:
             raise SystemError(f"""Error saving to portfolio_history for {self.model_path}. ({e}) 
                               You may have called 'reset_run()' without calling 'ensure_file_system()' immediately after.""")
         return
-    def update_portfolio_market_data(self) -> None:
+    def _update_portfolio_market_data(self) -> None:
         """Update market portfolio values and save to disk."""
         self.portfolio = update_market_value_columns(self.portfolio, self.cash)
         self.portfolio.to_csv(self.portfolio_path, index=False)
