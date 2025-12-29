@@ -11,7 +11,7 @@ def append_log(path: Path, row: dict) -> None:
     df = load_df(path)
     row_df = pd.DataFrame([row])
     if not df.empty:
-        row_df.to_csv(path, index=False, mode="a")
+        row_df.to_csv(path, index=False, mode="a", header=False)
     else:
         df = pd.DataFrame([row])
         df.to_csv(path, index=False)
