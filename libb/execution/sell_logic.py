@@ -6,7 +6,7 @@ import pandas as pd
 from .types_file import Order
 from typing import cast 
 
-def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log: Path) -> tuple[pd.DataFrame, float]:
+def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log_path: Path) -> tuple[pd.DataFrame, float]:
     ticker = order["ticker"].upper()
     order_type = order["order_type"]
     ticker_data = get_market_data(ticker)
@@ -17,21 +17,9 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
     shares = int(order["shares"])
     limit_price = float(cast(float, order["limit_price"]))
 
-
-
-    if ticker not in portfolio_df["ticker"].values:
-        append_log(trade_log, {
-            "Date": order["date"],
-            "Ticker": ticker,
-            "Action": "SELL",
-            "Status": "FAILED",
-            "Reason": "NO POSITION"
-        })
-        return portfolio_df, cash
-
     row = portfolio_df.loc[portfolio_df["ticker"] == ticker].iloc[0]
     if shares > row["shares"]:
-        append_log(trade_log, {
+        append_log(trade_log_path, {
             "Date": order["date"],
             "Ticker": ticker,
             "Action": "SELL",
@@ -42,7 +30,7 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
     
     if order_type == "limit" and high < limit_price:
 
-        append_log(trade_log, {
+        append_log(trade_log_path, {
             "Date": order["date"],
             "Ticker": ticker,
             "Action": "SELL",
@@ -52,6 +40,9 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
         return portfolio_df, cash
 
     elif order_type == "limit":
+        required_col = ["ticker", "limit_price", "shares"]
+        if not catch_missing_order_data(order, required_col, trade_log_path):
+                return portfolio_df, cash
         fill_price = open_price if open_price >= limit_price else limit_price
         proceeds = shares * fill_price
         portfolio_df, buy_price = reduce_position(portfolio_df, ticker, shares)
@@ -59,7 +50,7 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
 
         pnl = proceeds - (buy_price * shares)
 
-        append_log(trade_log, {
+        append_log(trade_log_path, {
                 "Date": order["date"],
                 "Ticker": ticker,
                 "Action": "SELL",
@@ -71,12 +62,16 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
     })
             
     elif order_type == "market":
+        required_col = ["ticker", "shares"]
+        if not catch_missing_order_data(order, required_col, trade_log_path):
+                return portfolio_df, cash
+        
         proceeds = shares * open_price
         portfolio_df, buy_price = reduce_position(portfolio_df, ticker, shares)
         cash += proceeds
 
         pnl = proceeds - (buy_price * shares)
-        append_log(trade_log, {
+        append_log(trade_log_path, {
                 "Date": order["date"],
                 "Ticker": ticker,
                 "Action": "SELL",
@@ -87,7 +82,13 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
                 "Reason": ""
         })
     else:
-         raise RuntimeError(f"Order type not recognized for sells. ({order_type})")
+          append_log(trade_log_path, {
+            "Date": order["date"],
+            "Ticker": ticker,
+            "Action": "SELL",
+            "Status": "FAILED",
+            "Reason": f"ORDER TYPE UNKNOWN: {order_type}"
+        })
 
 
     return portfolio_df, cash
