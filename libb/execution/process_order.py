@@ -30,4 +30,13 @@ def process_order(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_l
         })
         return portfolio_df, cash
 
-    raise ValueError(f"Unknown action: {action}")
+    else:
+        append_log(trade_log_path, {
+            "Date": order["date"],
+            "Ticker": ticker,
+            "Action": "UNKNOWN",
+            "Status": "FAILED",
+            "Reason": "UNKNOWN ORDER TYPE"
+        })
+        return portfolio_df, cash
+
