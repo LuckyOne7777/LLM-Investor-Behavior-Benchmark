@@ -40,7 +40,6 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
             return portfolio_df, cash
 
         
-
         assert intended_limit_price is not None
         intended_limit_price = float(intended_limit_price)
         # limit buy fails if price never trades at or below limit

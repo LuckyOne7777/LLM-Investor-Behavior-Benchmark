@@ -1,5 +1,5 @@
 from .portfolio_editing import reduce_position
-from .io import append_log
+from .io import append_log, catch_missing_cols
 from .update_data import get_market_data
 from pathlib import Path
 import pandas as pd

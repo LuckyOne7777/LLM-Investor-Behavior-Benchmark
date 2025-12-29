@@ -7,7 +7,7 @@ from datetime import date
 #TODO: graceful error handling for ticker downloading
 #TODO: Add additional data sources
 
-def get_market_data(ticker: str, date) -> MarketDataObject:
+def get_market_data(ticker: str, date: str | date  | None = None) -> MarketDataObject:
         
     if date is None:
         date = pd.Timestamp.now().date()
