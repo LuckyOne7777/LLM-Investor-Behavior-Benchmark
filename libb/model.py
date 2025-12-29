@@ -72,20 +72,20 @@ class LIBBmodel:
         "Create and set up all files/folders needed for processing and metrics. Automatically called during construction."
         for dir in [self.root, self.portfolio_dir, self.metrics_dir, self.research_dir, self.daily_reports_file_folder_path, 
                     self. deep_research_file_folder_path]:
-            self.ensure_dir(dir)
+            self._ensure_dir(dir)
 
         # portfolio files
-        self.ensure_file(self.portfolio_history_path, "date,equity,cash,positions_value,return_pct\n")
-        self.ensure_file(self.pending_trades_path, '{"orders": []}')
-        self.ensure_file(self.portfolio_path, "ticker,shares,buy_price,cost_basis,stop_loss,market_price,market_value,unrealized_pnl,cash\n")
+        self._ensure_file(self.portfolio_history_path, "date,equity,cash,positions_value,return_pct\n")
+        self._ensure_file(self.pending_trades_path, '{"orders": []}')
+        self._ensure_file(self.portfolio_path, "ticker,shares,buy_price,cost_basis,stop_loss,market_price,market_value,unrealized_pnl,cash\n")
         #TODO: make remove capital letters for columns
-        self.ensure_file(self.trade_log_path, "Date,Ticker,Action,Shares,Price,Cost Basis,PnL,Rationale,Confidence,Status,Reason\n")
-        self.ensure_file(self.position_history_path, "date,ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl,cash\n")
+        self._ensure_file(self.trade_log_path, "Date,Ticker,Action,Shares,Price,Cost Basis,PnL,Rationale,Confidence,Status,Reason\n")
+        self._ensure_file(self.position_history_path, "date,ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl,cash\n")
 
         # metrics files
-        self.ensure_file(self.behavior_path, "[]")
-        self.ensure_file(self.performance_path, "[]")
-        self.ensure_file(self.sentiment_path, "[]")
+        self._ensure_file(self.behavior_path, "[]")
+        self._ensure_file(self.performance_path, "[]")
+        self._ensure_file(self.sentiment_path, "[]")
         return
     
     def reset_run(self, cli_check: bool = True) -> None:
@@ -115,7 +115,7 @@ class LIBBmodel:
                 child.unlink()
         return
 
-    def ensure_dir(self, path: Path) -> None:
+    def _ensure_dir(self, path: Path) -> None:
         """Helper for creating folders."""
         path.mkdir(parents=True, exist_ok=True)
         return
@@ -217,10 +217,10 @@ class LIBBmodel:
     
     def process_portfolio(self) -> None:
         "Wrapper for all portfolio processing."
-        self.process_orders()
-        self.update_portfolio_market_data()
-        self.append_portfolio_history()
-        self.append_position_history()
+        self._process_orders()
+        self._update_portfolio_market_data()
+        self._append_portfolio_history()
+        self._append_position_history()
 
     def save_deep_research(self, txt: str) -> Path:
         """Save given text to 'deep_research' folder. Returns the file path after completion.
