@@ -7,11 +7,10 @@ def parse_json(text: str, tag: str):
     match = re.search(pattern, text, flags=re.DOTALL)
     
     if not match:
-        raise ValueError("No ORDERS_JSON block found.")
+        raise ValueError(f"No {tag} block found.")
 
     json_str = match.group(1)
 
-    # Optional: fix trailing commas
     json_str = re.sub(r",\s*}", "}", json_str)
 
     return json.loads(json_str)

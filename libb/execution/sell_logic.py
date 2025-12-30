@@ -20,22 +20,22 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
     row = portfolio_df.loc[portfolio_df["ticker"] == ticker].iloc[0]
     if shares > row["shares"]:
         append_log(trade_log_path, {
-            "Date": order["date"],
-            "Ticker": ticker,
-            "Action": "SELL",
-            "Status": "FAILED",
-            "Reason": f"INSUFFICIENT SHARES: REQUESTED {shares}, AVAILABLE {row['shares']}"
+            "date": order["date"],
+            "ticker": ticker,
+            "action": "SELL",
+            "status": "FAILED",
+            "reason": f"INSUFFICIENT SHARES: REQUESTED {shares}, AVAILABLE {row['shares']}"
         })
         return portfolio_df, cash
     
     if order_type == "limit" and high < limit_price:
 
         append_log(trade_log_path, {
-            "Date": order["date"],
-            "Ticker": ticker,
-            "Action": "SELL",
-            "Status": "FAILED",
-            "Reason": f"limit price of {limit_price} not met. (High: {high})"
+            "date": order["date"],
+            "ticker": ticker,
+            "action": "SELL",
+            "status": "FAILED",
+            "reason": f"limit price of {limit_price} not met. (High: {high})"
         })
         return portfolio_df, cash
 
@@ -51,14 +51,14 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
         pnl = proceeds - (buy_price * shares)
 
         append_log(trade_log_path, {
-                "Date": order["date"],
-                "Ticker": ticker,
-                "Action": "SELL",
-                "Shares": shares,
-                "Price": fill_price,
+                "date": order["date"],
+                "ticker": ticker,
+                "action": "SELL",
+                "shares": shares,
+                "price": fill_price,
                 "PnL": pnl,
-                "Status": "FILLED",
-                "Reason": ""
+                "status": "FILLED",
+                "reason": ""
     })
             
     elif order_type == "market":
@@ -72,22 +72,22 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
 
         pnl = proceeds - (buy_price * shares)
         append_log(trade_log_path, {
-                "Date": order["date"],
-                "Ticker": ticker,
-                "Action": "SELL",
-                "Shares": shares,
-                "Price": open_price,
+                "date": order["date"],
+                "ticker": ticker,
+                "action": "SELL",
+                "shares": shares,
+                "price": open_price,
                 "PnL": pnl,
-                "Status": "FILLED",
-                "Reason": ""
+                "status": "FILLED",
+                "reason": ""
         })
     else:
           append_log(trade_log_path, {
-            "Date": order["date"],
-            "Ticker": ticker,
-            "Action": "SELL",
-            "Status": "FAILED",
-            "Reason": f"ORDER TYPE UNKNOWN: {order_type}"
+            "date": order["date"],
+            "ticker": ticker,
+            "action": "SELL",
+            "status": "FAILED",
+            "reason": f"ORDER TYPE UNKNOWN: {order_type}"
         })
 
 

@@ -23,11 +23,11 @@ def process_order(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_l
 
     else:
         append_log(trade_log_path, {
-            "Date": order["date"],
-            "Ticker": ticker,
-            "Action": action,
-            "Status": "FAILED",
-            "Reason": "UNKNOWN ORDER ACTION"
+            "date": order["date"],
+            "ticker": ticker,
+            "action": action,
+            "status": "FAILED",
+            "reason": "UNKNOWN ORDER ACTION"
         })
         return portfolio_df, cash
 

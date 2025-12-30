@@ -9,12 +9,13 @@ def load_df(path: Path) -> pd.DataFrame:
 
 def append_log(path: Path, row: dict) -> None:
     df = load_df(path)
-    row_df = pd.DataFrame([row])
-    if not df.empty:
-        row_df.to_csv(path, index=False, mode="a", header=False)
-    else:
-        df = pd.DataFrame([row])
-        df.to_csv(path, index=False)
+
+    if df.columns.empty:
+        raise RuntimeError("Schema missing: header not initialized")
+
+    row_df = pd.DataFrame([row]).reindex(columns=df.columns)
+    row_df.to_csv(path, index=False, mode="a", header=False)
+
 
 def catch_missing_order_data(order: Order, required_cols: list, trade_log_path: Path) -> bool:
     """Log failures for missing or null data required for order.
@@ -30,11 +31,11 @@ def catch_missing_order_data(order: Order, required_cols: list, trade_log_path: 
 
     if missing_cols:
         append_log(trade_log_path, {
-            "Date": order["date"],
-            "Ticker": order["ticker"],
-            "Action": action,
-            "Status": "FAILED",
-            "Reason": f"MISSING OR NULL ORDER INFO: {missing_cols}"
+            "date": order["date"],
+            "ticker": order["ticker"],
+            "action": action,
+            "status": "FAILED",
+            "reason": f"MISSING OR NULL ORDER INFO: {missing_cols}"
         })
         return False
 

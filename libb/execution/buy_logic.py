@@ -35,11 +35,11 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
         # limit buy fails if price never trades at or below limit
         if market_low > intended_limit_price:
             append_log(trade_log_path, {
-                "Date": order["date"],
-                "Ticker": ticker,
-                "Action": "BUY",
-                "Status": "FAILED",
-                "Reason": f"limit price of {intended_limit_price} not met. (Low: {market_low})"
+                "date": order["date"],
+                "ticker": ticker,
+                "action": "BUY",
+                "status": "FAILED",
+                "reason": f"limit price of {intended_limit_price} not met. (Low: {market_low})"
             })
             return portfolio_df, cash
 
@@ -49,11 +49,11 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
 
         if cost > cash:
             append_log(trade_log_path, {
-                "Date": order["date"],
-                "Ticker": ticker,
-                "Action": "BUY",
-                "Status": "FAILED",
-                "Reason": "Insufficient cash"
+                "date": order["date"],
+                "ticker": ticker,
+                "action": "BUY",
+                "status": "FAILED",
+                "reason": "Insufficient cash"
             })
             return portfolio_df, cash
 
@@ -63,13 +63,13 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
         cash -= cost
 
         append_log(trade_log_path, {
-            "Date": order["date"],
-            "Ticker": ticker,
-            "Action": "BUY",
-            "Shares": shares,
-            "Price": fill_price,
-            "Status": "FILLED",
-            "Reason": ""
+            "date": order["date"],
+            "ticker": ticker,
+            "action": "BUY",
+            "shares": shares,
+            "price": fill_price,
+            "status": "FILLED",
+            "reason": ""
         })
 
     # ---------- MARKET BUY ----------
@@ -86,23 +86,23 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
 
         if cost > cash:
             append_log(trade_log_path, {
-                "Date": order["date"],
-                "Ticker": ticker,
-                "Action": "BUY",
-                "Status": "FAILED",
-                "Reason": "Insufficient cash"
+                "date": order["date"],
+                "ticker": ticker,
+                "action": "BUY",
+                "status": "FAILED",
+                "reason": "Insufficient cash"
             })
             return portfolio_df, cash
 
 
         append_log(trade_log_path, {
-            "Date": order["date"],
-            "Ticker": ticker,
-            "Action": "BUY",
-            "Shares": shares,
-            "Price": market_open,
-            "Status": "FILLED",
-            "Reason": ""
+            "date": order["date"],
+            "ticker": ticker,
+            "action": "BUY",
+            "shares": shares,
+            "price": market_open,
+            "status": "FILLED",
+            "reason": ""
         })
 
         portfolio_df = add_or_update_position(
@@ -115,13 +115,13 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
 
     else:
         append_log(trade_log_path, {
-            "Date": order["date"],
-            "Ticker": ticker,
-            "Action": "BUY",
-            "Shares": shares,
-            "Price": intended_limit_price,
-            "Status": "FAILED",
-            "Reason": f"ORDER TYPE UNKNOWN: {order_type}"
+            "date": order["date"],
+            "ticker": ticker,
+            "action": "BUY",
+            "shares": shares,
+            "price": intended_limit_price,
+            "status": "FAILED",
+            "reason": f"ORDER TYPE UNKNOWN: {order_type}"
         })
 
     return portfolio_df, cash

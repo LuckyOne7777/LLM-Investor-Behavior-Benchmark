@@ -59,8 +59,8 @@ def recent_execution_logs(trade_log_path: str, date: None | str | datetime = Non
         TODAY = pd.Timestamp(date).date() 
     time_range = TODAY - timedelta(days=look_back)
     trade_log = pd.read_csv(trade_log_path)
-    trade_log["Date"] = pd.to_datetime(trade_log["Date"]).dt.date
-    if trade_log[trade_log["Date"] >= time_range].empty:
+    trade_log["date"] = pd.to_datetime(trade_log["date"]).dt.date
+    if trade_log[trade_log["date"] >= time_range].empty:
         return f"No execution data for the past {look_back} days."
     else:
-        return trade_log[trade_log["Date"] >= time_range]    
+        return trade_log[trade_log["date"] >= time_range]    

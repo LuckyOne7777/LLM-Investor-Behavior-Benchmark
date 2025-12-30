@@ -53,6 +53,7 @@ class LIBBmodel:
         self._performance_path: Path = self._metrics_dir / "performance.json"
         self._sentiment_path: Path = self._metrics_dir / "sentiment.json"
 
+        self.reset_run()
         self.ensure_file_system()
 
         self.portfolio: pd.DataFrame = self._load_csv(self._portfolio_dir / "portfolio.csv")
@@ -79,7 +80,7 @@ class LIBBmodel:
         self._ensure_file(self._pending_trades_path, '{"orders": []}')
         self._ensure_file(self._portfolio_path, "ticker,shares,buy_price,cost_basis,stop_loss,market_price,market_value,unrealized_pnl,cash\n")
         #TODO: make remove capital letters for columns
-        self._ensure_file(self._trade_log_path, "Date,Ticker,Action,Shares,Price,Cost Basis,PnL,Rationale,Confidence,Status,Reason\n")
+        self._ensure_file(self._trade_log_path, "date,ticker,action,shares,price,cost_basis,PnL,rationale,confidence,status,reason\n")
         self._ensure_file(self._position_history_path, "date,ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl,cash\n")
 
         # metrics files
