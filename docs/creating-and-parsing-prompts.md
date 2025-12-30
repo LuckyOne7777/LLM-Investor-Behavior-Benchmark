@@ -11,8 +11,7 @@ Everything else, tone, reasoning style, rules, is user-controlled.
 
 ## Required Output: ORDERS_JSON
 
-All trade instructions must be returned inside a single JSON block labeled
-`ORDERS_JSON`.
+All trade instructions must be returned inside a single JSON block.
 
 The block must contain an `orders` array. Each element in the array represents
 one order.
@@ -25,6 +24,7 @@ No additional text is allowed inside the JSON block.
 
 Each order must conform to the following schema:
 
+```python
 class Order(TypedDict):
     action: Literal["b", "s", "u"]     # "b" = buy, "s" = sell, "u" = update stop-loss
     ticker: str
@@ -36,7 +36,7 @@ class Order(TypedDict):
     stop_loss: Optional[float]
     rationale: str                          # short reasoning message (currently not enforced)
     confidence: float                       # 0–1 (currently not enforced)
-
+```
 ---
 
 ### Field Notes
