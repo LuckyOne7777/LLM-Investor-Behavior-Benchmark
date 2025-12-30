@@ -16,14 +16,16 @@ def get_market_data(ticker: str, date: str | date | None = None) -> MarketDataOb
     yesterdays_market_date = date
 
     todays_market_date = yesterdays_market_date + pd.Timedelta(days=1)
+
+    # account for YF ticker differences
+    ticker = ticker.replace(".", "-")
     try:
         ticker_data = yf.download(ticker, start=yesterdays_market_date, 
                                   end=todays_market_date, auto_adjust=True, progress=False)
         if ticker_data is None or ticker_data.empty:
-            raise RuntimeError(f"""YahooFinance API returned None for {ticker}'s data. 
-                               Try running again or checking if given date was a weekend.""")
+            raise RuntimeError(f"""YahooFinance API returned None for {ticker}'s data""")
     except Exception as e:
-            raise RuntimeError(f"Error downloading {ticker}'s data: {e}. Try running again.")
+            raise RuntimeError(f"Error downloading {ticker}'s data: {e}. Try running again again.")
     if isinstance(ticker_data.columns, pd.MultiIndex):
              ticker_data.columns = ticker_data.columns.get_level_values(0)
     data: MarketDataObject = {
