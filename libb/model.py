@@ -29,63 +29,63 @@ class LIBBmodel:
             date = pd.Timestamp(date).date()
 
         self.STARTING_CASH: float = starting_cash
-        self.root: Path = Path(model_path)
-        self.model_path: str = str(model_path)
+        self._root: Path = Path(model_path)
+        self._model_path: str = str(model_path)
         self.date = date
 
         # directories
-        self.portfolio_dir: Path = self.root / "portfolio"
-        self.metrics_dir: Path = self.root / "metrics"
-        self.research_dir: Path = self.root / "research"
+        self._portfolio_dir: Path = self._root / "portfolio"
+        self._metrics_dir: Path = self._root / "metrics"
+        self._research_dir: Path = self._root / "research"
 
-        self.deep_research_file_folder_path: Path = self.research_dir / "deep_research"
-        self.daily_reports_file_folder_path: Path = self.research_dir / "daily_reports"
+        self._deep_research_file_folder_path: Path = self._research_dir / "deep_research"
+        self._daily_reports_file_folder_path: Path = self._research_dir / "daily_reports"
 
         # paths in portfolio
-        self.portfolio_history_path: Path = self.portfolio_dir / "portfolio_history.csv"
-        self.pending_trades_path: Path = self.portfolio_dir / "pending_trades.json"
-        self.portfolio_path: Path = self.portfolio_dir / "portfolio.csv"
-        self.trade_log_path: Path = self.portfolio_dir / "trade_log.csv"
-        self.position_history_path: Path = self.portfolio_dir / "position_history.csv"
+        self._portfolio_history_path: Path = self._portfolio_dir / "portfolio_history.csv"
+        self._pending_trades_path: Path = self._portfolio_dir / "pending_trades.json"
+        self._portfolio_path: Path = self._portfolio_dir / "portfolio.csv"
+        self._trade_log_path: Path = self._portfolio_dir / "trade_log.csv"
+        self._position_history_path: Path = self._portfolio_dir / "position_history.csv"
 
         # paths in metrics
-        self.behavior_path: Path = self.metrics_dir / "behavior.json"
-        self.performance_path: Path = self.metrics_dir / "performance.json"
-        self.sentiment_path: Path = self.metrics_dir / "sentiment.json"
+        self._behavior_path: Path = self._metrics_dir / "behavior.json"
+        self._performance_path: Path = self._metrics_dir / "performance.json"
+        self._sentiment_path: Path = self._metrics_dir / "sentiment.json"
 
         self.ensure_file_system()
 
-        self.portfolio: pd.DataFrame = self._load_csv(self.portfolio_dir / "portfolio.csv")
+        self.portfolio: pd.DataFrame = self._load_csv(self._portfolio_dir / "portfolio.csv")
         self.cash: float = (float(self.portfolio["cash"].iloc[0]) 
                      if not self.portfolio.empty else self.STARTING_CASH)
-        self.portfolio_history: pd.DataFrame = self._load_csv(self.portfolio_dir / "portfolio_history.csv")
-        self.trade_log: pd.DataFrame = self._load_csv(self.portfolio_dir / "trade_log.csv")
+        self.portfolio_history: pd.DataFrame = self._load_csv(self._portfolio_dir / "portfolio_history.csv")
+        self.trade_log: pd.DataFrame = self._load_csv(self._portfolio_dir / "trade_log.csv")
 
-        self.pending_trades: dict = self._load_json(self.portfolio_dir / "pending_trades.json")
+        self.pending_trades: dict = self._load_json(self._portfolio_dir / "pending_trades.json")
 
-        self.performance: dict = self._load_json(self.metrics_dir / "performance.json")
-        self.behavior: dict = self._load_json(self.metrics_dir / "behavior.json")
-        self.sentiment: dict = self._load_json(self.metrics_dir / "sentiment.json")
+        self.performance: dict = self._load_json(self._metrics_dir / "performance.json")
+        self.behavior: dict = self._load_json(self._metrics_dir / "behavior.json")
+        self.sentiment: dict = self._load_json(self._metrics_dir / "sentiment.json")
 
 
     def ensure_file_system(self):
         "Create and set up all files/folders needed for processing and metrics. Automatically called during construction."
-        for dir in [self.root, self.portfolio_dir, self.metrics_dir, self.research_dir, self.daily_reports_file_folder_path, 
-                    self. deep_research_file_folder_path]:
+        for dir in [self._root, self._portfolio_dir, self._metrics_dir, self._research_dir, self._daily_reports_file_folder_path, 
+                    self. _deep_research_file_folder_path]:
             self._ensure_dir(dir)
 
         # portfolio files
-        self._ensure_file(self.portfolio_history_path, "date,equity,cash,positions_value,return_pct\n")
-        self._ensure_file(self.pending_trades_path, '{"orders": []}')
-        self._ensure_file(self.portfolio_path, "ticker,shares,buy_price,cost_basis,stop_loss,market_price,market_value,unrealized_pnl,cash\n")
+        self._ensure_file(self._portfolio_history_path, "date,equity,cash,positions_value,return_pct\n")
+        self._ensure_file(self._pending_trades_path, '{"orders": []}')
+        self._ensure_file(self._portfolio_path, "ticker,shares,buy_price,cost_basis,stop_loss,market_price,market_value,unrealized_pnl,cash\n")
         #TODO: make remove capital letters for columns
-        self._ensure_file(self.trade_log_path, "Date,Ticker,Action,Shares,Price,Cost Basis,PnL,Rationale,Confidence,Status,Reason\n")
-        self._ensure_file(self.position_history_path, "date,ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl,cash\n")
+        self._ensure_file(self._trade_log_path, "Date,Ticker,Action,Shares,Price,Cost Basis,PnL,Rationale,Confidence,Status,Reason\n")
+        self._ensure_file(self._position_history_path, "date,ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl,cash\n")
 
         # metrics files
-        self._ensure_file(self.behavior_path, "[]")
-        self._ensure_file(self.performance_path, "[]")
-        self._ensure_file(self.sentiment_path, "[]")
+        self._ensure_file(self._behavior_path, "[]")
+        self._ensure_file(self._performance_path, "[]")
+        self._ensure_file(self._sentiment_path, "[]")
         return
     
     def reset_run(self, cli_check: bool = True) -> None:
@@ -103,12 +103,12 @@ class LIBBmodel:
         if cli_check:
             user_decision = None
             while user_decision not in {"y", "n"}:
-                user_decision = input(f"Warning: reset_run() is about to delete all files and folders within {self.root}. Proceed? (y/n) ")
+                user_decision = input(f"Warning: reset_run() is about to delete all files and folders within {self._root}. Proceed? (y/n) ")
             if user_decision == "n":
                 raise RuntimeError("Please remove reset_run call from your workflow.")
-        if self.root in (Path("/"), Path("C:/")):
-                    raise RuntimeError(f"Cannot delete root given: {self.root}")
-        for child in self.root.iterdir():
+        if self._root in (Path("/"), Path("C:/")):
+                    raise RuntimeError(f"Cannot delete root given: {self._root}")
+        for child in self._root.iterdir():
             if child.is_dir():
                 rmtree(child)
             else:
@@ -150,7 +150,7 @@ class LIBBmodel:
             order_date = pd.Timestamp(order["date"]).date()
             if order_date == self.date:
                 self.portfolio, self.cash = process_order(order, self.portfolio, 
-                self.cash, self.trade_log_path)
+                self.cash, self._trade_log_path)
             else:
                 unexecuted_trades["orders"].append(order)
         # keep any unexecuted trades, completely reset otherwise
@@ -167,8 +167,8 @@ class LIBBmodel:
         portfolio_copy["date"] = self.date
         portfolio_copy["avg_cost"] = portfolio_copy["cost_basis"] / portfolio_copy["shares"]
         portfolio_copy.drop(columns=["buy_price", "cost_basis"], inplace=True)
-        portfolio_copy.to_csv(self.position_history_path, mode="a", header= not 
-            self.position_history_path.exists(), index=False)
+        portfolio_copy.to_csv(self._position_history_path, mode="a", header= not 
+            self._position_history_path.exists(), index=False)
         return
     
     def _append_portfolio_history(self) -> None:
@@ -203,16 +203,16 @@ class LIBBmodel:
         "positions_value": market_equity,
         }])
         try:
-             log.to_csv(self.portfolio_history_path, mode="a", header= not 
-            self.portfolio_history_path.exists(), index=False)
+             log.to_csv(self._portfolio_history_path, mode="a", header= not 
+            self._portfolio_history_path.exists(), index=False)
         except Exception as e:
-            raise SystemError(f"""Error saving to portfolio_history for {self.model_path}. ({e}) 
+            raise SystemError(f"""Error saving to portfolio_history for {self._model_path}. ({e}) 
                               You may have called 'reset_run()' without calling 'ensure_file_system()' immediately after.""")
         return
     def _update_portfolio_market_data(self) -> None:
         """Update market portfolio values and save to disk."""
         self.portfolio = update_market_value_columns(self.portfolio, self.cash)
-        self.portfolio.to_csv(self.portfolio_path, index=False)
+        self.portfolio.to_csv(self._portfolio_path, index=False)
         return
     
     def process_portfolio(self) -> None:
@@ -226,7 +226,7 @@ class LIBBmodel:
         """Save given text to 'deep_research' folder. Returns the file path after completion.
         The File naming format is 'deep_research - {date}.txt'. """
         deep_research_name = Path(f"deep_research - {self.date}.txt")
-        full_path =  self.deep_research_file_folder_path / deep_research_name
+        full_path =  self._deep_research_file_folder_path / deep_research_name
         with open(full_path, "w") as file:
             file.write(txt)
             file.close()
@@ -239,7 +239,7 @@ class LIBBmodel:
             The file naming format is 'daily_update - {date}.txt'.
         """
         DAILY_UPDATES_FILE_NAME = Path(f"daily_update - {self.date}.txt")
-        full_path = self.daily_reports_file_folder_path / DAILY_UPDATES_FILE_NAME
+        full_path = self._daily_reports_file_folder_path / DAILY_UPDATES_FILE_NAME
         with open(full_path, "w") as file:
             file.write(txt)
         return full_path
@@ -248,7 +248,7 @@ class LIBBmodel:
         """
         Save the given JSON-serializable data to 'pending_trades.json'.
         """
-        with open(self.pending_trades_path, "w") as file:
+        with open(self._pending_trades_path, "w") as file:
             try:
                 json.dump(json_block, file, indent=2)
             except Exception as e:
@@ -267,7 +267,7 @@ class LIBBmodel:
         append (bool, optional): If True, append to the file; otherwise,
             overwrite it. Defaults to False.
         """
-        path = Path(self.research_dir / folder / file_name)
+        path = Path(self._research_dir / folder / file_name)
         path.parent.mkdir(exist_ok=True, parents=True)
         mode = "w" if not append else "a"
         with open(path, mode, encoding="utf-8") as file:
@@ -292,6 +292,6 @@ class LIBBmodel:
         """
         log = analyze_sentiment(text, self.date, report_type=report_type)
         self.sentiment.append(log)
-        with open(self.sentiment_path, "w") as file:
+        with open(self._sentiment_path, "w") as file:
             json.dump(self.sentiment, file, indent=2)
         return log
