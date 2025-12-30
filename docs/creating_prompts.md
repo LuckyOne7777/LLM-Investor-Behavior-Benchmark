@@ -62,11 +62,13 @@ example useage:
 from libb.other.parse import parse_json
 
 text: """
-      ...
+      abc..
     <EXAMPLE>
-    ...
+    {
+    xyz...
+    }
     </EXAMPLE>
-    ...
+    abc...
     """
 tag = "EXAMPLE"
 
@@ -77,9 +79,9 @@ print(result)
 Output:
 
 ```python
-    <EXAMPLE>
-    ...
-    </EXAMPLE>
+    {
+    xyz...
+    }
 ```
 Result is now completely normal to save to orders.
 
