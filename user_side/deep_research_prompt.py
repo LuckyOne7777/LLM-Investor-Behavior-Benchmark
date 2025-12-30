@@ -7,7 +7,7 @@ def create_deep_research_prompt(libb):
     portfolio = f"You have 0 active positions, create your portfolio. The starting cash is {starting_cash}. You must make at least 1 trade."
 
   portfolio_news = get_portfolio_news(libb.portfolio)
-  execution_log = recent_execution_logs(libb.trade_log_path)
+  execution_log = recent_execution_logs(libb.trade_log_path, date=libb.date)
   us_news = get_macro_news()
   # due to f-string formatting errors, had to define it seperately 
   example_orders_json = """

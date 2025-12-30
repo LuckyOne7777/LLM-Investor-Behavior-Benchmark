@@ -6,6 +6,7 @@ def create_daily_prompt(libb):
    starting_cash = libb.STARTING_CASH
    today = libb.date
    news = get_prompt_data.get_macro_news()
+   logs = get_prompt_data.recent_execution_logs(libb._trade_log_path, date=libb.date)
    if portfolio.empty:
       portfolio = f"You have 0 active positions, create your portfolio. The starting cash is {starting_cash}. You must make at least 1 trade."
 
@@ -61,6 +62,11 @@ CURRENT PORTFOLIO
 ---------------------------------------------------------------------------
 This is your EXACT portfolio:
 [{portfolio}]
+
+---------------------------------------------------------------------------
+RECENT LOGS
+---------------------------------------------------------------------------
+{logs}
 ---------------------------------------------------------------------------
 DAILY OBJECTIVES
 ---------------------------------------------------------------------------
