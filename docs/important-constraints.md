@@ -52,7 +52,9 @@ assumptions may change as the system matures and new research requirements emerg
 
 ## Lack of Supported Metrics
 
-For Version 1, the focus was just getting the system reliable and consistent, so right now the only supported metric class is sentiment. However, functions for performance functions have been created and just need to be connected.
+Right now the only supported metric class is sentiment.
+More metric classes are 
+planned and outlined in the roadmap.
 
 ---
 
