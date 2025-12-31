@@ -1,40 +1,35 @@
 # Workflow
 
-This section describes the canonical way to use LIBB in a research or live-tracking environment.
+This section describes the canonical way to use LIBB in research or live-tracking environments.
 
-LIBB is designed to be explicit and procedural:
+LIBB is explicit and procedural by design:
 - No critical logic runs implicitly
-- Users control when processing, prompting, and saving occur
+- Users control when processing, prompting, and persistence occur
 - The workflow is identical for single-model and multi-model runs
 
-All examples below are taken from the `user_side/` folder.  
-You are encouraged to copy them directly or adapt them as needed.
+All examples below are taken from `user_side/` and represent recommended usage patterns.
 
----
+## Core Workflow
 
-## Core Workflow Philosophy
-
-Every LIBB workflow follows the same high-level pattern:
+Every LIBB workflow follows the same high-level sequence:
 
 1. Initialize a `LIBBmodel` with a run directory
-2. **Process the portfolio first (required)**
+2. Process the portfolio (**required**)
 3. Generate model output via prompts
 4. Parse structured outputs (JSON blocks)
 5. Save results and artifacts
 6. (Optional) Run auxiliary analysis (sentiment, metrics, etc.)
 
-The only hard requirement is that `process_portfolio()` must be called before
-any prompts are executed. All downstream logic depends on this processed state.
-
----
+**Invariant:**  
+`process_portfolio()` must be called before any prompts are executed.  
+All downstream logic depends on this processed state.
 
 ## Required Components
 
 A minimal workflow requires:
-
-- Prompt skeletons (e.g. daily / weekly research prompts)
+- Prompt skeletons (e.g. daily or weekly research prompts)
 - User-defined functions for executing prompts
-- Awareness of design limitations listed in `important-notes.md`
+- Familiarity with constraints listed in `important-notes.md`
 
 ---
 
