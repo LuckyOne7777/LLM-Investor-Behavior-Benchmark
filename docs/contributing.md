@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to LIBB! Contributions,
 discussion, and alternative perspectives are welcome, especially from
-those interested in the core design philosophy 
+those interested in the core design philosophy.
 
 To keep the project focused and maintainable, contributions are guided
 by the principles outlined below.
@@ -42,8 +42,8 @@ Before contributing, please review:
 - Important Notes
 - Roadmap
 
-Understanding the project’s goals and philosophy will significantly
-increase the likelihood that a contribution is accepted.
+Contributions are 
+reviewed with these documents in mind.
 
 If you’re unsure whether a feature fits the project’s scope, please ask before implementing it.
 
@@ -111,4 +111,4 @@ Not all contributions will be
 merged, and the decision to decline a proposal does not reflect on the
 quality of the idea or the effort involved.
 
-Thoughtful discussion and collaboration are always welcome!
+Thoughtful discussion and collaboration is always welcome!
