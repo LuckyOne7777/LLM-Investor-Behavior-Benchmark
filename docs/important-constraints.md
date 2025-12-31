@@ -40,6 +40,28 @@ ensuring parsed data is well-formed before execution.
 
 ---
 
+## Ongoing Development and Stability
+
+LIBB is an actively evolving research system. Version 1 prioritizes explicit state,
+reproducibility, and conceptual clarity over feature completeness or long-term API
+stability.
+
+Many of the constraints listed in this document reflect the current design and are
+not guaranteed to persist across future versions. Interfaces, workflows, and internal
+assumptions may change as the system matures and new research requirements emerge.
+
+---
+
 ## Lack of Supported Metrics
 
 For Version 1, the focus was just getting the system reliable and consistent, so right now the only supported metric class is sentiment. However, functions for performance functions have been created and just need to be connected.
+
+---
+
+## High Likelihood of Unknown Bugs
+
+This entire repo was built in a little over a month, so a high volume of tests have not been performed. 
+However in all my personal testing, all found bugs have been patched; please open a pull request for any unknown bugs.
+
+
+
