@@ -33,6 +33,18 @@ A minimal workflow requires:
 
 ---
 
+## Behavio Parameters
+
+The following parameters affect the behavior of a LIBB run:
+
+- `date` (default: current sustem date on execution):  
+  Overrides the current system date for the run.  
+  Used to reproduce historical executions or evaluate behavior at a specific point in time.
+
+- `STARTING_CASH` (default: `10_000`):  
+  Initial cash balance used when initializing a portfolio.  
+  Can be overridden to simulate different account sizes.
+
 ## Minimum Required Workflow
 
 ```python
