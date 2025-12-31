@@ -41,7 +41,10 @@ def main():
     elif day_num < 4:
         daily_flow(today) # Mon-Thursday
     else:  # Weekend
+        print("Weekend: Skipping...")
         pass
     print("Success!")
 
-main()
+
+if __name__ == "__main__":
+    main()

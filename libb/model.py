@@ -2,6 +2,7 @@ from pathlib import Path
 import pandas as pd
 import json
 from datetime import date
+from libb.execution.utils import append_log
 from libb.execution.process_order import  process_order
 from libb.metrics.sentiment_metrics import analyze_sentiment
 from libb.execution.update_data import update_market_value_columns
@@ -164,10 +165,10 @@ class LIBBmodel:
         "Append position history CSV based on portfolio data."
         portfolio_copy = self.portfolio.copy()
         portfolio_copy["date"] = self.date
+        assert (portfolio_copy["shares"] != 0).all() 
         portfolio_copy["avg_cost"] = portfolio_copy["cost_basis"] / portfolio_copy["shares"]
         portfolio_copy.drop(columns=["buy_price", "cost_basis"], inplace=True)
-        portfolio_copy.to_csv(self._position_history_path, mode="a", header= not 
-            self._position_history_path.exists(), index=False)
+        append_log(self._position_history_path, portfolio_copy)
         return
     
     def _append_portfolio_history(self) -> None:
@@ -194,16 +195,15 @@ class LIBBmodel:
         else:
             last_total_equity = self.portfolio_history["equity"].iloc[-1]
             return_pct = (present_total_equity / last_total_equity) - 1
-        log = pd.DataFrame([{
+        log = {
         "date": self.date,
         "cash": self.cash,
         "equity": present_total_equity,
         "return_pct": return_pct,
         "positions_value": market_equity,
-        }])
+        }
         try:
-             log.to_csv(self._portfolio_history_path, mode="a", header= not 
-            self._portfolio_history_path.exists(), index=False)
+            append_log(self._portfolio_history_path, log)
         except Exception as e:
             raise SystemError(f"""Error saving to portfolio_history for {self._model_path}. ({e}) 
                               You may have called 'reset_run()' without calling 'ensure_file_system()' immediately after.""")
@@ -226,7 +226,7 @@ class LIBBmodel:
         The File naming format is 'deep_research - {date}.txt'. """
         deep_research_name = Path(f"deep_research - {self.date}.txt")
         full_path =  self._deep_research_file_folder_path / deep_research_name
-        with open(full_path, "w") as file:
+        with open(full_path, "w", encoding="utf-8") as file:
             file.write(txt)
             file.close()
         return full_path
@@ -239,7 +239,7 @@ class LIBBmodel:
         """
         DAILY_UPDATES_FILE_NAME = Path(f"daily_update - {self.date}.txt")
         full_path = self._daily_reports_file_folder_path / DAILY_UPDATES_FILE_NAME
-        with open(full_path, "w") as file:
+        with open(full_path, "w", encoding="utf-8") as file:
             file.write(txt)
         return full_path
     

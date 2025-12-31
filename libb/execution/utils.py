@@ -7,15 +7,22 @@ def load_df(path: Path) -> pd.DataFrame:
         return pd.DataFrame()
     return pd.read_csv(path)
 
-def append_log(path: Path, row: dict) -> None:
+def append_log(path: Path, row: dict | pd.DataFrame) -> None:
     df = load_df(path)
 
     if df.columns.empty:
         raise RuntimeError("Schema missing: header not initialized")
+    
+    if isinstance(row, pd.DataFrame):
+        row = row.reindex(columns=df.columns)
+        row.to_csv(path, index=False, mode="a", header=False, encoding="utf-8",)
 
-    row_df = pd.DataFrame([row]).reindex(columns=df.columns)
-    row_df.to_csv(path, index=False, mode="a", header=False)
-
+    elif isinstance (row, dict):
+        row_df = pd.DataFrame([row]).reindex(columns=df.columns)
+        row_df.to_csv(path, index=False, mode="a", header=False, encoding="utf-8",)
+    else:
+        raise RuntimeError(f"Invalid data type given for append_log(): {type(row)}. Row must be either a DataFrame or dict.")
+    return
 
 def catch_missing_order_data(order: Order, required_cols: list, trade_log_path: Path) -> bool:
     """Log failures for missing or null data required for order.
