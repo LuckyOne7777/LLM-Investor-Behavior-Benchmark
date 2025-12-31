@@ -56,7 +56,7 @@ For Version 1, the focus was just getting the system reliable and consistent, so
 
 ---
 
-## High Likelihood of Unknown Bugs
+## Stability 
 
 LIBB has limited automated test coverage.
 Expect rough edges, especially outside the documented course.
