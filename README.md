@@ -128,7 +128,6 @@ python user_side/workflow.py
 - Run directory structure
 - Portfolio files
 - Metrics files
-- Research and report artifacts
 
 No manual file setup is required.
 
