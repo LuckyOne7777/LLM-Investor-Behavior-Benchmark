@@ -37,13 +37,15 @@ A minimal workflow requires:
 
 The following parameters affect the behavior of a LIBB run:
 
-- `date` (default: current sustem date on execution):  
-  Overrides the current system date for the run.  
-  Used to reproduce historical executions or evaluate behavior at a specific point in time.
+- `date` (`str | date`, default: current system date)  
+  Overrides the run date used by the model.  
+  Useful for reproducing historical executions or evaluating behavior at a specific point in time.
 
-- `STARTING_CASH` (default: `10_000`):  
+- `starting_cash` (`float`, default: `10_000`)  
   Initial cash balance used when initializing a portfolio.  
   Can be overridden to simulate different account sizes.
+  Changing starting cash value in after intial creation is not recommended.
+
 
 ## Minimum Required Workflow
 
@@ -83,7 +85,7 @@ MODELS = ["deepseek", "gpt-4.1"]
 
 def weekly_flow():
     for model in MODELS:
-        libb = LIBBmodel(f"user_side/runs/run_v1/{model}")
+        libb = LIBBmodel(f"user_side/runs/run_v1/{model}", date="2025-12-15", STARTING_CASH=30_000)
     # Required: initialize processed state
         libb.process_portfolio()
 
