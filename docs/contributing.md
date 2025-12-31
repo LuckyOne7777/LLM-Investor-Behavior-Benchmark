@@ -31,9 +31,6 @@ New features are considered selectively.
 - Contributions that introduce heavy abstraction, rigid workflows, or
   unnecessary dependencies are unlikely to be accepted.
 
-This approach helps ensure the project evolves deliberately rather than
-incrementally drifting in scope.
-
 ---
 
 ## Design Alignment
