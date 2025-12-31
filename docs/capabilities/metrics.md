@@ -9,7 +9,7 @@ All metric functions are intended to be called **after**
 
 ---
 
-## Sentiment Metrics
+## Sentiment
 
 Sentiment metrics analyze model-generated text and extract interpretable
 sentiment signals. These metrics are informational only and are primarily
@@ -76,7 +76,7 @@ report_type="Daily"
 
 ### Example Output
 
-```
+```python
 [
 {
 "subjectivity": 0.17369308571046696,
@@ -84,7 +84,7 @@ report_type="Daily"
 "positive_count": 31,
 "negative_count": 72,
 "token_count": 593,
-"report_type": "Unknown",
+"report_type": "Daily",
 "date": "2025-12-28"
 }
 ]
