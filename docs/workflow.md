@@ -44,17 +44,17 @@ A minimal workflow requires:
 MODELS = ["deepseek", "gpt-4.1"]
 
 def weekly_flow():
-for model in MODELS:
-libb = LIBBmodel(f"user_side/runs/run_v1/{model}")
+    for model in MODELS:
+        libb = LIBBmodel(f"user_side/runs/run_v1/{model}")
 
     # Required: must always run first
-    libb.process_portfolio()
+        libb.process_portfolio()
 
-    deep_research_report = prompt_deep_research(libb)
+        deep_research_report = prompt_deep_research(libb)
 
-    orders_json = parse_json(deep_research_report, "ORDERS_JSON")
-    libb.save_orders(orders_json)
-return
+        orders_json = parse_json(deep_research_report, "ORDERS_JSON")
+        libb.save_orders(orders_json)
+    return
 ```
 ---
 
@@ -75,22 +75,22 @@ from libb.other.parse import parse_json
 MODELS = ["deepseek", "gpt-4.1"]
 
 def weekly_flow():
-for model in MODELS:
-libb = LIBBmodel(f"user_side/runs/run_v1/{model}")
+    for model in MODELS:
+        libb = LIBBmodel(f"user_side/runs/run_v1/{model}")
     # Required: initialize processed state
-    libb.process_portfolio()
+        libb.process_portfolio()
 
-    deep_research_report = prompt_deep_research(libb)
+        deep_research_report = prompt_deep_research(libb)
 
     # Optional persistence
-    libb.save_deep_research(deep_research_report)
+        libb.save_deep_research(deep_research_report)
 
-    orders_json = parse_json(deep_research_report, "ORDERS_JSON")
-    libb.save_orders(orders_json)
+        orders_json = parse_json(deep_research_report, "ORDERS_JSON")
+        libb.save_orders(orders_json)
 
     # Optional post-processing
-    libb.analyze_sentiment(deep_research_report)
-return
+        libb.analyze_sentiment(deep_research_report)
+    return
 ```
 ---
 ### Daily Workflow
