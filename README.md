@@ -10,7 +10,7 @@ This project originally began as a generic benchmark for LLM-based trading in U.
 
 This raised a fundamental question: ***“Why isn’t LLM trading held to the same analytical standards as the rest of finance?”***
 
-So I developped a library designed to support rigorous evaluation of LLM-driven trading systems. The long-term goal is to provide a shared foundation for this work and, ultimately, to establish a community standard for this type of research.
+So I developed a library designed to support rigorous evaluation of LLM-driven trading systems. The long-term goal is to provide a shared foundation for this work and, ultimately, to establish a community standard for this type of research.
 
 ## Features
 
