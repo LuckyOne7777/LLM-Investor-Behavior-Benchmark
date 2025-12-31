@@ -1,9 +1,5 @@
 # How to Read This Repository
 
-This project is a stateful trading system designed for daily execution and research.
-It prioritizes explicit state, filesystem-backed persistence, and simple orchestration
-over abstract frameworks.
-
 If you are new here, check out the main `README.md` and **do not start by reading the code**.
 Start with the documents below.
 
@@ -14,7 +10,7 @@ This folder is best read in the recommended order rather than file-by-file.
 ## Recommended Reading Order
 
 ### 1. Design Intent (Optional)
-These documents explain *why* the system looks the way it does.
+These documents explain *why* the system looks and operates the way it does.
 
 - [design-principles.md](design-principles.md) — Core philosophy and tradeoffs
 
