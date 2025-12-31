@@ -46,24 +46,27 @@ The following parameters affect the behavior of a LIBB run:
   Can be overridden to simulate different account sizes.
   Changing starting cash value in after intial creation is not recommended.
 
+---
 
 ## Minimum Required Workflow
 
 ```python
-MODELS = ["deepseek", "gpt-4.1"]
 
-def weekly_flow():
-    for model in MODELS:
-        libb = LIBBmodel(f"user_side/runs/run_v1/{model}")
+from libb.model import LIBBmodel
+from libb.other.parse import parse_json # or another parsing function
 
-    # Required: must always run first
-        libb.process_portfolio()
+def workflow():
+  libb = LIBBmodel(f"some_folder/model-x")
 
-        deep_research_report = prompt_deep_research(libb)
+  # Required: must always run first
+  libb.process_portfolio()
 
-        orders_json = parse_json(deep_research_report, "ORDERS_JSON")
-        libb.save_orders(orders_json)
-    return
+  # user created function
+  report = prompt_model()
+
+  orders_json = parse_json(eport, "ORDERS_JSON")
+  libb.save_orders(orders_json)
+  return
 ```
 ---
 
