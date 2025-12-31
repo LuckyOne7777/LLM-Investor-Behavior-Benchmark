@@ -50,9 +50,20 @@ Execution scheduling (e.g., daily vs. weekly runs) and model orchestration
 are intentionally left to the user, preserving flexibility while
 maintaining a consistent on-disk state.
 
+
+## Documentation
+
+New to LIBB?  
+Start here → **[Documentation Guide](docs/README.md)**
+
+This guide explains the system philosophy, execution workflow,
+and how to read the codebase effectively.
+
+---
+
 ## Getting Started (Commands)
 
-This guide lists the minimum commands required to install and run LIBB.
+After reading, this guide lists the minimum commands required to install and run LIBB.
 No additional setup steps are required.
 
 ---
@@ -133,12 +144,6 @@ No manual file setup is required.
 
 ---
 
-## Next Steps
-
-- See [workflow.md](https://github.com/LuckyOne7777/LLM-Investor-Behavior-Benchmark/blob/main/docs/workflow.md) for execution flow
-- See [accessing-state.md](https://github.com/LuckyOne7777/LLM-Investor-Behavior-Benchmark/blob/main/docs/capabilities/accessing-state.md) for using model state
-- Read [important-constraints.md](https://github.com/LuckyOne7777/LLM-Investor-Behavior-Benchmark/blob/main/docs/important-constraints.md) for caveats
-  
 ## Research Directions
 
 LIBB is an exploratory research library, and its development is driven
