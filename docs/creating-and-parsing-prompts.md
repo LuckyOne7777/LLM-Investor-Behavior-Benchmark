@@ -80,7 +80,7 @@ class Order(TypedDict):
 ---
 
 ## Example: Valid ORDERS_JSON Output
-
+```python
 <ORDERS_JSON>
 {
   "orders": [
@@ -99,7 +99,7 @@ class Order(TypedDict):
   ]
 }
 </ORDERS_JSON>
-
+```
 ---
 
 ## Validation Behavior
@@ -134,7 +134,7 @@ libb.other.parse.parse_json
 ---
 
 ## Example Usage
-
+```python
 text = """
 Some commentary above.
 
@@ -152,17 +152,17 @@ Some commentary below.
 tag = "EXAMPLE"
 
 result = parse_json(text, tag)
-
+```
 ---
 
 ### Output
-
+```python
 {
   "orders": [
     { "ticker": "ABC" }
   ]
 }
-
+```
 The parsed result is now a standard Python object and may be passed directly to
 libb.save_orders(...).
 
