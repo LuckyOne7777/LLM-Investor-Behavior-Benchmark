@@ -9,7 +9,7 @@ Everything else, tone, reasoning style, rules, is user-controlled.
 
 ---
 
-## Required Output: ORDERS_JSON
+## Required Output:
 
 All trade instructions must be returned inside a single JSON block.
 
@@ -56,15 +56,26 @@ class Order(TypedDict):
 
 - shares  
   - must always be an integer  
-  - use 0 when action == "u" if shares are not relevant  
+  - use 0 when action == "u" if shares are not relevant
+ 
+- stop loss
+  - Needed for buy and update orders
+  - For buys, stoploss will default to 0
+  - Obviously an explict value is required for updates
+     
 
 - date  
   - must be formatted as YYYY-MM-DD  
-  - only orders with the same date as the processing will be processed  
+  - only orders with the same date as the processing will be processed
+  - orders past the current running date *will be deleted*  
 
 - rationale and confidence  
   - currently recorded but not enforced  
-  - included for future extensibility and auditing  
+  - included for future extensibility and auditing
+ 
+- time in force
+  - Currently the only supported type is "DAY"
+  - time in force is not currently read by the system and will default to "DAY"  
 
 ---
 
