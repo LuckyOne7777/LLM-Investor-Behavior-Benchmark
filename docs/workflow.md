@@ -89,7 +89,6 @@ MODELS = ["deepseek", "gpt-4.1"]
 def weekly_flow():
     for model in MODELS:
         libb = LIBBmodel(f"user_side/runs/run_v1/{model}", date="2025-12-15", STARTING_CASH=30_000)
-    # Required: initialize processed state
         libb.process_portfolio()
 
         deep_research_report = prompt_deep_research(libb)
@@ -112,7 +111,6 @@ def daily_flow():
     for model in MODELS:
         libb = LIBBmodel(f"user_side/runs/run_v1/{model}")
 
-    # Required
         libb.process_portfolio()
 
         daily_report = prompt_daily_report(libb)
