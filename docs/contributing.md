@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to LIBB! Contributions,
 discussion, and alternative perspectives are welcome, especially from
-those interested in rigorous, transparent research workflows.
+those interested in the core design philosophy 
 
 To keep the project focused and maintainable, contributions are guided
 by the principles outlined below.
@@ -110,7 +110,7 @@ shape project direction, and uphold core design principles.
 
 ## Final Note
 
-LIBB is a research-oriented project. Not all contributions will be
+Not all contributions will be
 merged, and the decision to decline a proposal does not reflect on the
 quality of the idea or the effort involved.
 
