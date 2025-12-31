@@ -48,6 +48,6 @@ logging structure.
 ## Avoiding Reliance on Existing Infrastructure
 
 To maintain maximum control and transparency, the codebase intentionally
-avoids heavy external frameworks orAPIs. This design allows both
+avoids heavy external frameworks or APIs. This design allows both
 users and project developers to freely inspect, modify, and extend all
 aspects of LIBB without being constrained by hidden abstractions.
