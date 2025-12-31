@@ -11,8 +11,6 @@ by the principles outlined below.
 
 ## Scope of Contributions
 
-LIBB is intentionally aware of its scope and direction.
-
 - **Bug fixes**, documentation improvements, and fixes for existing
   issues are always welcome.
 - Improvements that increase correctness, clarity, or reproducibility
