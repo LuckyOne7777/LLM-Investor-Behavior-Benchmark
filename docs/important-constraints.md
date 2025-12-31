@@ -38,15 +38,11 @@ ensuring parsed data is well-formed before execution.
 
 ---
 
-## Ongoing Development and Stability
+## Ongoing Development
 
-LIBB is an actively evolving research system. Version 1 prioritizes explicit state,
-reproducibility, and conceptual clarity over feature completeness or long-term API
-stability.
-
-Many of the constraints listed in this document reflect the current design and are
-not guaranteed to persist across future versions. Interfaces, workflows, and internal
-assumptions may change as the system matures and new research requirements emerge.
+LIBB is under active development,
+so workflows and assumptions will likely become outdated when updating versions.
+Always review docs and revise the system as outlined beforehand.
 
 ---
 
