@@ -50,6 +50,42 @@ Before contributing, please review:
 Understanding the project’s goals and philosophy will significantly
 increase the likelihood that a contribution is accepted.
 
+If you’re unsure whether a feature fits the project’s scope, please ask before implementing it.
+
+---
+
+## Issues and Discussions
+
+Issues are encouraged for:
+
+- Bug reports or unexpected behavior
+- Questions about intended usage or design decisions
+- Early discussion of feature ideas before implementation
+- Clarifying documentation or constraints
+
+When opening an issue, please include as much context as possible
+(e.g., what you were trying to do, expected vs. actual behavior).
+
+Not all feature ideas will be accepted, but discussion is always
+welcome and helps inform future direction.
+
+---
+
+## Pull Requests
+
+All contributions should be submitted via pull request.
+
+When opening a pull request, please:
+
+- Clearly describe **what** the change does and **why** it is needed
+- Keep pull requests **focused and well-scoped** (avoid bundling unrelated changes)
+- Reference any relevant issues, discussions, or roadmap items when applicable
+- Update or add documentation if behavior, assumptions, or usage changes
+- Ensure the project runs correctly after your changes
+
+Pull requests that introduce new features should generally be preceded
+by a discussion or existing issue.
+
 ---
 
 ## Becoming a Maintainer
