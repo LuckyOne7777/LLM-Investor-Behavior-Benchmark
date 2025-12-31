@@ -70,9 +70,8 @@ class LIBBmodel:
 
 
 # ----------------------------------
-# File Handling
+# Filesystem & Persistence
 # ----------------------------------
-
 
     def ensure_file_system(self):
         "Create and set up all files/folders needed for processing and metrics. Automatically called during construction."
@@ -132,12 +131,6 @@ class LIBBmodel:
             path.write_text(default_content, encoding="utf-8")
 
 
-# ----------------------------------
-# Helpers
-# ----------------------------------
-
-
-
     def _load_csv(self, path: Path) -> pd.DataFrame:
         """Helper for loading CSV at a given path. Return empty DataFrame for invalid paths."""
         if path.exists():
@@ -164,6 +157,9 @@ class LIBBmodel:
             return
         for order in orders:
             order_date = pd.Timestamp(order["date"]).date()
+            # drop orders in the past
+            if order_date < self.date:
+                continue
             if order_date == self.date:
                 self.portfolio, self.cash = process_order(order, self.portfolio, 
                 self.cash, self._trade_log_path)

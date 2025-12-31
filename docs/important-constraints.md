@@ -37,3 +37,9 @@ Order extraction and structured data generation rely on manual parsing
 of model-generated outputs. The framework does not enforce schema
 validation or automatic correction, and users are responsible for
 ensuring parsed data is well-formed before execution.
+
+---
+
+## Lack of Supported Metrics
+
+For Version 1, the focus was just getting the system reliable and consistent, so right now the only supported metric class is sentiment. However, functions for performance functions have been created and just need to be connected.
