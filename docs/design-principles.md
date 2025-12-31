@@ -28,8 +28,7 @@ working.
 All class variables and functions are explicitly exposed, allowing users
 to freely edit variables such as portfolio and cash.
 
-In the future, name mangling may be introduced for deeper system
-functions and variables where appropriate.
+Name mangling is used to deter editing of vital variables and prevent use of unnecessary system functions, but all are still open to users.
 
 ---
 
