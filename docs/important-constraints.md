@@ -58,8 +58,9 @@ For Version 1, the focus was just getting the system reliable and consistent, so
 
 ## High Likelihood of Unknown Bugs
 
-This entire repo was built in a little over a month, so a high volume of tests have not been performed. 
-However in all my personal testing, all found bugs have been patched; please open a pull request for any unknown bugs.
-
+LIBB has limited automated test coverage.
+Expect rough edges, especially outside the documented course.
+Bug reports and pull requests are welcome.
+    
 
 
