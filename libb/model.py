@@ -69,6 +69,11 @@ class LIBBmodel:
         self.sentiment: dict = self._load_json(self._metrics_dir / "sentiment.json")
 
 
+# ----------------------------------
+# File Handling
+# ----------------------------------
+
+
     def ensure_file_system(self):
         "Create and set up all files/folders needed for processing and metrics. Automatically called during construction."
         for dir in [self._root, self._portfolio_dir, self._metrics_dir, self._research_dir, self._daily_reports_file_folder_path, 
@@ -127,6 +132,12 @@ class LIBBmodel:
             path.write_text(default_content, encoding="utf-8")
 
 
+# ----------------------------------
+# Helpers
+# ----------------------------------
+
+
+
     def _load_csv(self, path: Path) -> pd.DataFrame:
         """Helper for loading CSV at a given path. Return empty DataFrame for invalid paths."""
         if path.exists():
@@ -139,6 +150,11 @@ class LIBBmodel:
             with open(path, "r") as f:
                 return json.load(f)
         return {}
+    
+# ----------------------------------
+# Portfolio Processing
+# ----------------------------------
+
 
     def _process_orders(self) -> None:
         "Process all pending orders for the current date."
@@ -221,6 +237,11 @@ class LIBBmodel:
         self._append_portfolio_history()
         self._append_position_history()
 
+# ----------------------------------
+# Saving Logs
+# ----------------------------------
+
+
     def save_deep_research(self, txt: str) -> Path:
         """Save given text to 'deep_research' folder. Returns the file path after completion.
         The File naming format is 'deep_research - {date}.txt'. """
@@ -237,8 +258,8 @@ class LIBBmodel:
             Returns the file path after completion.
             The file naming format is 'daily_update - {date}.txt'.
         """
-        DAILY_UPDATES_FILE_NAME = Path(f"daily_update - {self.date}.txt")
-        full_path = self._daily_reports_file_folder_path / DAILY_UPDATES_FILE_NAME
+        daily_updates_file_name = Path(f"daily_update - {self.date}.txt")
+        full_path = self._daily_reports_file_folder_path / daily_updates_file_name
         with open(full_path, "w", encoding="utf-8") as file:
             file.write(txt)
         return full_path
@@ -273,6 +294,11 @@ class LIBBmodel:
             file.write(text)
             file.close()
         return
+
+# ----------------------------------
+# Calculate Metrics
+# ----------------------------------
+
     
     def analyze_sentiment(self, text: str, report_type: str="Unknown") -> dict:
         """
