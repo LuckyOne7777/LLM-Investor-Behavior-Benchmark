@@ -97,20 +97,20 @@ def weekly_flow():
 
 ```python
 def daily_flow():
-for model in MODELS:
-libb = LIBBmodel(f"user_side/runs/run_v1/{model}")
+    for model in MODELS:
+        libb = LIBBmodel(f"user_side/runs/run_v1/{model}")
 
     # Required
-    libb.process_portfolio()
+        libb.process_portfolio()
 
-    daily_report = prompt_daily_report(libb)
+        daily_report = prompt_daily_report(libb)
 
-    libb.analyze_sentiment(daily_report)
-    libb.save_daily_update(daily_report)
+        libb.analyze_sentiment(daily_report)
+        libb.save_daily_update(daily_report)
 
-    orders_json = parse_json(daily_report, "ORDERS_JSON")
-    libb.save_orders(orders_json)
-return
+        orders_json = parse_json(daily_report, "ORDERS_JSON")
+        libb.save_orders(orders_json)
+    return
 ```
 
 ## Notes
