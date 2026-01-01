@@ -123,10 +123,38 @@ def daily_flow():
     return
 ```
 
+---
+
+## Created File Tree
+
+After running for the first time, LIBB generates a fixed directory structure at the user-specified output path.
+
+```
+<output_dir>/
+├── metrics/          # evaluation
+│   ├── behavior.json
+│   ├── performance.json
+│   └── sentiment.json
+├── portfolio/        # trading state & history
+│   ├── pending_trades.json
+│   ├── portfolio.csv
+│   ├── portfolio_history.csv
+│   ├── position_history.csv
+│   └── trade_log.csv
+└── research/         # generated analysis
+    ├── daily_reports/
+    └── deep_research/
+
+```
+
+LIBB will use this file tree to save artifacts for all future runs in the output directory.
+
+---
+
+
+
 ## Notes
 
-- `process_portfolio()` is intentionally explicit and must never be called implicitly
 - do not use any other functions besides `process_portfolio()` for processing
 - Constructors do not perform processing or side effects
-- Users are free to extend or reorder optional steps, but processing must occur first
 - The workflow is designed for reproducibility and auditability
