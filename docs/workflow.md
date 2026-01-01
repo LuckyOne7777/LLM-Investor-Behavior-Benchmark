@@ -4,6 +4,7 @@ This section describes the canonical way to use LIBB in research or live-trackin
 
 LIBB is explicit and procedural by design:
 - No critical logic runs implicitly
+- All file handling is deterministic and setup automatically
 - Users control when processing, prompting, and persistence occur
 - The workflow is identical for single-model and multi-model runs
 
