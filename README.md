@@ -125,9 +125,13 @@ pip install -e .
 ```bash
 python -c "import libb; print(libb)"
 ```
+If successful, the output look something like:
+```bash
+<module 'libb' from 'C:\\Users\\nathan\\LIBB\\libb\\__init__.py'>
+```
 ---
 
-## 7. Set Environmental variables
+## 7. Set Environmental Variables
 
 To run the example workflow, you are required to have a the following API keys set
 in your environmental variables.
@@ -160,7 +164,7 @@ No manual file setup is required.
 ## Research Directions
 
 LIBB is an exploratory research library, and its development is driven
-by ongoing questions rather than a fixed roadmap.
+by ongoing areas of improvement rather than a fixed roadmap.
 
 Areas of current interest include:
 
@@ -170,7 +174,7 @@ Areas of current interest include:
 - Improved tooling for comparing runs and strategies over time
 - General design improvements for efficiency and code quality
 
-To see the current roadmap for major features, check out: roadmap.md
+To see the current roadmap for major features, check out: [roadmap.md](docs/short-term-roadmap.md)
 
 These directions reflect current research interests and may evolve,
 change, or be abandoned as the project develops.
