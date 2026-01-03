@@ -31,6 +31,7 @@ These describe the major capabilities at a high level.
   - [accessing-state.md](capabilities/accessing-state.md)
   - [file-interaction.md](capabilities/file-interaction.md)
   - [metrics.md](capabilities/metrics.md)
+  [graphing.md](capabilities/graphing.md)
   - [creating-and-parsing-prompts.md](creating-and-parsing-prompts.md)
 
 ---
