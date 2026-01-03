@@ -4,13 +4,6 @@
 
 The equity–sentiment graphing function provides a standardized way to inspect portfolio performance alongside model-derived sentiment signals over time.
 
-The primary goal of these plots is **diagnostic evaluation**, not performance storytelling or causal inference.
-
-Visual design choices prioritize:
-- temporal alignment
-- signal separation
-- methodological conservatism
-
 ---
 
 ## Function: `plot_equity_and_sentiment`
