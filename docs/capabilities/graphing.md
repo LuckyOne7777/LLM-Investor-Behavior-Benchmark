@@ -1,10 +1,5 @@
 # Graphing
 
-## Overview
-
-The equity–sentiment graphing function provides a standardized way to inspect portfolio performance alongside model-derived sentiment signals over time.
-
----
 
 ## Function: `plot_equity_and_sentiment`
 
