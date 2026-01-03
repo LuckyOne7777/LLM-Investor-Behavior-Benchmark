@@ -2,7 +2,7 @@ from pathlib import Path
 import pandas as pd
 import json
 from datetime import date
-from libb.execution.utils import append_log
+from libb.execution.utils import append_log, is_nyse_open
 from libb.execution.process_order import  process_order
 from libb.metrics.sentiment_metrics import analyze_sentiment
 from libb.execution.update_data import update_market_value_columns
@@ -222,7 +222,7 @@ class LIBBmodel:
         return
     def _update_portfolio_market_data(self) -> None:
         """Update market portfolio values and save to disk."""
-        self.portfolio = update_market_value_columns(self.portfolio, self.cash)
+        self.portfolio = update_market_value_columns(self.portfolio, self.cash, date=self.date)
         self.portfolio.to_csv(self._portfolio_path, index=False)
         return
     

@@ -1,6 +1,8 @@
 import pandas as pd
 from pathlib import Path
 from .types_file import Order
+import datetime as dt
+import pandas_market_calendars as mcal
 
 def load_df(path: Path) -> pd.DataFrame:
     if not path.exists():
@@ -47,3 +49,21 @@ def catch_missing_order_data(order: Order, required_cols: list, trade_log_path: 
         return False
 
     return True
+
+def is_nyse_open(date: dt.date) -> bool:
+    """
+    Check if the NYSE is open on a given date.
+
+    Parameters
+    ----------
+    date : datetime.date
+        The date to check.
+
+    Returns
+    -------
+    bool
+        True if NYSE is open, False otherwise.
+    """
+    nyse = mcal.get_calendar("NYSE")
+    schedule = nyse.schedule(start_date=date, end_date=date)
+    return not schedule.empty
