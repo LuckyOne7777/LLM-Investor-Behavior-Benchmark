@@ -43,7 +43,7 @@ The following parameters affect the behavior of a LIBB run:
   Overrides the run date used by the model.  
   Useful for reproducing historical executions or evaluating behavior at a specific point in time.
 
-- `starting_cash` (`float`, default: `10_000`)  
+- `STARTING_CASH` (`float`, default: `10_000`)  
   Initial cash balance used when initializing a portfolio.  
   Can be overridden to simulate different account sizes.
   Changing starting cash value in after intial creation is not recommended.
