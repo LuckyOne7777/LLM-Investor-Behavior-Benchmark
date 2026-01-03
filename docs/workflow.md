@@ -35,7 +35,7 @@ A minimal workflow requires:
 
 ---
 
-## Behavio Parameters
+## Behavioral Parameters
 
 The following parameters affect the behavior of a LIBB run:
 
