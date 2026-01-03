@@ -127,7 +127,19 @@ python -c "import libb; print(libb.file)"
 ```
 ---
 
-## 7. Run an Example Workflow
+## 7. Set Environmental variables
+
+To run the example workflow, you are required to have a the following API keys set
+in your environmental variables.
+
+```bash
+export OPENAI_API_KEY="key"
+export DEEPSEEK_API_KEY="key"
+```
+
+---
+
+## 8. Run an Example Workflow
 
 ```bash
 python user_side/workflow.py
