@@ -123,7 +123,7 @@ pip install -e .
 ## 6. Verify Installation
 
 ```bash
-python -c "import libb; print(libb.file)"
+python -c "import libb; print(libb)"
 ```
 ---
 
