@@ -31,6 +31,7 @@ A minimal workflow requires:
 - Prompt skeletons (e.g. daily or weekly research prompts)
 - User-defined functions for executing prompts
 - Familiarity with constraints listed in `important-notes.md`
+- API keys set for `OPENAI_API_KEY` and `DEEPSEEK_API_KEY`
 
 ---
 
