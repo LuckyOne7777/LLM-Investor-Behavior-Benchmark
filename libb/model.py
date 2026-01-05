@@ -159,6 +159,22 @@ class LIBBmodel:
             order_date = pd.Timestamp(order["date"]).date()
             # drop orders in the past
             if order_date < self.date:
+                append_log(self._trade_log_path, {
+                    "date": order["date"],
+                    "ticker": order["ticker"],
+                    "action": order["action"],
+                    "status": "FAILED",
+                    "reason": f"ORDER DATE ({order_date}) IS PAST RUN DATE ({self.date})"
+                                                    })
+                continue
+            if not isinstance(order["shares"], int) and order["shares"] is not None:
+                append_log(self._trade_log_path, {
+                    "date": order["date"],
+                    "ticker": order["ticker"],
+                    "action": order["action"],
+                    "status": "FAILED",
+                    "reason": f"SHARES NOT INT: ({order["shares"]})"
+                                                    })
                 continue
             if order_date == self.date:
                 self.portfolio, self.cash = process_order(order, self.portfolio, 

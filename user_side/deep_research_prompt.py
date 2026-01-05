@@ -9,7 +9,7 @@ def create_deep_research_prompt(libb):
   portfolio_news = get_portfolio_news(libb.portfolio)
   execution_log = recent_execution_logs(libb._trade_log_path, date=libb.date)
   us_news = get_macro_news()
-  # due to f-string formatting errors, had to define it seperately 
+  # defining it seperately due to f-string formatting errors
   example_orders_json = """
   <ORDERS_JSON>
 {
@@ -37,7 +37,7 @@ You are a professional-grade portfolio analyst operating in WEEKLY Deep Research
 Mode. Your job is to reevaluate the entire portfolio and produce a complete
 action plan with exact orders. Optimize risk-adjusted return under strict
 constraints. All reasoning must reflect conditions as of the most recent market
-close. Today is {today}
+close. Today is {today}.
 
 BEGIN BY RESTATING THE RULES, then deliver your research, decisions, and orders.
 
