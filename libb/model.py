@@ -155,7 +155,8 @@ class LIBBmodel:
 
 
     def _process_orders(self) -> None:
-        "Process all pending orders for the current date."
+        """Process all pending orders for the current date.
+        Not recommended for workflows; only use `process_portfolio()` for processing."""
         orders = self.pending_trades.get("orders", [])
         unexecuted_trades = {"orders": []}
         if not orders:
@@ -205,7 +206,8 @@ class LIBBmodel:
         return
     
     def _append_portfolio_history(self) -> None:
-        "Append portfolio history CSV based on portfolio data."
+        """Append portfolio history CSV based on portfolio data."""
+
         defaults = {
             "ticker": "",
             "shares": 0,
@@ -219,7 +221,7 @@ class LIBBmodel:
                 self.portfolio[col] = default
 
         if "market_value" not in self.portfolio.columns and not self.portfolio.empty:
-            raise RuntimeError("market_value not computed before portfolio history update")
+            raise RuntimeError("`market_value` not computed before portfolio history update")
         market_equity = self.portfolio["market_value"].sum()
         present_total_equity = market_equity + self.cash
         if self.portfolio_history.empty:
@@ -239,7 +241,7 @@ class LIBBmodel:
             append_log(self._portfolio_history_path, log)
         except Exception as e:
             raise SystemError(f"""Error saving to portfolio_history for {self._model_path}. ({e}) 
-                              You may have called 'reset_run()' without calling 'ensure_file_system()' immediately after.""")
+                              You may have called 'reset_run()` without calling `ensure_file_system()` immediately after.""")
         return
     def _update_portfolio_market_data(self) -> None:
         """Update market portfolio values and save to disk."""
@@ -260,8 +262,8 @@ class LIBBmodel:
 
 
     def save_deep_research(self, txt: str) -> Path:
-        """Save given text to 'deep_research' folder. Returns the file path after completion.
-        The File naming format is 'deep_research - {date}.txt'. """
+        """Save given text to `deep_research` folder. Returns the file path after completion.
+        The file naming format is `deep_research - {date}.txt`. """
         deep_research_name = Path(f"deep_research - {self.date}.txt")
         full_path =  self._deep_research_file_folder_path / deep_research_name
         with open(full_path, "w", encoding="utf-8") as file:
@@ -270,10 +272,10 @@ class LIBBmodel:
         return full_path
     
     def save_daily_update(self, txt: str) -> Path:
-        """Save the given text to the 'daily_reports' folder.
+        """Save the given text to the `daily_reports` folder.
 
             Returns the file path after completion.
-            The file naming format is 'daily_update - {date}.txt'.
+            The file naming format is `daily_update - {date}.txt`.
         """
         daily_updates_file_name = Path(f"daily_update - {self.date}.txt")
         full_path = self._daily_reports_file_folder_path / daily_updates_file_name
@@ -283,13 +285,13 @@ class LIBBmodel:
     
     def save_orders(self, json_block: dict) -> None:
         """
-        Save the given JSON-serializable data to 'pending_trades.json'.
+        Save the given JSON-serializable data to `pending_trades.json`.
         """
         with open(self._pending_trades_path, "w") as file:
             try:
                 json.dump(json_block, file, indent=2)
             except Exception as e:
-                raise RuntimeError(f"Error while saving JSON block to 'pending_trades.json'. ({e})")
+                raise RuntimeError(f"Error while saving JSON block to `pending_trades.json`. ({e})")
         return
 
     def save_additonal_log(self, file_name: str, text: str, folder: str="additional_logs", append: bool=False) -> None:
@@ -297,11 +299,11 @@ class LIBBmodel:
     Save text to a log file inside the research directory.
 
     Args:
-        file_name (str): Name of the file to write to.
-        text (str): Text content to save.
-        folder (str, optional): Subfolder inside research_dir where the file
+        file_name (`str`, required): Name of the file to write to.
+        text (`str`): Text content to save.
+        folder (`str`, optional): Subfolder inside research_dir where the file
             will be stored. Defaults to "additional_logs".
-        append (bool, optional): If True, append to the file; otherwise,
+        append (`bool`, optional): If True, append to the file; otherwise,
             overwrite it. Defaults to False.
         """
         path = Path(self._research_dir / folder / file_name)
@@ -325,8 +327,8 @@ class LIBBmodel:
         and written to disk as JSON.
 
         Args:
-            text (str): Text to analyze.
-            report_type (str, optional): Type or source of the report.
+            text (`str`, required): Text to analyze.
+            report_type (`str`, optional): Type or source of the report.
                 Defaults to "Unknown".
 
         Returns:
