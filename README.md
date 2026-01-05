@@ -64,7 +64,7 @@ and how to read the codebase effectively.
 
 ## Getting Started (Commands)
 
-After reading, this guide lists the minimum commands required to install and run LIBB.
+This guide lists the minimum commands required to install and run LIBB.
 No additional setup steps are required.
 
 ---
@@ -72,7 +72,7 @@ No additional setup steps are required.
 ## 1. Clone the Repository
 
 git clone https://github.com/LuckyOne7777/LLM-Investor-Behavior-Benchmark.git
-cd LIBB
+cd LLM-Investor-Behavior-Benchmark
 ```
 
 ---
@@ -112,7 +112,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## 5. Install LIBB (Editable Mode)
+## 5. Install LIBB (Editable / Development Mode)
 
 ```bash
 pip install -e .
@@ -129,18 +129,19 @@ If successful, the output look something like:
 ```bash
 <module 'libb' from 'C:\\Users\\nathan\\LIBB\\libb\\__init__.py'>
 ```
+
 ---
 
 ## 7. Set Environmental Variables
 
-To run the example workflow, you are required to have a the following API keys set
+To run the example workflow, you are required to have the following API keys set
 in your environmental variables.
 
 ```bash
 export OPENAI_API_KEY="key"
 export DEEPSEEK_API_KEY="key"
 ```
-
+(Windows PowerShell users may use `setx` instead.)
 ---
 
 ## 8. Run an Example Workflow
