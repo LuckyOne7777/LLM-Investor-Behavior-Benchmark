@@ -94,6 +94,10 @@ will fail silently or raise errors.
   Require interactive confirmation before deleting files.  
   Defaults to `True`.
 
+- `auto_ensure` (`bool`, optional): 
+  Automatically calls `ensure_file_system()` after deletion.
+  Defaults to False.
+
 ---
 
 ### Safety Checks

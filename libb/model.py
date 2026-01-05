@@ -92,7 +92,7 @@ class LIBBmodel:
         self._ensure_file(self._sentiment_path, "[]")
         return
     
-    def reset_run(self, cli_check: bool = True) -> None:
+    def reset_run(self, cli_check: bool = True, auto_ensure: bool = False) -> None:
         """
         Delete all files within the given root.
 
@@ -102,6 +102,9 @@ class LIBBmodel:
         Args:
             cli_check (bool): Require interactive confirmation before deleting files.
                 Defaults to True.
+
+            auto_ensure (bool): Automatically calls `ensure_file_system()` after deletion
+                Defaults to False.
         """
         
         if cli_check:
@@ -117,6 +120,8 @@ class LIBBmodel:
                 rmtree(child)
             else:
                 child.unlink()
+        if auto_ensure:
+            self.ensure_file_system()
         return
 
     def _ensure_dir(self, path: Path) -> None:
