@@ -135,13 +135,15 @@ If successful, the output look something like:
 ## 7. Set Environmental Variables
 
 To run the example workflow, you are required to have the following API keys set
-in your environmental variables.
+in your environmental variables. Be sure to add any additonal keys needed for your workflow.
 
 ```bash
 export OPENAI_API_KEY="key"
 export DEEPSEEK_API_KEY="key"
 ```
+
 (Windows PowerShell users may use `setx` instead.)
+
 ---
 
 ## 8. Run an Example Workflow
