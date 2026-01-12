@@ -1,13 +1,14 @@
 from pathlib import Path 
 import pandas as pd
 import json
-from datetime import date
+from datetime import date, datetime
 from libb.execution.utils import append_log, is_nyse_open
 from libb.execution.process_order import  process_order
 from libb.metrics.sentiment_metrics import analyze_sentiment
 from libb.execution.update_data import update_market_value_columns
+from libb.user_data.news import _get_macro_news, _get_portfolio_news
+from libb.user_data.logs import _recent_execution_logs
 from shutil import rmtree
-from datetime import date
 
 class LIBBmodel:
     """
@@ -15,7 +16,7 @@ class LIBBmodel:
     and daily execution for a single run date.
     """
     def __init__(self, model_path: Path | str, starting_cash: float = 10_000, 
-                 date: str | date | None = None):
+                 run_date: str | date | None = None):
         """
         Initialize the trading model and load persisted state.
 
@@ -24,15 +25,15 @@ class LIBBmodel:
             starting_cash: Initial cash balance if no portfolio exists.
             date: Run date for the model. If None, defaults to today.
         """
-        if date is None:
-            date = pd.Timestamp.now().date()
+        if run_date is None:
+            run_date = pd.Timestamp.now().date()
         else:
-            date = pd.Timestamp(date).date()
+            run_date = pd.Timestamp(run_date).date()
 
         self.STARTING_CASH: float = starting_cash
         self._root: Path = Path(model_path)
         self._model_path: str = str(model_path)
-        self.date = date
+        self.date = run_date
 
         # directories
         self._portfolio_dir: Path = self._root / "portfolio"
@@ -339,3 +340,23 @@ class LIBBmodel:
         with open(self._sentiment_path, "w") as file:
             json.dump(self.sentiment, file, indent=2)
         return log
+
+# ----------------------------------
+# News
+# ----------------------------------
+
+    def get_portfolio_news(self, n: int = 2, summary_limit: int = 150):
+        """Return current-day portfolio news (see services.news.get_portfolio_news)."""
+        return _get_portfolio_news(self.portfolio, n=n, summary_limit=summary_limit)
+    
+
+# ----------------------------------
+# user logs
+# ----------------------------------
+    def recent_execution_logs(self, date: None | str | datetime = None, look_back: int = 5) -> pd.DataFrame:
+        if date is None:
+            date = self.date
+        return _recent_execution_logs(self._trade_log_path, date=date, look_back=look_back)
+    
+    
+    
