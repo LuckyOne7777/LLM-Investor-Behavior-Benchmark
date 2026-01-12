@@ -125,6 +125,6 @@ def _get_portfolio_news(portfolio, n: int = 2, summary_limit: int = 150):
         return ("Portfolio is empty.")
     portfolio_news = []
     for ticker in tickers:
-        ticker_news = get_ticker_news(ticker, n, summary_limit)
+        ticker_news = _get_ticker_news(ticker, n, summary_limit)
         portfolio_news.append(f"{ticker_news}")
     return ("\n\n").join(portfolio_news)

@@ -33,7 +33,7 @@ class LIBBmodel:
         self.STARTING_CASH: float = starting_cash
         self._root: Path = Path(model_path)
         self._model_path: str = str(model_path)
-        self.date = run_date
+        self.run_date: date = run_date
 
         # directories
         self._portfolio_dir: Path = self._root / "portfolio"
@@ -165,13 +165,13 @@ class LIBBmodel:
         for order in orders:
             order_date = pd.Timestamp(order["date"]).date()
             # drop orders in the past
-            if order_date < self.date:
+            if order_date < self.run_date:
                 append_log(self._trade_log_path, {
                     "date": order["date"],
                     "ticker": order["ticker"],
                     "action": order["action"],
                     "status": "FAILED",
-                    "reason": f"ORDER DATE ({order_date}) IS PAST RUN DATE ({self.date})"
+                    "reason": f"ORDER DATE ({order_date}) IS PAST RUN DATE ({self.run_date})"
                                                     })
                 continue
             if not isinstance(order["shares"], int) and order["shares"] is not None:
@@ -183,7 +183,7 @@ class LIBBmodel:
                     "reason": f"SHARES NOT INT: ({order["shares"]})"
                                                     })
                 continue
-            if order_date == self.date:
+            if order_date == self.run_date:
                 self.portfolio, self.cash = process_order(order, self.portfolio, 
                 self.cash, self._trade_log_path)
             else:
@@ -199,7 +199,7 @@ class LIBBmodel:
     def _append_position_history(self) -> None:
         "Append position history CSV based on portfolio data."
         portfolio_copy = self.portfolio.copy()
-        portfolio_copy["date"] = self.date
+        portfolio_copy["date"] = self.run_date
         assert (portfolio_copy["shares"] != 0).all() 
         portfolio_copy["avg_cost"] = portfolio_copy["cost_basis"] / portfolio_copy["shares"]
         portfolio_copy.drop(columns=["buy_price", "cost_basis"], inplace=True)
@@ -232,7 +232,7 @@ class LIBBmodel:
             last_total_equity = self.portfolio_history["equity"].iloc[-1]
             return_pct = (present_total_equity / last_total_equity) - 1
         log = {
-        "date": self.date,
+        "date": self.run_date,
         "cash": self.cash,
         "equity": present_total_equity,
         "return_pct": return_pct,
@@ -246,7 +246,7 @@ class LIBBmodel:
         return
     def _update_portfolio_market_data(self) -> None:
         """Update market portfolio values and save to disk."""
-        self.portfolio = update_market_value_columns(self.portfolio, self.cash, date=self.date)
+        self.portfolio = update_market_value_columns(self.portfolio, self.cash, date=self.run_date)
         self.portfolio.to_csv(self._portfolio_path, index=False)
         return
     
@@ -265,7 +265,7 @@ class LIBBmodel:
     def save_deep_research(self, txt: str) -> Path:
         """Save given text to `deep_research` folder. Returns the file path after completion.
         The file naming format is `deep_research - {date}.txt`. """
-        deep_research_name = Path(f"deep_research - {self.date}.txt")
+        deep_research_name = Path(f"deep_research - {self.run_date}.txt")
         full_path =  self._deep_research_file_folder_path / deep_research_name
         with open(full_path, "w", encoding="utf-8") as file:
             file.write(txt)
@@ -278,7 +278,7 @@ class LIBBmodel:
             Returns the file path after completion.
             The file naming format is `daily_update - {date}.txt`.
         """
-        daily_updates_file_name = Path(f"daily_update - {self.date}.txt")
+        daily_updates_file_name = Path(f"daily_update - {self.run_date}.txt")
         full_path = self._daily_reports_file_folder_path / daily_updates_file_name
         with open(full_path, "w", encoding="utf-8") as file:
             file.write(txt)
@@ -335,7 +335,7 @@ class LIBBmodel:
         Returns:
             dict: Sentiment analysis log for the given text.
         """
-        log = analyze_sentiment(text, self.date, report_type=report_type)
+        log = analyze_sentiment(text, self.run_date, report_type=report_type)
         self.sentiment.append(log)
         with open(self._sentiment_path, "w") as file:
             json.dump(self.sentiment, file, indent=2)
@@ -354,9 +354,14 @@ class LIBBmodel:
 # user logs
 # ----------------------------------
     def recent_execution_logs(self, date: None | str | datetime = None, look_back: int = 5) -> pd.DataFrame:
+        """
+        Return recent execution logs for the model (see `libb.user_data.logs._recent_execution_logs`).
+        """
         if date is None:
-            date = self.date
-        return _recent_execution_logs(self._trade_log_path, date=date, look_back=look_back)
+            effective_date = self.run_date
+        else:
+            effective_date = pd.Timestamp(date).date()
+        return _recent_execution_logs(self._trade_log_path, date=effective_date, look_back=look_back)
     
     
     

@@ -1,13 +1,16 @@
-from .get_prompt_data import get_portfolio_news, recent_execution_logs, get_macro_news
-def create_deep_research_prompt(libb):
-  today = libb.date
+from .get_prompt_data import get_macro_news
+from libb.model import LIBBmodel
+def create_deep_research_prompt(libb: LIBBmodel):
+  today = libb.run_date
   portfolio = libb.portfolio
   starting_cash = libb.STARTING_CASH
   if portfolio.empty:
     portfolio = f"You have 0 active positions, create your portfolio. The starting cash is {starting_cash}. You must make at least 1 trade."
 
-  portfolio_news = get_portfolio_news(libb.portfolio)
-  execution_log = recent_execution_logs(libb._trade_log_path, date=libb.date)
+  portfolio_news = libb.get_portfolio_news()
+  execution_log = libb.recent_execution_logs()
+  if execution_log.empty:
+    execution_log = "No recent trade logs."
   us_news = get_macro_news()
   # defining it seperately due to f-string formatting errors
   example_orders_json = """
