@@ -9,6 +9,21 @@ from libb.execution.update_data import update_market_value_columns
 from libb.user_data.news import _get_macro_news, _get_portfolio_news
 from libb.user_data.logs import _recent_execution_logs
 from shutil import rmtree
+from dataclasses import dataclass
+
+@dataclass
+class ModelSnapshot:
+    cash: float
+
+    portfolio_history: pd.DataFrame
+    portfolio: pd.DataFrame
+    trade_log: pd.DataFrame
+    position_history: pd.DataFrame
+
+    pending_trades: dict
+    performance: dict
+    behavior: dict
+    sentiment: dict
 
 class LIBBmodel:
     """
@@ -62,12 +77,15 @@ class LIBBmodel:
                      if not self.portfolio.empty else self.STARTING_CASH)
         self.portfolio_history: pd.DataFrame = self._load_csv(self._portfolio_dir / "portfolio_history.csv")
         self.trade_log: pd.DataFrame = self._load_csv(self._portfolio_dir / "trade_log.csv")
+        self.position_history: pd.DataFrame = self._load_csv(self._portfolio_dir / "position_history.csv")
 
         self.pending_trades: dict = self._load_json(self._portfolio_dir / "pending_trades.json")
-
         self.performance: dict = self._load_json(self._metrics_dir / "performance.json")
         self.behavior: dict = self._load_json(self._metrics_dir / "behavior.json")
         self.sentiment: dict = self._load_json(self._metrics_dir / "sentiment.json")
+
+        self.STARTUP_DISK_SNAPSHOT = self._save_disk_snapshot()
+        assert self.STARTUP_DISK_SNAPSHOT is not None
 
 
 # ----------------------------------
@@ -77,7 +95,7 @@ class LIBBmodel:
     def ensure_file_system(self):
         "Create and set up all files/folders needed for processing and metrics. Automatically called during construction."
         for dir in [self._root, self._portfolio_dir, self._metrics_dir, self._research_dir, self._daily_reports_file_folder_path, 
-                    self. _deep_research_file_folder_path]:
+                    self._deep_research_file_folder_path]:
             self._ensure_dir(dir)
 
         # portfolio files
@@ -149,7 +167,44 @@ class LIBBmodel:
             with open(path, "r") as f:
                 return json.load(f)
         return {}
+    def _override_json_file(self, data: dict, path: Path) -> None:
+        with open(path, "w") as file:
+            json.dump(data, file, indent=2)
+        return
     
+    def _override_csv_file(self, df: pd.DataFrame, path: Path) -> None:
+        df.to_csv(path, mode="w", header=True, index=False)
+        return
+    
+    def _save_disk_snapshot(self) -> ModelSnapshot:
+        "Function for saving a disk snapshot."
+        return ModelSnapshot(
+        cash= (float(self.portfolio["cash"].iloc[0]) 
+                     if not self.portfolio.empty else self.STARTING_CASH),
+
+        portfolio= self._load_csv(self._portfolio_path),
+        portfolio_history= self._load_csv(self._portfolio_history_path),
+        trade_log= self._load_csv(self._trade_log_path),
+        position_history=self._load_csv(self._position_history_path),
+        pending_trades= self._load_json(self._pending_trades_path),
+
+        performance= self._load_json(self._performance_path),
+        behavior= self._load_json(self._behavior_path),
+        sentiment= self._load_json(self._sentiment_path),
+        )
+    def _load_snapshot_to_disk(self, snapshot: ModelSnapshot) -> None:
+        """Override CSV and JSON artifacts based on prior disk snapshot."""
+        self._override_csv_file(snapshot.portfolio, self._portfolio_path)
+        self._override_csv_file(snapshot.portfolio_history, self._portfolio_history_path)
+        self._override_csv_file(snapshot.trade_log, self._trade_log_path)
+        self._override_csv_file(snapshot.position_history, self._position_history_path)
+
+        self._override_json_file(snapshot.performance, self._performance_path)
+        self._override_json_file(snapshot.sentiment, self._sentiment_path)
+        self._override_json_file(snapshot.pending_trades, self._pending_trades_path)
+        self._override_json_file(snapshot.behavior, self._behavior_path)
+        return
+
 # ----------------------------------
 # Portfolio Processing
 # ----------------------------------
@@ -222,7 +277,7 @@ class LIBBmodel:
                 self.portfolio[col] = default
 
         if "market_value" not in self.portfolio.columns and not self.portfolio.empty:
-            raise RuntimeError("`market_value` not computed before portfolio history update")
+            raise RuntimeError("`market_value` not computed before portfolio history update.")
         market_equity = self.portfolio["market_value"].sum()
         present_total_equity = market_equity + self.cash
         if self.portfolio_history.empty:
