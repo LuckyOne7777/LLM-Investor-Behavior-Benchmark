@@ -305,12 +305,22 @@ class LIBBmodel:
         self.portfolio.to_csv(self._portfolio_path, index=False)
         return
     
+    def _catch_processing_errors(self) -> None:
+        """
+        Process portfolio and reset to prior disk state on errors.
+        """
+        try:
+            self._process_orders()
+            self._update_portfolio_market_data()
+            self._append_portfolio_history()
+            self._append_position_history()
+        except Exception as e:
+            self._load_snapshot_to_disk(self.STARTUP_DISK_SNAPSHOT)
+            raise SystemError("Processing failed: disk state has been reset to snapshot created on startup.") from e
+
     def process_portfolio(self) -> None:
         "Wrapper for all portfolio processing."
-        self._process_orders()
-        self._update_portfolio_market_data()
-        self._append_portfolio_history()
-        self._append_position_history()
+        self._catch_processing_errors
 
 # ----------------------------------
 # Saving Logs
