@@ -2,6 +2,7 @@ from pathlib import Path
 import pandas as pd
 import json
 from datetime import date, datetime
+from libb.execution.types_file import Order, ModelSnapshot
 from libb.execution.utils import append_log, is_nyse_open
 from libb.execution.process_order import  process_order
 from libb.metrics.sentiment_metrics import analyze_sentiment
@@ -9,35 +10,6 @@ from libb.execution.update_data import update_market_value_columns
 from libb.user_data.news import _get_macro_news, _get_portfolio_news
 from libb.user_data.logs import _recent_execution_logs
 from shutil import rmtree
-from dataclasses import dataclass
-from libb.execution.types_file import Order
-from typing import cast
-from copy import deepcopy
-
-@dataclass (frozen=True)
-class ModelSnapshot:
-    cash: float
-
-    portfolio_history: pd.DataFrame
-    portfolio: pd.DataFrame
-    trade_log: pd.DataFrame
-    position_history: pd.DataFrame
-
-    pending_trades: dict[str, list[dict]]
-    performance: list[dict]
-    behavior: list[dict]
-    sentiment: list[dict]
-
-    def __post_init__(self):
-        object.__setattr__(self, "portfolio_history", self.portfolio_history.copy(deep=True))
-        object.__setattr__(self, "portfolio", self.portfolio.copy(deep=True))
-        object.__setattr__(self, "trade_log", self.trade_log.copy(deep=True))
-        object.__setattr__(self, "position_history", self.position_history.copy(deep=True))
-
-        object.__setattr__(self, "pending_trades", deepcopy(self.pending_trades))
-        object.__setattr__(self, "performance", deepcopy(self.performance))
-        object.__setattr__(self, "behavior", deepcopy(self.behavior))
-        object.__setattr__(self, "sentiment", deepcopy(self.sentiment))
 
 class LIBBmodel:
     """
