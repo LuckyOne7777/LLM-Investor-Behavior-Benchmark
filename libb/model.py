@@ -238,7 +238,7 @@ class LIBBmodel:
                     "ticker": order["ticker"],
                     "action": order["action"],
                     "status": "FAILED",
-                    "reason": f"SHARES NOT INT: ({order["shares"]})"
+                    "reason": f"SHARES NOT INT: ({order['shares']})"
                                                     })
                 continue
             if order_date == self.run_date:
