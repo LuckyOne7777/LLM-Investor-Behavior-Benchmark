@@ -28,6 +28,17 @@ class ModelSnapshot:
     behavior: list[dict]
     sentiment: list[dict]
 
+    def __post_init__(self):
+        object.__setattr__(self, "portfolio_history", self.portfolio_history.copy(deep=True))
+        object.__setattr__(self, "portfolio", self.portfolio.copy(deep=True))
+        object.__setattr__(self, "trade_log", self.trade_log.copy(deep=True))
+        object.__setattr__(self, "position_history", self.position_history.copy(deep=True))
+
+        object.__setattr__(self, "pending_trades", deepcopy(self.pending_trades))
+        object.__setattr__(self, "performance", deepcopy(self.performance))
+        object.__setattr__(self, "behavior", deepcopy(self.behavior))
+        object.__setattr__(self, "sentiment", deepcopy(self.sentiment))
+
 class LIBBmodel:
     """
     Stateful trading model that manages portfolio data, metrics, research,
