@@ -10,8 +10,11 @@ from libb.user_data.news import _get_macro_news, _get_portfolio_news
 from libb.user_data.logs import _recent_execution_logs
 from shutil import rmtree
 from dataclasses import dataclass
+from libb.execution.types_file import Order
+from typing import cast
+from copy import deepcopy
 
-@dataclass
+@dataclass (frozen=True)
 class ModelSnapshot:
     cash: float
 
@@ -20,10 +23,10 @@ class ModelSnapshot:
     trade_log: pd.DataFrame
     position_history: pd.DataFrame
 
-    pending_trades: dict
-    performance: dict
-    behavior: dict
-    sentiment: dict
+    pending_trades: dict[str, list[dict]]
+    performance: list[dict]
+    behavior: list[dict]
+    sentiment: list[dict]
 
 class LIBBmodel:
     """
@@ -79,10 +82,10 @@ class LIBBmodel:
         self.trade_log: pd.DataFrame = self._load_csv(self._trade_log_path)
         self.position_history: pd.DataFrame = self._load_csv(self._position_history_path)
 
-        self.pending_trades: dict = self._load_json(self._pending_trades_path)
-        self.performance: dict = self._load_json(self._performance_path)
-        self.behavior: dict = self._load_json(self._behavior_path)
-        self.sentiment: dict = self._load_json(self._sentiment_path)
+        self.pending_trades: dict[str, list[dict]] = self._load_orders_dict(self._pending_trades_path)
+        self.performance: list[dict] = self._load_json(self._performance_path)
+        self.behavior: list[dict] = self._load_json(self._behavior_path)
+        self.sentiment: list[dict] = self._load_json(self._sentiment_path)
 
         self.STARTUP_DISK_SNAPSHOT = self._save_disk_snapshot()
         assert self.STARTUP_DISK_SNAPSHOT is not None
@@ -164,13 +167,20 @@ class LIBBmodel:
             return pd.read_csv(path)
         return pd.DataFrame()
 
-    def _load_json(self, path: Path) -> dict:
+    def _load_json(self, path: Path) -> list[dict]:
         "Helper for loading JSON files at a given path. Return empty dict for invalid paths."
         if path.exists():
             with open(path, "r") as f:
                 return json.load(f)
-        return {}
-    def _override_json_file(self, data: dict, path: Path) -> None:
+        return []
+    
+    def _load_orders_dict(self, path: Path) -> dict[str, list[dict]]:
+        if path.exists():
+            with open(path, "r") as f:
+                return json.load(f)
+        return {"orders": []}
+
+    def _override_json_file(self, data: list[dict] | dict[str, list[dict]], path: Path) -> None:
         with open(path, "w") as file:
             json.dump(data, file, indent=2)
         return
@@ -189,7 +199,7 @@ class LIBBmodel:
         portfolio_history= self._load_csv(self._portfolio_history_path),
         trade_log= self._load_csv(self._trade_log_path),
         position_history=self._load_csv(self._position_history_path),
-        pending_trades= self._load_json(self._pending_trades_path),
+        pending_trades= self._load_orders_dict(self._pending_trades_path),
 
         performance= self._load_json(self._performance_path),
         behavior= self._load_json(self._behavior_path),
@@ -216,7 +226,7 @@ class LIBBmodel:
     def _process_orders(self) -> None:
         """Process all pending orders for the current date.
         Not recommended for workflows; only use `process_portfolio()` for processing."""
-        orders = self.pending_trades.get("orders", [])
+        orders = cast(list[Order], self.pending_trades.get("orders", []))
         unexecuted_trades = {"orders": []}
         if not orders:
             return
