@@ -296,8 +296,8 @@ class LIBBmodel:
         try:
             append_log(self._portfolio_history_path, log)
         except Exception as e:
-            raise SystemError(f"""Error saving to portfolio_history for {self._model_path}. ({e}) 
-                              You may have called 'reset_run()` without calling `ensure_file_system()` immediately after.""")
+            raise SystemError(f"""Error saving to portfolio_history for {self._model_path}. 
+                              You may have called 'reset_run()` without calling `ensure_file_system()` immediately after.""") from e
         return
     def _update_portfolio_market_data(self) -> None:
         """Update market portfolio values and save to disk."""
