@@ -1,11 +1,12 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import json
+from pathlib import Path
 
 
 def plot_equity_and_sentiment(
-    portfolio_csv: str,
-    sentiment_json: str,
+    portfolio_csv: str | Path,
+    sentiment_json: str | Path,
 ):
     """
     Creates a two-panel plot:
