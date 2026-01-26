@@ -125,15 +125,18 @@ class LIBBmodel:
             auto_ensure (bool): Automatically calls `ensure_file_system()` after deletion
                 Defaults to False.
         """
-        
+        root = self._root.resolve()
         if cli_check:
             user_decision = None
             while user_decision not in {"y", "n"}:
-                user_decision = input(f"Warning: reset_run() is about to delete all files and folders within {self._root}. Proceed? (y/n) ")
+                user_decision = input(f"Warning: reset_run() is about to delete all contents within {root}. Proceed? (y/n) ")
             if user_decision == "n":
                 raise RuntimeError("Please remove reset_run call from your workflow.")
-        if self._root in (Path("/"), Path("C:/")):
-                    raise RuntimeError(f"Cannot delete root given: {self._root}")
+
+        # Block filesystem root (/, C:\, D:\, UNC share roots, etc.)
+        if root == Path(root.anchor):
+            raise RuntimeError(f"Refusing to delete filesystem root: {root}")
+
         for child in self._root.iterdir():
             if child.is_dir():
                 rmtree(child)
