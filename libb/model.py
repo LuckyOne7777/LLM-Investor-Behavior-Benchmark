@@ -323,7 +323,7 @@ class LIBBmodel:
 
     def process_portfolio(self) -> None:
         "Wrapper for all portfolio processing."
-        self._catch_processing_errors
+        self._catch_processing_errors()
 
 # ----------------------------------
 # Saving Logs
