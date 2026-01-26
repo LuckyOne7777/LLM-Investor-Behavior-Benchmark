@@ -137,7 +137,7 @@ class LIBBmodel:
         if root == Path(root.anchor):
             raise RuntimeError(f"Refusing to delete filesystem root: {root}")
 
-        for child in self._root.iterdir():
+        for child in root.iterdir():
             if child.is_dir():
                 rmtree(child)
             else:
