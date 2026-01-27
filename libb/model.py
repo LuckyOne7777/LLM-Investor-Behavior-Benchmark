@@ -144,6 +144,10 @@ class LIBBmodel:
         if not path.exists():
             path.write_text(default_content, encoding="utf-8")
 
+# ----------------------------------
+# File Helpers
+# ----------------------------------
+
 
     def _load_csv(self, path: Path) -> pd.DataFrame:
         """Helper for loading CSV at a given path. Return empty DataFrame for invalid paths."""
@@ -173,6 +177,10 @@ class LIBBmodel:
         df.to_csv(path, mode="w", header=True, index=False)
         return
     
+# ----------------------------------
+# Snapshot Behavior
+# ----------------------------------
+    
     def _save_disk_snapshot(self) -> ModelSnapshot:
         "Function for saving a disk snapshot."
         return ModelSnapshot(
@@ -190,7 +198,7 @@ class LIBBmodel:
         sentiment= self._load_json(self._sentiment_path),
         )
     def _load_snapshot_to_disk(self, snapshot: ModelSnapshot) -> None:
-        """Override CSV and JSON artifacts based on prior disk snapshot."""
+        """Override CSV and JSON disk artifacts based on prior disk snapshot."""
         self._override_csv_file(snapshot.portfolio, self._portfolio_path)
         self._override_csv_file(snapshot.portfolio_history, self._portfolio_history_path)
         self._override_csv_file(snapshot.trade_log, self._trade_log_path)
@@ -201,6 +209,7 @@ class LIBBmodel:
         self._override_json_file(snapshot.pending_trades, self._pending_trades_path)
         self._override_json_file(snapshot.behavior, self._behavior_path)
         return
+    
 
 # ----------------------------------
 # Portfolio Processing
