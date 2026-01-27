@@ -340,7 +340,6 @@ class LIBBmodel:
         full_path =  self._deep_research_file_folder_path / deep_research_name
         with open(full_path, "w", encoding="utf-8") as file:
             file.write(txt)
-            file.close()
         return full_path
     
     def save_daily_update(self, txt: str) -> Path:
