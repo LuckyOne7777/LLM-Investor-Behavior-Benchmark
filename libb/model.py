@@ -41,6 +41,7 @@ class LIBBmodel:
         self._portfolio_dir: Path = self._root / "portfolio"
         self._metrics_dir: Path = self._root / "metrics"
         self._research_dir: Path = self._root / "research"
+        self._logging_dir: Path = self._root / "logging"
 
         self._deep_research_file_folder_path: Path = self._research_dir / "deep_research"
         self._daily_reports_file_folder_path: Path = self._research_dir / "daily_reports"
@@ -82,7 +83,7 @@ class LIBBmodel:
     def ensure_file_system(self):
         "Create and set up all files/folders needed for processing and metrics. Automatically called during construction."
         for dir in [self._root, self._portfolio_dir, self._metrics_dir, self._research_dir, self._daily_reports_file_folder_path, 
-                    self._deep_research_file_folder_path]:
+                    self._deep_research_file_folder_path, self._logging_dir]:
             self._ensure_dir(dir)
 
         # portfolio files
@@ -383,6 +384,17 @@ class LIBBmodel:
         with open(path, mode, encoding="utf-8") as file:
             file.write(text)
         return
+    
+
+# ----------------------------------
+# Logging
+# ----------------------------------
+
+def save_new_logging_file(self):
+    pass
+
+def append_log_file(self):
+    pass
 
 # ----------------------------------
 # Calculate Metrics
