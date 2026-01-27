@@ -383,7 +383,6 @@ class LIBBmodel:
         mode = "w" if not append else "a"
         with open(path, mode, encoding="utf-8") as file:
             file.write(text)
-            file.close()
         return
 
 # ----------------------------------
