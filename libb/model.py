@@ -363,7 +363,7 @@ class LIBBmodel:
             try:
                 json.dump(json_block, file, indent=2)
             except Exception as e:
-                raise RuntimeError(f"Error while saving JSON block to `pending_trades.json`. ({e})")
+                raise RuntimeError(f"Error while saving JSON block to `pending_trades.json`.") from e
         return
 
     def save_additonal_log(self, file_name: str, text: str, folder: str="additional_logs", append: bool=False) -> None:
