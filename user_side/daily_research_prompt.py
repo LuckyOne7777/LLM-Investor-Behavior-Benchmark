@@ -1,17 +1,22 @@
 import user_side.get_prompt_data as get_prompt_data
-import pandas as pd
 from libb.model import LIBBmodel
 # TODO: what if postions are 0 but cash != starting cash?
 def create_daily_prompt(libb: LIBBmodel):
    portfolio = libb.portfolio
-   starting_cash = libb.STARTING_CASH
    today = libb.run_date
    news = get_prompt_data.get_macro_news()
    logs = libb.recent_execution_logs()
-   if logs.empty:
-      logs = "No recent trade logs."
-   if portfolio.empty:
-      portfolio = f"You have 0 active positions, create your portfolio. The starting cash is {starting_cash}. You must make at least 1 trade."
+   
+   portfolio_text = (
+    portfolio.to_string(index=False)
+    if not portfolio.empty
+    else f"You have 0 active positions and must make at least one trade to fulfill portfolio requirements. Starting cash: {libb.STARTING_CASH}")
+
+   logs_text = (
+       logs.to_string(index=False)
+      if not isinstance(logs, str) and not logs.empty
+      else "No recent trade logs.")
+
 
    # because of the string formatting, the json block must be passed in
    orders_section = """<ORDERS_JSON>
@@ -64,12 +69,12 @@ pnl). Do NOT reset or assume any starting capital.
 CURRENT PORTFOLIO
 ---------------------------------------------------------------------------
 This is your EXACT portfolio:
-[{portfolio}]
+[{portfolio_text}]
 
 ---------------------------------------------------------------------------
 RECENT LOGS
 ---------------------------------------------------------------------------
-{logs}
+{logs_text}
 ---------------------------------------------------------------------------
 DAILY OBJECTIVES
 ---------------------------------------------------------------------------
