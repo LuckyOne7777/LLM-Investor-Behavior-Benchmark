@@ -117,7 +117,7 @@ class LIBBmodel:
             cli_check (bool): Require interactive confirmation before deleting files.
                 Defaults to True.
 
-            auto_ensure (bool): Automatically calls `ensure_file_system()` after deletion
+            auto_ensure (bool): Automatically calls `ensure_file_system()` after deletion.
                 Defaults to False.
         """
         root = self._root.resolve()
