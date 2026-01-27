@@ -2,7 +2,7 @@ from .buy_logic import process_buy
 from .sell_logic import process_sell
 from .portfolio_editing import update_stoploss
 from .utils import append_log
-from .types_file import Order
+from ..other.types_file import Order
 import pandas as pd
 from pathlib import Path
 

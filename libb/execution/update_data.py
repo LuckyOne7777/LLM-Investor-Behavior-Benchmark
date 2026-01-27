@@ -1,6 +1,6 @@
 import pandas as pd 
 import yfinance as yf
-from .types_file import MarketDataObject
+from ..other.types_file import MarketDataObject
 from datetime import date
 
 #TODO: ticker range fails on weekends

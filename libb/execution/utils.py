@@ -1,6 +1,6 @@
 import pandas as pd
 from pathlib import Path
-from .types_file import Order
+from ..other.types_file import Order
 import datetime as dt
 import pandas_market_calendars as mcal
 

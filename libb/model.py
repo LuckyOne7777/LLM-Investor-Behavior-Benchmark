@@ -2,7 +2,7 @@ from pathlib import Path
 import pandas as pd
 import json
 from datetime import date, datetime
-from libb.execution.types_file import Order, ModelSnapshot
+from libb.other.types_file import Order, ModelSnapshot
 from libb.execution.utils import append_log, is_nyse_open
 from libb.execution.process_order import  process_order
 from libb.metrics.sentiment_metrics import analyze_sentiment
@@ -10,6 +10,7 @@ from libb.execution.update_data import update_market_value_columns
 from libb.user_data.news import _get_macro_news, _get_portfolio_news
 from libb.user_data.logs import _recent_execution_logs
 from shutil import rmtree
+from typing import cast
 
 class LIBBmodel:
     """
