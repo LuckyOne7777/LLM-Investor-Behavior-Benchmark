@@ -1,8 +1,9 @@
 from pathlib import Path 
 import pandas as pd
 import json
-from datetime import date, datetime
-from libb.other.types_file import Order, ModelSnapshot
+from datetime import date, datetime, UTC, time
+from zoneinfo import ZoneInfo
+from libb.other.types_file import Order, ModelSnapshot, TradeStatus
 from libb.execution.utils import append_log, is_nyse_open
 from libb.execution.process_order import  process_order
 from libb.metrics.sentiment_metrics import analyze_sentiment
@@ -31,6 +32,8 @@ class LIBBmodel:
             run_date = pd.Timestamp.now().date()
         else:
             run_date = pd.Timestamp(run_date).date()
+
+        self.start_time= datetime.now(UTC)
 
         self.STARTING_CASH: float = starting_cash
         self._root: Path = Path(model_path)
@@ -71,6 +74,10 @@ class LIBBmodel:
         self.performance: list[dict] = self._load_json(self._performance_path)
         self.behavior: list[dict] = self._load_json(self._behavior_path)
         self.sentiment: list[dict] = self._load_json(self._sentiment_path)
+
+        self.filled_orders: int = 0
+        self.failed_orders: int = 0
+        self.skipped_orders: int = 0
 
         self.STARTUP_DISK_SNAPSHOT = self._save_disk_snapshot()
         assert self.STARTUP_DISK_SNAPSHOT is not None
@@ -235,6 +242,7 @@ class LIBBmodel:
                     "status": "FAILED",
                     "reason": f"ORDER DATE ({order_date}) IS PAST RUN DATE ({self.run_date})"
                                                     })
+                self.failed_orders += 1
                 continue
             if not isinstance(order["shares"], int) and order["shares"] is not None:
                 append_log(self._trade_log_path, {
@@ -244,12 +252,21 @@ class LIBBmodel:
                     "status": "FAILED",
                     "reason": f"SHARES NOT INT: ({order['shares']})"
                                                     })
+                self.failed_orders += 1
                 continue
             if order_date == self.run_date:
-                self.portfolio, self.cash = process_order(order, self.portfolio, 
+                self.portfolio, self.cash, status = process_order(order, self.portfolio, 
                 self.cash, self._trade_log_path)
             else:
                 unexecuted_trades["orders"].append(order)
+                status = TradeStatus.SKIPPED
+            match status:
+                case TradeStatus.FILLED:
+                    self.filled_orders += 1
+                case TradeStatus.FAILED:
+                    self.failed_orders += 1
+                case TradeStatus.SKIPPED:
+                    self.skipped_orders += 1
         # keep any unexecuted trades, completely reset otherwise
         if not unexecuted_trades["orders"]:
             self.pending_trades = {"orders": []}
@@ -294,7 +311,7 @@ class LIBBmodel:
             last_total_equity = self.portfolio_history["equity"].iloc[-1]
             return_pct = (present_total_equity / last_total_equity) - 1
         log = {
-        "date": self.run_date,
+        "date": str(self.run_date),
         "cash": self.cash,
         "equity": present_total_equity,
         "return_pct": return_pct,
@@ -321,8 +338,10 @@ class LIBBmodel:
             self._update_portfolio_market_data()
             self._append_portfolio_history()
             self._append_position_history()
+            self.save_new_logging_file()
         except Exception as e:
             self._load_snapshot_to_disk(self.STARTUP_DISK_SNAPSHOT)
+            self.save_new_logging_file(status="FAILURE", error=e)
             raise SystemError("Processing failed: disk state has been reset to snapshot created on startup.") from e
 
     def process_portfolio(self) -> None:
@@ -390,12 +409,45 @@ class LIBBmodel:
 # Logging
 # ----------------------------------
 
-def save_new_logging_file(self):
-    pass
+    def save_new_logging_file(self, status: str = "SUCCESS", error: Exception | str = "none"):
 
-def append_log_file(self):
-    pass
+        portfolio_equity = self.portfolio["market_price"].sum() + self.cash
 
+        log_file_name = Path(f"{self.run_date}.json")
+        full_path = self._logging_dir / log_file_name
+
+        nyse_open_on_date = is_nyse_open(self.run_date)
+
+        NY_TZ = ZoneInfo("America/New_York")
+        MARKET_CLOSE = time(16, 0)
+
+        start_time_ny = self.start_time.astimezone(NY_TZ)
+        created_after_close = start_time_ny.time() >= MARKET_CLOSE
+        eligible_for_execution = nyse_open_on_date and created_after_close  
+
+        end_time = datetime.now(UTC)
+        
+        log = {
+            "date": str(self.run_date),
+            "started_at": str(self.start_time),
+            "finished_at": str(end_time),
+            "nyse_open_on_date": nyse_open_on_date,
+            "created_after_close": created_after_close,
+            "eligible_for_execution": eligible_for_execution,
+            "processing_status": status,
+            "orders_processed": self.filled_orders,
+            "orders_failed": self.failed_orders,
+            "orders_skipped": self.skipped_orders,
+            "portfolio_value": portfolio_equity,
+
+            "error": str(error),
+            }
+        with open(full_path, "w") as file:
+                try:
+                    json.dump(log, file, indent=2)
+                except Exception as e:
+                    raise RuntimeError(f"Error while saving JSON log to {full_path}.") from e
+        return
 # ----------------------------------
 # Calculate Metrics
 # ----------------------------------

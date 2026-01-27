@@ -1,4 +1,5 @@
 from typing import TypedDict, Literal, Optional
+from enum import Enum
 from dataclasses import dataclass
 import pandas as pd
 from copy import deepcopy
@@ -47,3 +48,8 @@ class ModelSnapshot:
         object.__setattr__(self, "performance", deepcopy(self.performance))
         object.__setattr__(self, "behavior", deepcopy(self.behavior))
         object.__setattr__(self, "sentiment", deepcopy(self.sentiment))
+
+class TradeStatus(Enum):
+    FILLED = "FILLED"
+    FAILED = "FAILED"
+    SKIPPED = "SKIPPED"
