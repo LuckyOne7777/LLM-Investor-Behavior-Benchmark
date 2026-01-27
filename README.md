@@ -6,6 +6,7 @@ LIBB is an open-source, opinionated research library designed to automatically m
 while still giving users flexibility over the system.
 
 ## Why LIBB Exists
+
 This project originally began as a generic benchmark for LLM-based trading in U.S. equities. While surveying existing LLM trading projects (including my own), I noticed a consistent lack of rigorous sentiment, behavioral, and performance metrics; most projects reported little more than an equity curve.
 
 This raised a fundamental question: ***“Why isn’t LLM trading held to the same analytical standards as the rest of finance?”***
@@ -51,7 +52,6 @@ Execution scheduling (e.g., daily vs. weekly runs) and model orchestration
 are intentionally left to the user, preserving flexibility while
 maintaining a consistent on-disk state.
 
-
 ## Documentation
 
 New to LIBB?  
@@ -62,97 +62,206 @@ and how to read the codebase effectively.
 
 ---
 
-## Getting Started (Commands)
+## Getting Started
 
-This guide lists the minimum commands required to install and run LIBB.
-No additional setup steps are required.
+This guide shows two supported setup paths:
+
+- **Option A (Recommended): Virtual Environment**
+- **Option B: Global / No Virtual Environment**
+
+Choose the option that best fits your workflow.
 
 ---
-```bash
-## 1. Clone the Repository
 
+## Option A: Virtual Environment (Recommended)
+
+This option isolates dependencies and avoids conflicts with other Python projects.
+
+### 1. Clone the Repository
+
+```bash
 git clone https://github.com/LuckyOne7777/LLM-Investor-Behavior-Benchmark.git
 cd LLM-Investor-Behavior-Benchmark
 ```
 
----
+Verify contents:
 
-## 2. Create a Virtual Environment (Recommended)
+```bash
+ls
+```
 
-### Windows
+You should see folders like libb/, user_side/, and requirements.txt.
+
+### 2. Create a Virtual Environment
+
+Windows:
 
 ```bash
 python -m venv .venv
 ```
 
-### macOS / Linux
+macOS / Linux:
 
 ```bash
+
 python3 -m venv .venv
+
 ```
 
----
+### 3. Activate the Virtual Environment
 
-## 3. Activate the Virtual Environment
+Windows (PowerShell)
+If activation fails due to script execution policy, run once:
 
-### Windows
+```bash
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
+
+Then activate:
+
 ```bash
 .venv\Scripts\activate
 ```
 
-### macOS / Linux
+Windows (Command Prompt alternative)
+
+```bash
+.venv\Scripts\activate.bat
+```
+
+macOS / Linux
+
 ```bash
 source .venv/bin/activate
 ```
----
 
-## 4. Install Requirements.txt
+Verify activation:
 
 ```bash
-pip install -r requirements.txt
+python --version
 ```
 
-## 5. Install LIBB (Editable / Development Mode)
+You should see (.venv) in your shell prompt.
+
+### 4. Install Dependencies
 
 ```bash
+pip install --upgrade pip
+pip install -r requirements.txt
 pip install -e .
 ```
 
----
-
-## 6. Verify Installation
+### 5. Verify Installation
 
 ```bash
-python -c "import libb; print(libb)"
+python -c "import libb; print(libb.__file__)"
 ```
-If successful, the output look something like:
+
+Expected output should point to `libb/__init__.py`.
+
+### 6. Set Environment Variables
+
+macOS / Linux:
+
 ```bash
-<module 'libb' from 'C:\\Users\\nathan\\LIBB\\libb\\__init__.py'>
+export OPENAI_API_KEY="your_key_here"
+export DEEPSEEK_API_KEY="your_key_here"
+```
+
+Windows (PowerShell):
+
+```bash
+setx OPENAI_API_KEY "your_key_here"
+setx DEEPSEEK_API_KEY "your_key_here"
+```
+
+Restart the terminal after using setx.
+
+### 7. Run an Example Workflow
+
+```bash
+python -m user_side.workflow
+```
+
+### 8. Exit the Virtual Environment
+
+Deactivate:
+
+To remove the virtual environment entirely:
+
+```bash
+rm -rf .venv
+```
+
+(Windows users may delete .venv via File Explorer.)
+
+## Option B: Global Setup (No Virtual Environment)
+
+This option installs dependencies into the active Python environment.
+Recommended only for users comfortable managing global Python packages.
+
+### 1. Clone the Repo
+
+```bash
+git clone https://github.com/LuckyOne7777/LLM-Investor-Behavior-Benchmark.git
+cd LLM-Investor-Behavior-Benchmark
+```
+
+### 2. Verify Python Version
+
+LIBB requires Python 3.10 or newer.
+
+```bash
+python --version
+```
+
+### 3. Upgrade pip
+
+```bash
+python -m pip install --upgrade pip
+```
+
+### 4. Install Dependencies Globally
+
+```bash
+pip install -r requirements.txt
+pip install -e .
+```
+
+Verify installation:
+
+```bash
+
+python -c "import libb; print(libb.__file__)"
+```
+
+### 5. Set Environment Variables
+
+Same as Option A.
+
+### 6. Run an Example Workflow
+
+```bash
+python -m user_side.workflow
 ```
 
 ---
 
-## 7. Set Environmental Variables
-
-To run the example workflow, you are required to have the following API keys set
-in your environmental variables. Be sure to add any additonal keys needed for your workflow.
+### Optional: Uninstall
 
 ```bash
-export OPENAI_API_KEY="key"
-export DEEPSEEK_API_KEY="key"
+pip uninstall libb
 ```
 
-(Windows PowerShell users may use `setx` instead.)
+Notes
 
----
+Dependencies may remain installed if they were already present.
 
-## 8. Run an Example Workflow
+Windows users may encounter PowerShell execution policy restrictions.
 
-```bash
-python user_side/workflow.py
-```
+Command Prompt can be used instead of PowerShell if preferred.
 
----
+Execution scheduling and orchestration are intentionally left to the user.
 
 ## What Gets Created Automatically
 
