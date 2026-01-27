@@ -156,7 +156,7 @@ class LIBBmodel:
         return pd.DataFrame()
 
     def _load_json(self, path: Path) -> list[dict]:
-        "Helper for loading JSON files at a given path. Return empty dict for invalid paths."
+        "Helper for loading JSON files at a given path. Return empty list for invalid paths."
         if path.exists():
             with open(path, "r") as f:
                 return json.load(f)
