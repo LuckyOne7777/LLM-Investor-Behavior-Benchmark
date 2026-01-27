@@ -66,7 +66,7 @@ def workflow():
   # user created function
   report = prompt_model()
 
-  orders_json = parse_json(eport, "ORDERS_JSON")
+  orders_json = parse_json(report, "ORDERS_JSON")
   libb.save_orders(orders_json)
   return
 ```
