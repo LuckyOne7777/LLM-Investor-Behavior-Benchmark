@@ -37,8 +37,10 @@ def main():
     day_num = today.weekday()
 
     if day_num  == 4: # Friday
+        print("Friday: Running Weekly Flow...")
         weekly_flow(today)
     elif day_num < 4:
+        print("Regular Weekday: Running Daily Flow...")
         daily_flow(today) # Mon-Thursday
     else:  # Weekend
         print("Weekend: Skipping...")
