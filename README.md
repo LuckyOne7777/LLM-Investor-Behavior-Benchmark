@@ -189,11 +189,17 @@ Deactivate:
 
 To remove the virtual environment entirely:
 
+Linux / macOS:
+
 ```bash
 rm -rf .venv
 ```
 
-(Windows users may delete .venv via File Explorer.)
+Windows:
+
+```bash
+Remove-Item -Recurse -Force .venv
+```
 
 ## Option B: Global Setup (No Virtual Environment)
 
