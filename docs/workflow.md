@@ -54,7 +54,7 @@ The following parameters affect the behavior of a LIBB run:
 
 ```python
 
-from libb.model import LIBBmodel
+from libb import LIBBmodel
 from libb.other.parse import parse_json # or another parsing function
 
 def workflow():
@@ -82,7 +82,7 @@ recommended usage patterns.
 ### Weekly Workflow
 
 ```python
-from libb.model import LIBBmodel
+from libb import LIBBmodel
 from .prompt_models import prompt_daily_report, prompt_deep_research
 from libb.other.parse import parse_json
 
