@@ -277,6 +277,36 @@ Execution scheduling and orchestration are intentionally left to the user.
 
 No manual file setup is required.
 
+## Created File Tree
+
+After running for the first time, LIBB generates a fixed directory structure at the user-specified output path.
+
+```text
+
+<output_dir>/
+├── metrics/          # evaluation
+│   ├── behavior.json
+│   ├── performance.json
+│   └── sentiment.json
+├── portfolio/        # trading state & history
+│   ├── pending_trades.json
+│   ├── portfolio.csv
+│   ├── portfolio_history.csv
+│   ├── position_history.csv
+│   └── trade_log.csv
+|
+|── loggging/ # JSON log files   
+|
+└── research/         # generated analysis
+    ├── daily_reports/
+    └── deep_research/
+
+```
+
+LIBB will use this file tree to save artifacts for all future runs in the output directory.
+
+---
+
 ---
 
 ## Research Directions
