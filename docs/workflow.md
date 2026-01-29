@@ -150,6 +150,9 @@ After running for the first time, LIBB generates a fixed directory structure at 
 │   ├── portfolio_history.csv
 │   ├── position_history.csv
 │   └── trade_log.csv
+|
+|── loggging/ # JSON log files   
+|
 └── research/         # generated analysis
     ├── daily_reports/
     └── deep_research/
