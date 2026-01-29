@@ -53,21 +53,7 @@ Behavioral metrics are intended for research and analysis, not enforcement.
 
 ---
 
-### 4. Structured Logging
-
-Introduce a consistent, structured logging system across LIBB.
-
-Goals:
-- unified logging format for runs
-- explicit logging of major lifecycle events
-- improved debuggability and auditability
-- separation between logs and metrics
-
-Logging is intended for transparency and debugging, not performance analysis.
-
----
-
-### 5. Multiple Data Source Support
+### 4. Multiple Data Source Support
 
 Add support for multiple market data sources.
 
@@ -78,7 +64,7 @@ Goals:
 
 ---
 
-### 6. Data Source Fallbacks
+### 5. Data Source Fallbacks
 
 Provide automatic or user-defined fallback mechanisms when a primary data source
 fails or returns incomplete data.
@@ -92,7 +78,7 @@ Fallback behavior should be explicit and auditable.
 
 ---
 
-### 7. Fractional Share Support
+### 6. Fractional Share Support
 
 Add first-class support for fractional share trading across order handling,
 portfolio state, and accounting logic.
