@@ -3,6 +3,7 @@
 This section describes the canonical way to use LIBB in research or live-tracking environments.
 
 LIBB is explicit and procedural by design:
+
 - No critical logic runs implicitly
 - All file handling is deterministic and setup automatically
 - Users control when processing, prompting, and persistence occur
@@ -28,6 +29,7 @@ All downstream logic depends on this processed state.
 ## Required Components
 
 A minimal workflow requires:
+
 - Prompt skeletons (e.g. daily or weekly research prompts)
 - User-defined functions for executing prompts
 - Familiarity with constraints listed in `important-notes.md`
@@ -69,7 +71,9 @@ def workflow():
   orders_json = parse_json(report, "ORDERS_JSON")
   libb.save_orders(orders_json)
   return
+
 ```
+
 ---
 
 ## Example Workflow
@@ -105,7 +109,9 @@ def weekly_flow():
         libb.analyze_sentiment(deep_research_report)
     return
 ```
+
 ---
+
 ### Daily Workflow
 
 ```python
@@ -131,7 +137,8 @@ def daily_flow():
 
 After running for the first time, LIBB generates a fixed directory structure at the user-specified output path.
 
-```
+```text
+
 <output_dir>/
 ├── metrics/          # evaluation
 │   ├── behavior.json
@@ -152,8 +159,6 @@ After running for the first time, LIBB generates a fixed directory structure at 
 LIBB will use this file tree to save artifacts for all future runs in the output directory.
 
 ---
-
-
 
 ## Notes
 
