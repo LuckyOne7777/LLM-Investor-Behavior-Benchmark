@@ -17,9 +17,10 @@ def process_order(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_l
         return process_sell(order, portfolio_df, cash, trade_log_path)
 
     if action == "u":
-        #TODO: Generalize update_stoploss function
-        update_stoploss(portfolio_df, order, trade_log_path)
-        return portfolio_df, cash, TradeStatus.FILLED
+        if update_stoploss(portfolio_df, order, trade_log_path):
+            return portfolio_df, cash, TradeStatus.FILLED
+        else:
+            return portfolio_df, cash, TradeStatus.FAILED
 
     else:
         append_log(trade_log_path, {
