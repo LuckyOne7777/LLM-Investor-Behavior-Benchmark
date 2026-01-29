@@ -16,6 +16,7 @@ Refactor internal state representation to ensure cash is tracked independently
 from portfolio positions.
 
 Goals:
+
 - eliminate implicit cash coupling
 - improve clarity of portfolio valuation
 - reduce risk of accounting and reconciliation errors
@@ -30,6 +31,7 @@ Incorporate portfolio performance metrics to enable quantitative evaluation of
 model behavior over time.
 
 Planned focus areas:
+
 - returns and drawdowns
 - risk-adjusted performance measures
 - time-series tracking of portfolio value
@@ -45,6 +47,7 @@ Complete the behavioral metrics framework to quantify patterns in model
 decision-making.
 
 Planned focus areas:
+
 - bias-related signals
 - consistency and repetition analysis
 - response patterns across similar conditions
@@ -58,6 +61,7 @@ Behavioral metrics are intended for research and analysis, not enforcement.
 Add support for multiple market data sources.
 
 Goals:
+
 - configurable primary data source
 - ability to switch sources without code changes
 - consistent data interface across sources
@@ -70,6 +74,7 @@ Provide automatic or user-defined fallback mechanisms when a primary data source
 fails or returns incomplete data.
 
 Goals:
+
 - improve robustness of runs
 - reduce silent failures
 - preserve reproducibility across environments
@@ -84,6 +89,7 @@ Add first-class support for fractional share trading across order handling,
 portfolio state, and accounting logic.
 
 Goals:
+
 - allow non-integer share quantities in orders
 - update position tracking to support fractional holdings
 - ensure cash debits and credits reflect precise fractional execution
