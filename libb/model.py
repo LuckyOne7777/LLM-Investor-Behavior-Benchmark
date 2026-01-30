@@ -112,6 +112,14 @@ class LIBBmodel:
         self.behavior: list[dict] = self._load_json(self._behavior_path)
         self.sentiment: list[dict] = self._load_json(self._sentiment_path)
 
+
+    def _reset_runtime_state(self) -> None:
+        self.filled_orders = 0
+        self.failed_orders = 0
+        self.skipped_orders = 0
+        self.start_time = datetime.now(UTC)
+        self.STARTUP_DISK_SNAPSHOT = None
+
     
     def reset_run(self, cli_check: bool = True, auto_ensure: bool = False) -> None:
         """
