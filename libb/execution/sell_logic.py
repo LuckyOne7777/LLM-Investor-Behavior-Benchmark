@@ -6,7 +6,7 @@ import pandas as pd
 from ..other.types_file import Order, TradeStatus
 from typing import cast 
 
-def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log_path: Path) -> tuple[pd.DataFrame, float, TradeStatus]:
+def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log_path: Path) -> tuple[pd.DataFrame, float, bool]:
     ticker = order["ticker"].upper()
     order_type = order["order_type"]
     ticker_data = get_market_data(ticker)
@@ -26,7 +26,7 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
             "status": "FAILED",
             "reason": f"INSUFFICIENT SHARES: REQUESTED {shares}, AVAILABLE {row['shares']}"
         })
-        return portfolio_df, cash, TradeStatus.FAILED
+        return portfolio_df, cash, False
     
     if order_type == "limit" and high < limit_price:
 
@@ -37,12 +37,12 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
             "status": "FAILED",
             "reason": f"limit price of {limit_price} not met. (High: {high})"
         })
-        return portfolio_df, cash, TradeStatus.FAILED
+        return portfolio_df, cash, False
 
     elif order_type == "limit":
         required_col = ["ticker", "limit_price", "shares"]
         if not catch_missing_order_data(order, required_col, trade_log_path):
-                return portfolio_df, cash, TradeStatus.FAILED
+                return portfolio_df, cash, False
         fill_price = open_price if open_price >= limit_price else limit_price
         proceeds = shares * fill_price
         portfolio_df, buy_price = reduce_position(portfolio_df, ticker, shares)
@@ -60,12 +60,12 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
                 "status": "FILLED",
                 "reason": ""
     })
-        return portfolio_df, cash, TradeStatus.FILLED
+        return portfolio_df, cash, True
             
     elif order_type == "market":
         required_col = ["ticker", "shares"]
         if not catch_missing_order_data(order, required_col, trade_log_path):
-                return portfolio_df, cash, TradeStatus.FAILED
+                return portfolio_df, cash, False
         
         proceeds = shares * open_price
         portfolio_df, buy_price = reduce_position(portfolio_df, ticker, shares)
@@ -82,7 +82,7 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
                 "status": "FILLED",
                 "reason": ""
         })
-        return portfolio_df, cash, TradeStatus.FILLED
+        return portfolio_df, cash, True
     else:
         append_log(trade_log_path, {
             "date": order["date"],
@@ -93,4 +93,4 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
         })
 
 
-        return portfolio_df, cash, TradeStatus.FAILED
+        return portfolio_df, cash, False

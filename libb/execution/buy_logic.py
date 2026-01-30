@@ -5,7 +5,7 @@ import pandas as pd
 from ..other.types_file import Order, TradeStatus
 from pathlib import Path
 
-def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log_path: Path) -> tuple[pd.DataFrame, float, TradeStatus]:
+def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log_path: Path) -> tuple[pd.DataFrame, float, bool]:
     ticker = order["ticker"].upper()
     date = order["date"]
     order_type = order["order_type"]
@@ -27,7 +27,7 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
         ]
         # return portfolio if null order
         if not catch_missing_order_data(order, required_cols, trade_log_path):
-            return portfolio_df, cash, TradeStatus.FAILED
+            return portfolio_df, cash, False
 
         
         assert intended_limit_price is not None
@@ -41,7 +41,7 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
                 "status": "FAILED",
                 "reason": f"limit price of {intended_limit_price} not met. (Low: {market_low})"
             })
-            return portfolio_df, cash, TradeStatus.FAILED
+            return portfolio_df, cash, False
 
         # realistic fill price
         fill_price = market_open if market_open <= intended_limit_price else intended_limit_price
@@ -55,7 +55,7 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
                 "status": "FAILED",
                 "reason": "Insufficient cash"
             })
-            return portfolio_df, cash, TradeStatus.FAILED
+            return portfolio_df, cash, False
 
         portfolio_df = add_or_update_position(
             portfolio_df, ticker, shares, fill_price, stop_loss
@@ -72,7 +72,7 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
             "reason": ""
         })
 
-        return portfolio_df, cash, TradeStatus.FILLED
+        return portfolio_df, cash, True
 
     # ---------- MARKET BUY ----------
     elif order_type == "market":
@@ -83,7 +83,7 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
         ]
         # return portfolio if null order
         if not catch_missing_order_data(order, required_cols, trade_log_path):
-            return portfolio_df, cash, TradeStatus.FAILED
+            return portfolio_df, cash, False
         cost = shares * market_open
 
         if cost > cash:
@@ -94,7 +94,7 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
                 "status": "FAILED",
                 "reason": "Insufficient cash"
             })
-            return portfolio_df, cash, TradeStatus.FAILED
+            return portfolio_df, cash, False
 
 
         append_log(trade_log_path, {
@@ -113,7 +113,7 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
 
         cash -= cost
 
-        return portfolio_df, cash, TradeStatus.FILLED
+        return portfolio_df, cash, True
 
 
 
@@ -128,4 +128,4 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
             "reason": f"ORDER TYPE UNKNOWN: {order_type}"
         })
 
-        return portfolio_df, cash, TradeStatus.FAILED
+        return portfolio_df, cash, False

@@ -11,10 +11,20 @@ def process_order(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_l
     ticker = order["ticker"].upper()
 
     if action == "b":
-        return process_buy(order, portfolio_df, cash, trade_log_path)
+        portfolio_df, cash, status = process_buy(order, portfolio_df, cash, trade_log_path)
+
+        if status:
+            return portfolio_df, cash, TradeStatus.FILLED
+        else: 
+            return portfolio_df, cash, TradeStatus.FAILED
 
     if action == "s":
-        return process_sell(order, portfolio_df, cash, trade_log_path)
+        portfolio_df, cash, status = process_sell(order, portfolio_df, cash, trade_log_path)
+
+        if status:
+            return portfolio_df, cash, TradeStatus.FILLED
+        else: 
+             return portfolio_df, cash, TradeStatus.FAILED
 
     if action == "u":
         if update_stoploss(portfolio_df, order, trade_log_path):
