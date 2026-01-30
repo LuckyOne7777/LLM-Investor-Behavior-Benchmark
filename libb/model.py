@@ -71,9 +71,7 @@ class LIBBmodel:
         self.failed_orders: int = 0
         self.skipped_orders: int = 0
 
-        self.STARTUP_DISK_SNAPSHOT = self._save_disk_snapshot()
-        assert self.STARTUP_DISK_SNAPSHOT is not None
-
+        self.STARTUP_DISK_SNAPSHOT: ModelSnapshot | None = self._save_disk_snapshot()
 
 # ----------------------------------
 # Filesystem & Persistence
@@ -238,6 +236,7 @@ class LIBBmodel:
         )
     def _load_snapshot_to_disk(self, snapshot: ModelSnapshot) -> None:
         """Override CSV and JSON disk artifacts based on prior disk snapshot."""
+        
         self._override_csv_file(snapshot.portfolio, self._portfolio_path)
         self._override_csv_file(snapshot.portfolio_history, self._portfolio_history_path)
         self._override_csv_file(snapshot.trade_log, self._trade_log_path)
@@ -382,7 +381,10 @@ class LIBBmodel:
             self._append_position_history()
             self.save_new_logging_file()
         except Exception as e:
-            self._load_snapshot_to_disk(self.STARTUP_DISK_SNAPSHOT)
+            if self.STARTUP_DISK_SNAPSHOT is None:
+                raise RuntimeError("No startup disk snapshot available for rollback; disk may be corrupted.")
+            else:
+                self._load_snapshot_to_disk(self.STARTUP_DISK_SNAPSHOT)
             self.save_new_logging_file(status="FAILURE", error=e)
             raise SystemError("Processing failed: disk state has been reset to snapshot created on startup.") from e
 
