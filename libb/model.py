@@ -423,7 +423,7 @@ class LIBBmodel:
 
     def save_new_logging_file(self, status: str = "SUCCESS", error: Exception | str = "none"):
 
-        portfolio_equity = self.portfolio["market_price"].sum() + self.cash
+        portfolio_equity = self.portfolio["market_value"].sum() + self.cash
 
         log_file_name = Path(f"{self.run_date}.json")
         full_path = self._logging_dir / log_file_name
