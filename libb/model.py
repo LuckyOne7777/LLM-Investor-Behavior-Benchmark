@@ -146,6 +146,7 @@ class LIBBmodel:
                 child.unlink()
         if auto_ensure:
             self.ensure_file_system()
+            self._hydrate_from_disk()
         return
 
     def _ensure_dir(self, path: Path) -> None:
