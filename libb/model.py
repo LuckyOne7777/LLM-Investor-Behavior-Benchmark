@@ -256,6 +256,8 @@ class LIBBmodel:
                     "status": "REJECTED",
                     "reason": f"NYSE CLOSED ON ORDER DATE"
                                                     })
+                self.failed_orders += 1
+                continue
             if not isinstance(order["shares"], int) and order["shares"] is not None:
                 append_log(self._trade_log_path, {
                     "date": order["date"],
