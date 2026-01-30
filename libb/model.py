@@ -109,6 +109,21 @@ class LIBBmodel:
         self._ensure_file(self._sentiment_path, "[]")
         return
     
+    def _hydrate_from_disk(self) -> None:
+        "Match objects in memory from disk state."
+        self.portfolio: pd.DataFrame = self._load_csv(self._portfolio_path)
+        self.cash: float = (float(self.portfolio["cash"].iloc[0]) 
+                     if not self.portfolio.empty else self.STARTING_CASH)
+        self.portfolio_history: pd.DataFrame = self._load_csv(self._portfolio_history_path)
+        self.trade_log: pd.DataFrame = self._load_csv(self._trade_log_path)
+        self.position_history: pd.DataFrame = self._load_csv(self._position_history_path)
+
+        self.pending_trades: dict[str, list[dict]] = self._load_orders_dict(self._pending_trades_path)
+        self.performance: list[dict] = self._load_json(self._performance_path)
+        self.behavior: list[dict] = self._load_json(self._behavior_path)
+        self.sentiment: list[dict] = self._load_json(self._sentiment_path)
+
+    
     def reset_run(self, cli_check: bool = True, auto_ensure: bool = False) -> None:
         """
         Delete all files within the given root.
@@ -120,7 +135,7 @@ class LIBBmodel:
             cli_check (bool): Require interactive confirmation before deleting files.
                 Defaults to True.
 
-            auto_ensure (bool): Automatically calls `ensure_file_system()` after deletion.
+            auto_ensure (bool): Automatically calls `ensure_file_system()` and resets memory after deletion.
                 Defaults to False.
         """
         root = self._root.resolve()
@@ -339,7 +354,7 @@ class LIBBmodel:
         return
     def _update_portfolio_market_data(self) -> None:
         """Update market portfolio values and save to disk."""
-        self.portfolio = update_market_value_columns(self.portfolio, self.cash, date=self.run_date)
+        update_market_value_columns(self.portfolio, self.cash, date=self.run_date)
         self.portfolio.to_csv(self._portfolio_path, index=False)
         return
     
