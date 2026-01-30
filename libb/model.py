@@ -156,6 +156,8 @@ class LIBBmodel:
         if auto_ensure:
             self.ensure_file_system()
             self._hydrate_from_disk()
+            self._reset_runtime_state()
+            self.STARTUP_DISK_SNAPSHOT = self._save_disk_snapshot()
         return
 
     def _ensure_dir(self, path: Path) -> None:
