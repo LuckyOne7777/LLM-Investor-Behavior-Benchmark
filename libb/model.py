@@ -122,19 +122,31 @@ class LIBBmodel:
 
     
     def reset_run(self, cli_check: bool = True, auto_ensure: bool = False) -> None:
+         
         """
-        Delete all files within the given root.
+        Reset model state by deleting all on-disk artifacts under the model root.
 
-        If `ensure_file_system()` and `_hydrate_from disk()` is not called afterward in that order, processing will
-        silently fail or raise an error. To avoid needing to call these functions, use `auto_ensure = True`
-        as a default parameter.
+        By default, this method ONLY deletes filesystem state. The current
+        LIBBmodel instance remains alive, and in-memory runtime state is NOT
+        reset unless `auto_ensure=True` is provided.
+
+        When `auto_ensure=True`, this method performs a full logical reset:
+            - Deletes all on-disk model artifacts
+            - Recreates required filesystem structure
+            - Rehydrates disk-backed state into memory
+            - Resets all runtime-only state (counters, timestamps, snapshots)
+            - Establishes a new startup disk snapshot
+
+        With `auto_ensure=True`, the resulting model state is equivalent to a
+        freshly constructed LIBBmodel instance pointing at the same path,
+        without restarting the Python process.
 
         Args:
-            cli_check (bool): Require interactive confirmation before deleting files.
-                Defaults to True.
+            cli_check (bool): Require interactive confirmation before deleting
+                all model files. Defaults to True.
 
-            auto_ensure (bool): Automatically calls `ensure_file_system()` and resets memory after deletion.
-                Defaults to False.
+            auto_ensure (bool): Perform a full disk + runtime reset after
+                deletion. Defaults to False.
         """
         root = self._root.resolve()
         if cli_check:
