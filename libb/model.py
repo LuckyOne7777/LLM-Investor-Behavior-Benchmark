@@ -117,8 +117,9 @@ class LIBBmodel:
         """
         Delete all files within the given root.
 
-        If ensure_file_system() is not called afterward, processing will
-        silently fail or raise an error.
+        If `ensure_file_system()` and `_hydrate_from disk()` is not called afterward in that order, processing will
+        silently fail or raise an error. To avoid needing to call these functions, use `auto_ensure = True`
+        as a default parameter.
 
         Args:
             cli_check (bool): Require interactive confirmation before deleting files.
