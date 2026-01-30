@@ -3,6 +3,7 @@ from enum import Enum
 from dataclasses import dataclass
 import pandas as pd
 from copy import deepcopy
+import os
 
 class Order(TypedDict):
     action: Literal["b", "s", "u"]     # "u" = update stop-loss
@@ -53,3 +54,16 @@ class TradeStatus(Enum):
     FILLED = "FILLED"
     FAILED = "FAILED"
     SKIPPED = "SKIPPED"
+
+
+@dataclass
+class MarketConfig:
+    alpha_vantage_key: str | None = None
+    finnhub_key: str | None = None
+
+    @classmethod
+    def from_env(cls):
+        return cls(
+            alpha_vantage_key=os.getenv("ALPHA_VANTAGE_KEY"),
+            finnhub_key=os.getenv("FINNHUB_API_KEY"),
+        )
