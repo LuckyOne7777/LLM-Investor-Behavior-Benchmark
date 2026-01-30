@@ -50,6 +50,8 @@ def catch_missing_order_data(order: Order, required_cols: list, trade_log_path: 
 
     return True
 
+nyse = mcal.get_calendar("NYSE")
+
 def is_nyse_open(date: dt.date) -> bool:
     """
     Check if the NYSE is open on a given date.
@@ -64,6 +66,5 @@ def is_nyse_open(date: dt.date) -> bool:
     bool
         True if NYSE is open, False otherwise.
     """
-    nyse = mcal.get_calendar("NYSE")
     schedule = nyse.schedule(start_date=date, end_date=date)
     return not schedule.empty
