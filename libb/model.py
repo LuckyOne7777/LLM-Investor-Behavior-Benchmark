@@ -247,6 +247,15 @@ class LIBBmodel:
                                                     })
                 self.failed_orders += 1
                 continue
+            # drop orders on weekends and holidays
+            if not is_nyse_open(order_date):
+                append_log(self._trade_log_path, {
+                    "date": order["date"],
+                    "ticker": order["ticker"],
+                    "action": order["action"],
+                    "status": "FAILED",
+                    "reason": f"NYSE CLOSED ON ORDER DATE"
+                                                    })
             if not isinstance(order["shares"], int) and order["shares"] is not None:
                 append_log(self._trade_log_path, {
                     "date": order["date"],
