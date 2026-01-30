@@ -65,18 +65,7 @@ class LIBBmodel:
         self._sentiment_path: Path = self._metrics_dir / "sentiment.json"
 
         self.ensure_file_system()
-
-        self.portfolio: pd.DataFrame = self._load_csv(self._portfolio_path)
-        self.cash: float = (float(self.portfolio["cash"].iloc[0]) 
-                     if not self.portfolio.empty else self.STARTING_CASH)
-        self.portfolio_history: pd.DataFrame = self._load_csv(self._portfolio_history_path)
-        self.trade_log: pd.DataFrame = self._load_csv(self._trade_log_path)
-        self.position_history: pd.DataFrame = self._load_csv(self._position_history_path)
-
-        self.pending_trades: dict[str, list[dict]] = self._load_orders_dict(self._pending_trades_path)
-        self.performance: list[dict] = self._load_json(self._performance_path)
-        self.behavior: list[dict] = self._load_json(self._behavior_path)
-        self.sentiment: list[dict] = self._load_json(self._sentiment_path)
+        self._hydrate_from_disk()
 
         self.filled_orders: int = 0
         self.failed_orders: int = 0
