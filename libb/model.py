@@ -431,11 +431,18 @@ class LIBBmodel:
         nyse_open_on_date = is_nyse_open(self.run_date)
 
         NY_TZ = ZoneInfo("America/New_York")
-        MARKET_CLOSE = time(16, 0)
+        MARKET_CLOSE = time(16, 0) # 4PM
 
-        start_time_ny = self.start_time.astimezone(NY_TZ)
-        created_after_close = start_time_ny.time() >= MARKET_CLOSE
-        eligible_for_execution = nyse_open_on_date and created_after_close  
+        is_today = self.run_date == pd.Timestamp.now().date()
+
+        if is_today:
+            start_time_ny = self.start_time.astimezone(NY_TZ)
+            created_after_close = start_time_ny.time() >= MARKET_CLOSE
+        else:
+            created_after_close = True
+
+        eligible_for_execution = nyse_open_on_date and created_after_close
+
 
         end_time = datetime.now(UTC)
         
@@ -451,7 +458,6 @@ class LIBBmodel:
             "orders_failed": self.failed_orders,
             "orders_skipped": self.skipped_orders,
             "portfolio_value": portfolio_equity,
-
             "error": str(error),
             }
         with open(full_path, "w") as file:
