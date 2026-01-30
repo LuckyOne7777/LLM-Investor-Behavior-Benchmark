@@ -360,6 +360,15 @@ class LIBBmodel:
 
     def process_portfolio(self) -> None:
         "Wrapper for all portfolio processing."
+        ""
+        today = pd.Timestamp.now().date()
+
+        if self.run_date > today:
+            raise RuntimeError(
+            f"""Cannot process portfolio: run_date ({self.run_date}) is ahead
+            of the current date ({today})."""
+            )
+        
         self._catch_processing_errors()
 
 # ----------------------------------
