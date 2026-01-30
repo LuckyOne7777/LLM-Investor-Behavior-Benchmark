@@ -242,7 +242,7 @@ class LIBBmodel:
                     "date": order["date"],
                     "ticker": order["ticker"],
                     "action": order["action"],
-                    "status": "FAILED",
+                    "status": "REJECTED",
                     "reason": f"ORDER DATE ({order_date}) IS PAST RUN DATE ({self.run_date})"
                                                     })
                 self.failed_orders += 1
@@ -253,7 +253,7 @@ class LIBBmodel:
                     "date": order["date"],
                     "ticker": order["ticker"],
                     "action": order["action"],
-                    "status": "FAILED",
+                    "status": "REJECTED",
                     "reason": f"NYSE CLOSED ON ORDER DATE"
                                                     })
             if not isinstance(order["shares"], int) and order["shares"] is not None:
