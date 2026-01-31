@@ -35,7 +35,6 @@ def daily_flow(date):
 
 def main():
     today = pd.Timestamp.now().date()
-    today = pd.Timestamp("2026-01-21")
     day_num = today.weekday()
 
     if day_num  == 4: # Friday
