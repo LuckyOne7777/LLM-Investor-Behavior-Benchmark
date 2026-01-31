@@ -5,22 +5,6 @@ users should be aware of when working with LIBB.
 
 ---
 
-## Minimum Portfolio Requirements
-
-At least one ticker must remain in the portfolio at all times to
-maintain correct cash accounting. Fully liquidating all positions may
-lead to inconsistent or undefined behavior in downstream calculations.
-
----
-
-## Trading Calendar Assumptions
-
-LIBB assumes execution on U.S. trading days only. The framework does not
-currently account for weekends or market holidays, and workflows should
-avoid running on non-trading days.
-
----
-
 ## Market Data Source
 
 Yahoo Finance (`yfinance`) is currently the sole supported market data
