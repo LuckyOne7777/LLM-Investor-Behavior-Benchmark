@@ -55,6 +55,7 @@ class LIBBmodel:
         # paths in portfolio
         self._portfolio_history_path: Path = self._portfolio_dir / "portfolio_history.csv"
         self._pending_trades_path: Path = self._portfolio_dir / "pending_trades.json"
+        self._cash_path: Path = self._portfolio_dir / "cash.json"
         self._portfolio_path: Path = self._portfolio_dir / "portfolio.csv"
         self._trade_log_path: Path = self._portfolio_dir / "trade_log.csv"
         self._position_history_path: Path = self._portfolio_dir / "position_history.csv"
@@ -87,9 +88,12 @@ class LIBBmodel:
         # portfolio files
         self._ensure_file(self._portfolio_history_path, "date,equity,cash,positions_value,return_pct\n")
         self._ensure_file(self._pending_trades_path, '{"orders": []}')
-        self._ensure_file(self._portfolio_path, "ticker,shares,buy_price,cost_basis,stop_loss,market_price,market_value,unrealized_pnl,cash\n")
+
+        self._ensure_file(self._cash_path, json.dumps({"cash": self.STARTING_CASH}) )
+
+        self._ensure_file(self._portfolio_path, "ticker,shares,buy_price,cost_basis,stop_loss,market_price,market_value,unrealized_pnl\n")
         self._ensure_file(self._trade_log_path, "date,ticker,action,shares,price,cost_basis,PnL,rationale,confidence,status,reason\n")
-        self._ensure_file(self._position_history_path, "date,ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl,cash\n")
+        self._ensure_file(self._position_history_path, "date,ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl\n")
 
         # metrics files
         self._ensure_file(self._behavior_path, "[]")
@@ -100,8 +104,7 @@ class LIBBmodel:
     def _hydrate_from_disk(self) -> None:
         "Match objects in memory from disk state."
         self.portfolio: pd.DataFrame = self._load_csv(self._portfolio_path)
-        self.cash: float = (float(self.portfolio["cash"].iloc[0]) 
-                     if not self.portfolio.empty else self.STARTING_CASH)
+        self.cash: float = self._load_cash()
         self.portfolio_history: pd.DataFrame = self._load_csv(self._portfolio_history_path)
         self.trade_log: pd.DataFrame = self._load_csv(self._trade_log_path)
         self.position_history: pd.DataFrame = self._load_csv(self._position_history_path)
@@ -209,6 +212,31 @@ class LIBBmodel:
             with open(path, "r") as f:
                 return json.load(f)
         return {"orders": []}
+    
+    def _load_cash(self) -> float:
+        with open(self._cash_path, "r") as f:
+            data = json.load(f)
+
+        if "cash" not in data:
+            raise RuntimeError(
+                f"`cash.json` missing required key 'cash' at {self._cash_path}"
+            )
+
+        cash = data["cash"]
+
+        try:
+            return float(cash)
+        except (TypeError, ValueError):
+            raise RuntimeError(
+                f"Invalid cash value in {self._cash_path}: {cash!r}"
+            )
+
+
+
+    def _save_cash(self, cash: float) -> None:
+        with open(self._cash_path, "w") as f:
+                json.dump({"cash": cash}, f, indent=2)
+
 
     def _override_json_file(self, data: list[dict] | dict[str, list[dict]], path: Path) -> None:
         with open(path, "w") as file:
@@ -226,8 +254,7 @@ class LIBBmodel:
     def _save_disk_snapshot(self) -> ModelSnapshot:
         "Function for saving a disk snapshot."
         return ModelSnapshot(
-        cash= (float(self.portfolio["cash"].iloc[0]) 
-                     if not self.portfolio.empty else self.STARTING_CASH),
+        cash= self._load_cash(),
 
         portfolio= self._load_csv(self._portfolio_path),
         portfolio_history= self._load_csv(self._portfolio_history_path),
@@ -370,8 +397,8 @@ class LIBBmodel:
                               You may have called 'reset_run()` without calling `ensure_file_system()` immediately after.""") from e
         return
     def _update_portfolio_market_data(self) -> None:
-        """Update market portfolio values and save to disk."""
-        self.portfolio = update_market_value_columns(self.portfolio, self.cash, date=self.run_date)
+        """Update market portfolio value and cash. Save new values to disk."""
+        self.portfolio = update_market_value_columns(self.portfolio, date=self.run_date)
 
         self.portfolio.to_csv(self._portfolio_path, index=False)
         
@@ -388,7 +415,7 @@ class LIBBmodel:
         "Null values found in required portfolio columns:\n"
         f"{self.portfolio[required_cols]}")
 
-
+        self._save_cash(self.cash)
         return
     
     def _catch_processing_errors(self) -> None:

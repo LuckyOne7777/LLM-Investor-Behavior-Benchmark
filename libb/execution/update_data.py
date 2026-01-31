@@ -52,7 +52,7 @@ def get_market_data(ticker: str, date: str | date | None = None) -> MarketDataOb
          raise RuntimeError(f"{ticker} data for 'Close' is None")
     return data
 
-def update_market_value_columns(portfolio: pd.DataFrame, cash: float, 
+def update_market_value_columns(portfolio: pd.DataFrame, 
                                date: str | date | None = None) -> pd.DataFrame:
     portfolio = portfolio.copy()
 
@@ -63,10 +63,9 @@ def update_market_value_columns(portfolio: pd.DataFrame, cash: float,
 
         ticker_data = get_market_data(ticker, date)
         close_price = ticker_data["Close"]
-                     
+
         portfolio.at[i, "market_price"] = close_price
         portfolio.at[i, "market_value"] = close_price * shares
         portfolio.at[i, "unrealized_pnl"] = portfolio.at[i, "market_value"] - cost_basis
-        portfolio.at[i, "cash"] = cash
 
     return portfolio
