@@ -72,6 +72,7 @@ class LIBBmodel:
         self.skipped_orders: int = 0
 
         self.STARTUP_DISK_SNAPSHOT: ModelSnapshot | None = self._save_disk_snapshot()
+        self._instance_is_valid: bool = True
 
 # ----------------------------------
 # Filesystem & Persistence
@@ -147,6 +148,9 @@ class LIBBmodel:
                 deletion. Defaults to False.
         """
         root = self._root.resolve()
+
+        self._instance_is_valid = False
+        
         if cli_check:
             user_decision = None
             while user_decision not in {"y", "n"}:
@@ -168,6 +172,7 @@ class LIBBmodel:
             self._hydrate_from_disk()
             self._reset_runtime_state()
             self.STARTUP_DISK_SNAPSHOT = self._save_disk_snapshot()
+            self._instance_is_valid = True
         return
 
     def _ensure_dir(self, path: Path) -> None:
@@ -381,6 +386,7 @@ class LIBBmodel:
             self._append_position_history()
             self.save_new_logging_file()
         except Exception as e:
+            self._instance_is_valid = False
             if self.STARTUP_DISK_SNAPSHOT is None:
                 raise RuntimeError("No startup disk snapshot available for rollback; disk may be corrupted.")
             else:
@@ -398,6 +404,9 @@ class LIBBmodel:
             f"""Cannot process portfolio: run_date ({self.run_date}) is ahead
             of the current date ({today})."""
             )
+        if not self._instance_is_valid:
+                raise RuntimeError("LIBBmodel instance is invalid after failure; create a new instance to avoid divergence from state.")
+
         
         self._catch_processing_errors()
 
