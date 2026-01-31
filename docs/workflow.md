@@ -9,8 +9,6 @@ LIBB is explicit and procedural by design:
 - Users control when processing, prompting, and persistence occur
 - The workflow is identical for single-model and multi-model runs
 
-All examples below are taken from `user_side/` and represent recommended usage patterns.
-
 ## Core Workflow
 
 Every LIBB workflow follows the same high-level sequence:
@@ -76,7 +74,7 @@ def workflow():
 
 ---
 
-## Example Workflow
+## Example Workflows
 
 The following examples are taken from `user_side/workflow.py` and represent
 recommended usage patterns.
@@ -86,9 +84,11 @@ recommended usage patterns.
 ### Weekly Workflow
 
 ```python
+
 from libb import LIBBmodel
-from .prompt_models import prompt_daily_report, prompt_deep_research
+from .prompt_orchestration.prompt_models import prompt_daily_report, prompt_deep_research # user functions
 from libb.other.parse import parse_json
+import pandas as pd
 
 MODELS = ["deepseek", "gpt-4.1"]
 
@@ -99,13 +99,13 @@ def weekly_flow():
 
         deep_research_report = prompt_deep_research(libb)
 
-    # Optional persistence
+        # Optional persistence
         libb.save_deep_research(deep_research_report)
 
         orders_json = parse_json(deep_research_report, "ORDERS_JSON")
         libb.save_orders(orders_json)
 
-    # Optional post-processing
+        # Optional post-processing
         libb.analyze_sentiment(deep_research_report)
     return
 ```
