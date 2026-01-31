@@ -150,7 +150,7 @@ class LIBBmodel:
         root = self._root.resolve()
 
         self._instance_is_valid = False
-        
+
         if cli_check:
             user_decision = None
             while user_decision not in {"y", "n"}:
@@ -493,11 +493,13 @@ class LIBBmodel:
 
         eligible_for_execution = nyse_open_on_date and created_after_close
 
+        weekday_name = str(self.run_date.strftime("%A"))
 
         end_time = datetime.now(UTC)
         
         log = {
             "date": str(self.run_date),
+            "weekday": weekday_name,
             "started_at": str(self.start_time),
             "finished_at": str(end_time),
             "nyse_open_on_date": nyse_open_on_date,
