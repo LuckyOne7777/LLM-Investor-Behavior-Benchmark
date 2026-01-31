@@ -62,6 +62,76 @@ and how to read the codebase effectively.
 
 ---
 
+## Example Workflow
+
+```python
+
+from libb import LIBBmodel
+from .prompt_orchestration.prompt_models import prompt_daily_report
+from libb.other.parse import parse_json
+import pandas as pd
+
+MODELS = ["deepseek", "gpt-4.1"]
+
+def daily_flow():
+    for model in MODELS:
+        libb = LIBBmodel(f"<example_dir>/runs/run_v1/{model}")
+
+        libb.process_portfolio()
+
+        # user created function
+        daily_report = prompt_daily_report(libb)
+
+        libb.analyze_sentiment(daily_report)
+        libb.save_daily_update(daily_report)
+
+        orders_json = parse_json(daily_report, "ORDERS_JSON")
+        libb.save_orders(orders_json)
+    return
+```
+
+---
+
+## What Gets Created Automatically
+
+- Run directory structure
+- Portfolio files
+- Metrics files
+
+No manual file setup is required.
+
+---
+
+## Created File Tree
+
+After running for the first time, LIBB generates a fixed directory structure at the user-specified output path.
+
+```text
+
+<output_dir>/
+├── metrics/          # evaluation
+│   ├── behavior.json
+│   ├── performance.json
+│   └── sentiment.json
+├── portfolio/        # trading state & history
+│   ├── pending_trades.json
+│   ├── portfolio.csv
+│   ├── portfolio_history.csv
+│   ├── position_history.csv
+│   └── trade_log.csv
+|
+|── loggging/ # JSON log files   
+|
+└── research/         # generated analysis
+    ├── daily_reports/
+    └── deep_research/
+
+```
+
+LIBB will use this file tree to save artifacts for all future runs in the output directory.
+
+---
+
 ## Getting Started
 
 This guide shows two supported setup paths:
@@ -268,44 +338,6 @@ Windows users may encounter PowerShell execution policy restrictions.
 Command Prompt can be used instead of PowerShell if preferred.
 
 Execution scheduling and orchestration are intentionally left to the user.
-
-## What Gets Created Automatically
-
-- Run directory structure
-- Portfolio files
-- Metrics files
-
-No manual file setup is required.
-
-## Created File Tree
-
-After running for the first time, LIBB generates a fixed directory structure at the user-specified output path.
-
-```text
-
-<output_dir>/
-├── metrics/          # evaluation
-│   ├── behavior.json
-│   ├── performance.json
-│   └── sentiment.json
-├── portfolio/        # trading state & history
-│   ├── pending_trades.json
-│   ├── portfolio.csv
-│   ├── portfolio_history.csv
-│   ├── position_history.csv
-│   └── trade_log.csv
-|
-|── loggging/ # JSON log files   
-|
-└── research/         # generated analysis
-    ├── daily_reports/
-    └── deep_research/
-
-```
-
-LIBB will use this file tree to save artifacts for all future runs in the output directory.
-
----
 
 ---
 
