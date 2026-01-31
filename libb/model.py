@@ -371,8 +371,24 @@ class LIBBmodel:
         return
     def _update_portfolio_market_data(self) -> None:
         """Update market portfolio values and save to disk."""
-        update_market_value_columns(self.portfolio, self.cash, date=self.run_date)
+        self.portfolio = update_market_value_columns(self.portfolio, self.cash, date=self.run_date)
+
         self.portfolio.to_csv(self._portfolio_path, index=False)
+        
+        required_cols = [
+            "ticker",
+            "shares",
+            "cost_basis",
+            "market_price",
+            "market_value",
+            "unrealized_pnl",
+            ]
+
+        assert self.portfolio[required_cols].notnull().all().all(), (
+        "Null values found in required portfolio columns:\n"
+        f"{self.portfolio[required_cols]}")
+
+
         return
     
     def _catch_processing_errors(self) -> None:
@@ -407,8 +423,10 @@ class LIBBmodel:
         if not self._instance_is_valid:
                 raise RuntimeError("LIBBmodel instance is invalid after failure; create a new instance to avoid divergence from state.")
 
-        
-        self._catch_processing_errors()
+        if is_nyse_open(self.run_date):
+            self._catch_processing_errors()
+        else:
+            self.save_new_logging_file()
 
 # ----------------------------------
 # Saving Logs
