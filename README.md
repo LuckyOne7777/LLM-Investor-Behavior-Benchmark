@@ -107,25 +107,25 @@ No manual file setup is required.
 After running for the first time, LIBB generates a fixed directory structure at the user-specified output path.
 
 ```text
-
 <output_dir>/
-├── metrics/          # evaluation
+├── metrics/                  # evaluation outputs
 │   ├── behavior.json
 │   ├── performance.json
 │   └── sentiment.json
-├── portfolio/        # trading state & history
+│
+├── portfolio/                # live trading state & history
+│   ├── cash.json             # authoritative current cash balance
 │   ├── pending_trades.json
-│   ├── portfolio.csv
-│   ├── portfolio_history.csv
-│   ├── position_history.csv
+│   ├── portfolio.csv         # current positions only
+│   ├── portfolio_history.csv # daily equity & cash snapshots
+│   ├── position_history.csv  # per-position daily history
 │   └── trade_log.csv
-|
-|── loggging/ # JSON log files   
-|
-└── research/         # generated analysis
+│
+├── logging/                  # per-run execution logs (JSON)
+│
+└── research/                 # generated analysis & reports
     ├── daily_reports/
     └── deep_research/
-
 ```
 
 LIBB will use this file tree to save artifacts for all future runs in the output directory.

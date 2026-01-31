@@ -10,22 +10,7 @@ This document is intentionally limited in scope and subject to change.
 
 ## Top Priorities
 
-### 1. Separate Cash from Portfolio State
-
-Refactor internal state representation to ensure cash is tracked independently
-from portfolio positions.
-
-Goals:
-
-- eliminate implicit cash coupling
-- improve clarity of portfolio valuation
-- reduce risk of accounting and reconciliation errors
-
-This change is foundational and may affect downstream metrics and workflows.
-
----
-
-### 2. Performance Metrics
+### 1. Performance Metrics
 
 Incorporate portfolio performance metrics to enable quantitative evaluation of
 model behavior over time.
@@ -41,7 +26,7 @@ explicitly used by the user.
 
 ---
 
-### 3. Behavioral Metrics
+### 2. Behavioral Metrics
 
 Complete the behavioral metrics framework to quantify patterns in model
 decision-making.
@@ -56,7 +41,7 @@ Behavioral metrics are intended for research and analysis, not enforcement.
 
 ---
 
-### 4. Multiple Data Source Support
+### 3. Multiple Data Source Support
 
 Add support for multiple market data sources.
 
@@ -68,7 +53,7 @@ Goals:
 
 ---
 
-### 5. Data Source Fallbacks
+### 4. Data Source Fallbacks
 
 Provide automatic or user-defined fallback mechanisms when a primary data source
 fails or returns incomplete data.
@@ -83,7 +68,7 @@ Fallback behavior should be explicit and auditable.
 
 ---
 
-### 6. Fractional Share Support
+### 5. Fractional Share Support
 
 Add first-class support for fractional share trading across order handling,
 portfolio state, and accounting logic.
