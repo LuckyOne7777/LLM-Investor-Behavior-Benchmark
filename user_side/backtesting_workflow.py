@@ -33,20 +33,19 @@ def daily_flow(date):
     return
 
 def main():
-    today = pd.Timestamp("2026-01-10")
+    start_date = pd.Timestamp("2026-01-05")
     for i in range(10):
-        today = today + pd.Timedelta(days=i)    
-        day_num = today.weekday()
+        run_date = start_date + pd.Timedelta(days=i)    
+        day_num = run_date.weekday()
 
         if day_num  == 4: # Friday
             print("Friday: Running Weekly Flow...")
-            weekly_flow(today)
+            weekly_flow(run_date)
         elif day_num < 4:
             print("Regular Weekday: Running Daily Flow...")
-            daily_flow(today) # Mon-Thursday
+            daily_flow(run_date) # Mon-Thursday
         else:  # Weekend
             print("Weekend: Skipping...")
-            pass
         print("Success!")
 
 
