@@ -1,5 +1,5 @@
 from libb import LIBBmodel
-from .prompt_models import prompt_daily_report, prompt_deep_research
+from .prompt_orchestration.prompt_models import prompt_daily_report, prompt_deep_research
 from libb.other.parse import parse_json
 import pandas as pd
 
@@ -30,10 +30,12 @@ def daily_flow(date):
         orders_json = parse_json(daily_report, "ORDERS_JSON")
 
         libb.save_orders(orders_json)
+        libb.reset_run(auto_ensure=True)
     return
 
 def main():
     today = pd.Timestamp.now().date()
+    today = pd.Timestamp("2026-01-21")
     day_num = today.weekday()
 
     if day_num  == 4: # Friday

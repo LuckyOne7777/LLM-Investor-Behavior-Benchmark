@@ -1,8 +1,8 @@
 from openai import OpenAI
 import os
 from datetime import datetime
-from .deep_research_prompt import create_deep_research_prompt
-from .daily_research_prompt import create_daily_prompt
+from ..prompts.deep_research_prompt import create_deep_research_prompt
+from ..prompts.daily_research_prompt import create_daily_prompt
 
 from openai import OpenAI
 import os

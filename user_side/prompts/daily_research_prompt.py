@@ -1,4 +1,4 @@
-import user_side.get_prompt_data as get_prompt_data
+import user_side.prompt_orchestration.get_prompt_data as get_prompt_data
 from libb.model import LIBBmodel
 
 

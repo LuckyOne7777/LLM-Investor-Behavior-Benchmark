@@ -1,4 +1,4 @@
-from .get_prompt_data import get_macro_news
+from ..prompt_orchestration.get_prompt_data import get_macro_news
 from libb.model import LIBBmodel
 
 
