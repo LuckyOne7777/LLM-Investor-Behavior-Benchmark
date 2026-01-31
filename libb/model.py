@@ -252,7 +252,14 @@ class LIBBmodel:
 # ----------------------------------
     
     def _save_disk_snapshot(self) -> ModelSnapshot:
-        "Function for saving a disk snapshot."
+        """
+        Capture a snapshot of the last committed on-disk model state.
+
+        This snapshot reflects persisted state only and is used for rollback
+        after processing failures. In-memory runtime mutations that have not
+        been flushed to disk are intentionally excluded.
+        """
+
         return ModelSnapshot(
         cash= self._load_cash(),
 
