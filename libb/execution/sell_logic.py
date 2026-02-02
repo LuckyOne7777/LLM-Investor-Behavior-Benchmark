@@ -9,7 +9,8 @@ from typing import cast
 def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log_path: Path) -> tuple[pd.DataFrame, float, bool]:
     ticker = order["ticker"].upper()
     order_type = order["order_type"]
-    ticker_data = get_market_data(ticker)
+    date = order["date"]
+    ticker_data = get_market_data(ticker, date)
 
     high = ticker_data["High"]
     open_price = ticker_data["Open"]

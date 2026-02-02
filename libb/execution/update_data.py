@@ -7,13 +7,10 @@ from datetime import date
 #TODO: graceful error handling for ticker downloading
 #TODO: Add additional data sources
 
-def get_market_data(ticker: str, date: str | date | None = None) -> MarketDataObject:
+def get_market_data(ticker: str, date: str | date) -> MarketDataObject:
         
-    if date is None:
-        date = pd.Timestamp.now().date()
-    else:
-        date = pd.Timestamp(date).date()
-    yesterdays_market_date = date
+
+    yesterdays_market_date = pd.Timestamp(date).date()
 
     todays_market_date = yesterdays_market_date + pd.Timedelta(days=1)
 
