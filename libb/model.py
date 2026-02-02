@@ -2,16 +2,13 @@ from pathlib import Path
 from datetime import date, datetime, UTC, time
 from zoneinfo import ZoneInfo
 from shutil import rmtree
-from typing import cast
 import json
 
 import pandas as pd
 
-from libb.other.types_file import Order, ModelSnapshot, TradeStatus
-from libb.execution.utils import append_log, is_nyse_open
-from libb.execution.process_order import process_order
+from libb.other.types_file import ModelSnapshot
+from libb.execution.utils import is_nyse_open
 from libb.metrics.sentiment_metrics import analyze_sentiment
-from libb.execution.update_data import update_market_value_columns
 from libb.user_data.news import  _get_portfolio_news
 from libb.user_data.logs import _recent_execution_logs
 
