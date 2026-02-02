@@ -6,7 +6,7 @@ import json
 
 import pandas as pd
 
-from libb.other.types_file import ModelSnapshot
+from libb.other.types_file import ModelSnapshot, Log
 from libb.execution.utils import is_nyse_open
 from libb.metrics.sentiment_metrics import analyze_sentiment
 from libb.user_data.news import  _get_portfolio_news
@@ -391,7 +391,7 @@ class LIBBmodel:
 # Logging
 # ----------------------------------
 
-    def _create_log_dict(self, status: str, error: Exception | str) -> dict:
+    def _create_log_dict(self, status: str, error: Exception | str) -> Log:
 
         portfolio_equity = self.portfolio["market_value"].sum() + self.cash
 
@@ -414,25 +414,26 @@ class LIBBmodel:
 
         end_time = datetime.now(UTC)
         
-        log = {
-            "date": str(self.run_date),
-            "weekday": weekday_name,
-            "started_at": str(self.start_time),
-            "finished_at": str(end_time),
-            "nyse_open_on_date": nyse_open_on_date,
-            "created_after_close": created_after_close,
-            "eligible_for_execution": eligible_for_execution,
-            "processing_status": status,
-            "orders_processed": self.filled_orders,
-            "orders_failed": self.failed_orders,
-            "orders_skipped": self.skipped_orders,
-            "portfolio_value": portfolio_equity,
-            "error": str(error),
-            }
+        log = Log(
+            date=str(self.run_date),
+            weekday=weekday_name,
+            started_at=str(self.start_time),
+            finished_at=str(end_time),
+            nyse_open_on_date=nyse_open_on_date,
+            created_after_close=created_after_close,
+            eligible_for_execution=eligible_for_execution,
+            processing_status=status,
+            orders_processed=self.filled_orders,
+            orders_failed=self.failed_orders,
+            orders_skipped=self.skipped_orders,
+            portfolio_value=portfolio_equity,
+            error=error,
+                )
+
 
         return log 
     
-    def _save_logging_file_to_disk(self, log: dict):
+    def _save_logging_file_to_disk(self, log: Log):
         log_file_name = Path(f"{self.run_date}.json")
         full_path = self._logging_dir / log_file_name
         with open(full_path, "w") as file:
