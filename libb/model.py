@@ -13,6 +13,7 @@ from libb.user_data.news import  _get_portfolio_news
 from libb.user_data.logs import _recent_execution_logs
 
 from libb.core.processing import Processing
+from libb.core.writing_disk import DiskWriter
 
 class LIBBmodel:
 
@@ -66,6 +67,16 @@ class LIBBmodel:
 
         self.ensure_file_system()
         self._hydrate_from_disk()
+
+        self.writer = DiskWriter(
+                research_dir=self._research_dir,
+                deep_research_dir=self._deep_research_file_folder_path,
+                daily_reports_dir=self._daily_reports_file_folder_path,
+                pending_trades_path=self._pending_trades_path,
+                logging_dir=self._logging_dir,
+                _cash_path=self._cash_path,
+                run_date=self.run_date,
+                    )
 
         self.filled_orders: int = 0
         self.failed_orders: int = 0
@@ -229,22 +240,6 @@ class LIBBmodel:
             raise RuntimeError(
                 f"Invalid cash value in {self._cash_path}: {cash!r}"
             )
-
-
-
-    def _save_cash(self, cash: float) -> None:
-        with open(self._cash_path, "w") as f:
-                json.dump({"cash": cash}, f, indent=2)
-
-
-    def _override_json_file(self, data: list[dict] | dict[str, list[dict]], path: Path) -> None:
-        with open(path, "w") as file:
-            json.dump(data, file, indent=2)
-        return
-    
-    def _override_csv_file(self, df: pd.DataFrame, path: Path) -> None:
-        df.to_csv(path, mode="w", header=True, index=False)
-        return
     
 # ----------------------------------
 # Snapshot Behavior
@@ -331,60 +326,32 @@ class LIBBmodel:
                 self._save_new_logging_file()
 
 # ----------------------------------
-# Saving Logs
+# Disk Writing
 # ----------------------------------
 
 
     def save_deep_research(self, txt: str) -> Path:
-        """Save given text to `deep_research` folder. Returns the file path after completion.
-        The file naming format is `deep_research - {date}.txt`. """
-        deep_research_name = Path(f"deep_research - {self.run_date}.txt")
-        full_path =  self._deep_research_file_folder_path / deep_research_name
-        with open(full_path, "w", encoding="utf-8") as file:
-            file.write(txt)
-        return full_path
+        return self.writer.save_deep_research(txt)
     
     def save_daily_update(self, txt: str) -> Path:
-        """Save the given text to the `daily_reports` folder.
-
-            Returns the file path after completion.
-            The file naming format is `daily_update - {date}.txt`.
-        """
-        daily_updates_file_name = Path(f"daily_update - {self.run_date}.txt")
-        full_path = self._daily_reports_file_folder_path / daily_updates_file_name
-        with open(full_path, "w", encoding="utf-8") as file:
-            file.write(txt)
-        return full_path
+        return self.writer.save_daily_update(txt)
     
     def save_orders(self, json_block: dict) -> None:
-        """
-        Save the given JSON-serializable data to `pending_trades.json`.
-        """
-        with open(self._pending_trades_path, "w") as file:
-            try:
-                json.dump(json_block, file, indent=2)
-            except Exception as e:
-                raise RuntimeError(f"Error while saving JSON block to `pending_trades.json`.") from e
-        return
+        self.writer.save_orders(json_block)
 
     def save_additional_log(self, file_name: str, text: str, folder: str="additional_logs", append: bool=False) -> None:
-        """
-    Save text to a log file inside the research directory.
+        self.writer.save_additional_log(file_name, text, folder, append)
+    
 
-    Args:
-        file_name (`str`, required): Name of the file to write to.
-        text (`str`): Text content to save.
-        folder (`str`, optional): Subfolder inside research_dir where the file
-            will be stored. Defaults to "additional_logs".
-        append (`bool`, optional): If True, append to the file; otherwise,
-            overwrite it. Defaults to False.
-        """
-        path = Path(self._research_dir / folder / file_name)
-        path.parent.mkdir(exist_ok=True, parents=True)
-        mode = "w" if not append else "a"
-        with open(path, mode, encoding="utf-8") as file:
-            file.write(text)
-        return
+    def _save_cash(self, cash: float) -> None:
+        self.writer._save_cash(cash)
+
+
+    def _override_json_file(self, data: list[dict] | dict[str, list[dict]], path: Path) -> None:
+        self.writer._override_json_file(data, path)
+    
+    def _override_csv_file(self, df: pd.DataFrame, path: Path) -> None:
+        self.writer._override_csv_file(df, path)
     
 
 # ----------------------------------
