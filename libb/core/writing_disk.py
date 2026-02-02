@@ -1,0 +1,88 @@
+from pathlib import Path
+import json
+from datetime import date
+from libb.other.types_file import Log
+import pandas as pd
+
+class DiskWriter:
+    def __init__(
+        self,
+        *,
+        research_dir: Path,
+        deep_research_dir: Path,
+        daily_reports_dir: Path,
+        pending_trades_path: Path,
+        run_date: date,
+        logging_dir: Path,
+        _cash_path: Path):
+
+        self.research_dir = research_dir
+        self.deep_research_dir = deep_research_dir
+        self.daily_reports_dir = daily_reports_dir
+        self.pending_trades_path = pending_trades_path
+        self.run_date = run_date
+        self.logging_dir = logging_dir
+        self._cash_path = _cash_path
+
+    # ----------------------------
+    # Research & Reports
+    # ----------------------------
+
+    def save_deep_research(self, text: str) -> Path:
+        path = self.deep_research_dir / f"deep_research - {self.run_date}.txt"
+        path.write_text(text, encoding="utf-8")
+        return path
+
+    def save_daily_update(self, text: str) -> Path:
+        path = self.daily_reports_dir / f"daily_update - {self.run_date}.txt"
+        path.write_text(text, encoding="utf-8")
+        return path
+
+    def save_additional_log(
+        self,
+        file_name: str,
+        text: str,
+        folder: str = "additional_logs",
+        append: bool = False,
+    ) -> None:
+        path = self.research_dir / folder / file_name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        mode = "a" if append else "w"
+        with open(path, mode, encoding="utf-8") as f:
+            f.write(text)
+
+    # ----------------------------
+    # Orders
+    # ----------------------------
+
+    def save_orders(self, orders: dict) -> None:
+        with open(self.pending_trades_path, "w") as f:
+            json.dump(orders, f, indent=2)
+
+    # ----------------------------
+    # Log
+    # ----------------------------
+
+    def save_run_log(self, log: Log) -> Path:
+        path = self.logging_dir / f"{self.run_date}.json"
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(log, f, indent=2)
+        return path
+    
+    # ----------------------------
+    # Portfolio Artifact Saving
+    # ----------------------------
+    
+    def _save_cash(self, cash: float) -> None:
+        with open(self._cash_path, "w") as f:
+                json.dump({"cash": cash}, f, indent=2)
+
+
+    def _override_json_file(self, data: list[dict] | dict[str, list[dict]], path: Path) -> None:
+        with open(path, "w") as file:
+            json.dump(data, file, indent=2)
+        return
+    
+    def _override_csv_file(self, df: pd.DataFrame, path: Path) -> None:
+        df.to_csv(path, mode="w", header=True, index=False)
+        return
