@@ -78,6 +78,7 @@ class Processing:
             if order_date == self.run_date:
                 self.portfolio, self.cash, status = process_order(order, self.portfolio, 
                 self.cash, self._trade_log_path)
+
             else:
                 unexecuted_trades["orders"].append(order)
                 status = TradeStatus.SKIPPED
@@ -171,6 +172,6 @@ class Processing:
         self._append_position_history()
         return unexecuted_trades, self.cash
     
-    def get_order_status_count(self) -> Tuple[int, int]:
-        return self.filled_orders, self.failed_orders
+    def get_order_status_count(self) -> Tuple[int, int, int]:
+        return self.filled_orders, self.failed_orders, self.skipped_orders
             
