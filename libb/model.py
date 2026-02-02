@@ -367,7 +367,7 @@ class LIBBmodel:
                 raise RuntimeError(f"Error while saving JSON block to `pending_trades.json`.") from e
         return
 
-    def save_additonal_log(self, file_name: str, text: str, folder: str="additional_logs", append: bool=False) -> None:
+    def save_additional_log(self, file_name: str, text: str, folder: str="additional_logs", append: bool=False) -> None:
         """
     Save text to a log file inside the research directory.
 
