@@ -15,6 +15,8 @@ from libb.execution.update_data import update_market_value_columns
 from libb.user_data.news import  _get_portfolio_news
 from libb.user_data.logs import _recent_execution_logs
 
+from libb.core.processing import Processing
+
 class LIBBmodel:
 
     """
@@ -293,161 +295,11 @@ class LIBBmodel:
 # ----------------------------------
 
 
-    def _process_orders(self) -> None:
-        """Process all pending orders for the current date.
-        Not recommended for workflows; only use `process_portfolio()` for processing."""
-        orders = cast(list[Order], self.pending_trades.get("orders", []))
-        unexecuted_trades = {"orders": []}
-        if not orders:
-            return
-        for order in orders:
-            order_date = pd.Timestamp(order["date"]).date()
-            # drop orders in the past
-            if order_date < self.run_date:
-                append_log(self._trade_log_path, {
-                    "date": order["date"],
-                    "ticker": order["ticker"],
-                    "action": order["action"],
-                    "status": "REJECTED",
-                    "reason": f"ORDER DATE ({order_date}) IS PAST RUN DATE ({self.run_date})"
-                                                    })
-                self.failed_orders += 1
-                continue
-            # drop orders on weekends and holidays
-            if not is_nyse_open(order_date):
-                append_log(self._trade_log_path, {
-                    "date": order["date"],
-                    "ticker": order["ticker"],
-                    "action": order["action"],
-                    "status": "REJECTED",
-                    "reason": f"NYSE CLOSED ON ORDER DATE"
-                                                    })
-                self.failed_orders += 1
-                continue
-            if not isinstance(order["shares"], int) and order["shares"] is not None:
-                append_log(self._trade_log_path, {
-                    "date": order["date"],
-                    "ticker": order["ticker"],
-                    "action": order["action"],
-                    "status": "FAILED",
-                    "reason": f"SHARES NOT INT: ({order['shares']})"
-                                                    })
-                self.failed_orders += 1
-                continue
-            if order_date == self.run_date:
-                self.portfolio, self.cash, status = process_order(order, self.portfolio, 
-                self.cash, self._trade_log_path)
-            else:
-                unexecuted_trades["orders"].append(order)
-                status = TradeStatus.SKIPPED
-            match status:
-                case TradeStatus.FILLED:
-                    self.filled_orders += 1
-                case TradeStatus.FAILED:
-                    self.failed_orders += 1
-                case TradeStatus.SKIPPED:
-                    self.skipped_orders += 1
-        # keep any unexecuted trades, completely reset otherwise
-        if not unexecuted_trades["orders"]:
-            self.pending_trades = {"orders": []}
-        else:
-            self.pending_trades = unexecuted_trades
-        self.save_orders(self.pending_trades)
-        return
-    
-    def _append_position_history(self) -> None:
-        "Append position history CSV based on portfolio data."
-        portfolio_copy = self.portfolio.copy()
-        portfolio_copy["date"] = self.run_date
-        assert (portfolio_copy["shares"] != 0).all() 
-        portfolio_copy["avg_cost"] = portfolio_copy["cost_basis"] / portfolio_copy["shares"]
-        portfolio_copy.drop(columns=["buy_price", "cost_basis"], inplace=True)
-        append_log(self._position_history_path, portfolio_copy)
-        return
-    
-    def _append_portfolio_history(self) -> None:
-        """Append portfolio history CSV based on portfolio data."""
-
-        defaults = {
-            "ticker": "",
-            "shares": 0,
-            "buy_price": 0.0,
-            "cost_basis": 0.0,
-            "stop_loss": 0.0,
-                }
-
-        for col, default in defaults.items():
-            if col not in self.portfolio.columns:
-                self.portfolio[col] = default
-
-        if "market_value" not in self.portfolio.columns and not self.portfolio.empty:
-            raise RuntimeError("`market_value` not computed before portfolio history update.")
-        market_equity = self.portfolio["market_value"].sum()
-        present_total_equity = market_equity + self.cash
-        if self.portfolio_history.empty:
-            return_pct = None
-            last_total_equity = None
-        else:
-            last_total_equity = self.portfolio_history["equity"].iloc[-1]
-            return_pct = (present_total_equity / last_total_equity) - 1
-        log = {
-        "date": str(self.run_date),
-        "cash": self.cash,
-        "equity": present_total_equity,
-        "return_pct": return_pct,
-        "positions_value": market_equity,
-        }
-        try:
-            append_log(self._portfolio_history_path, log)
-        except Exception as e:
-            raise SystemError(f"""Error saving to portfolio_history for {self._model_path}. 
-                              You may have called 'reset_run()` without calling `ensure_file_system()` immediately after.""") from e
-        return
-    def _update_portfolio_market_data(self) -> None:
-        """Update market portfolio value and cash. Save new values to disk."""
-        self.portfolio = update_market_value_columns(self.portfolio, date=self.run_date)
-
-        self.portfolio.to_csv(self._portfolio_path, index=False)
-        
-        required_cols = [
-            "ticker",
-            "shares",
-            "cost_basis",
-            "market_price",
-            "market_value",
-            "unrealized_pnl",
-            ]
-
-        assert self.portfolio[required_cols].notnull().all().all(), (
-        "Null values found in required portfolio columns:\n"
-        f"{self.portfolio[required_cols]}")
-
-        self._save_cash(self.cash)
-        return
-    
-    def _catch_processing_errors(self) -> None:
-        """
-        Process portfolio and reset to prior disk state on errors.
-        """
-        try:
-            self._process_orders()
-            self._update_portfolio_market_data()
-            self._append_portfolio_history()
-            self._append_position_history()
-            self.save_new_logging_file()
-        except Exception as e:
-            self._instance_is_valid = False
-            if self.STARTUP_DISK_SNAPSHOT is None:
-                raise RuntimeError("No startup disk snapshot available for rollback; disk may be corrupted.")
-            else:
-                self._load_snapshot_to_disk(self.STARTUP_DISK_SNAPSHOT)
-            self.save_new_logging_file(status="FAILURE", error=e)
-            raise SystemError("Processing failed: disk state has been reset to snapshot created on startup.") from e
-
     def process_portfolio(self) -> None:
         "Wrapper for all portfolio processing."
         ""
         today = pd.Timestamp.now().date()
+
 
         if self.run_date > today:
             raise RuntimeError(
@@ -458,9 +310,28 @@ class LIBBmodel:
                 raise RuntimeError("LIBBmodel instance is invalid after failure; create a new instance to avoid divergence from state.")
 
         if is_nyse_open(self.run_date):
-            self._catch_processing_errors()
-        else:
-            self.save_new_logging_file()
+            try:
+                processing = Processing(run_date=self.run_date, portfolio=self.portfolio, cash=self.cash,
+                                _trade_log_path=self._trade_log_path, portfolio_history=self.portfolio_history, 
+                                _position_history_path=self._position_history_path,
+                                  _portfolio_history_path=self._portfolio_history_path,
+                                _portfolio_path=self._portfolio_path, _model_path=self._model_path)
+
+                self.pending_trades, self.cash = processing.processing(self.pending_trades)
+                self.filled_orders, self.failed_orders = processing.get_order_status_count()
+                self._save_cash(self.cash)
+                self.save_orders(self.pending_trades)
+                self.save_new_logging_file()
+            except Exception as e:
+                self._instance_is_valid = False
+                if self.STARTUP_DISK_SNAPSHOT is None:
+                    raise RuntimeError("No startup disk snapshot available for rollback; disk may be corrupted.")
+                else:
+                    self._load_snapshot_to_disk(self.STARTUP_DISK_SNAPSHOT)
+                self.save_new_logging_file(status="FAILURE", error=e)
+                raise SystemError("Processing failed: disk state has been reset to snapshot created on startup.") from e
+            else:
+                self.save_new_logging_file()
 
 # ----------------------------------
 # Saving Logs
