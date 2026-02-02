@@ -318,17 +318,17 @@ class LIBBmodel:
                 self.filled_orders, self.failed_orders, self.skipped_orders = processing.get_order_status_count()
                 self._save_cash(self.cash)
                 self.save_orders(self.pending_trades)
-                self.save_new_logging_file()
+                self._save_new_logging_file()
             except Exception as e:
                 self._instance_is_valid = False
                 if self.STARTUP_DISK_SNAPSHOT is None:
                     raise RuntimeError("No startup disk snapshot available for rollback; disk may be corrupted.")
                 else:
                     self._load_snapshot_to_disk(self.STARTUP_DISK_SNAPSHOT)
-                self.save_new_logging_file(status="FAILURE", error=e)
+                self._save_new_logging_file()
                 raise SystemError("Processing failed: disk state has been reset to snapshot created on startup.") from e
             else:
-                self.save_new_logging_file()
+                self._save_new_logging_file()
 
 # ----------------------------------
 # Saving Logs
@@ -391,12 +391,9 @@ class LIBBmodel:
 # Logging
 # ----------------------------------
 
-    def save_new_logging_file(self, status: str = "SUCCESS", error: Exception | str = "none"):
+    def _create_log_dict(self, status: str, error: Exception | str) -> dict:
 
         portfolio_equity = self.portfolio["market_value"].sum() + self.cash
-
-        log_file_name = Path(f"{self.run_date}.json")
-        full_path = self._logging_dir / log_file_name
 
         nyse_open_on_date = is_nyse_open(self.run_date)
 
@@ -432,12 +429,22 @@ class LIBBmodel:
             "portfolio_value": portfolio_equity,
             "error": str(error),
             }
+
+        return log 
+    
+    def _save_logging_file_to_disk(self, log: dict):
+        log_file_name = Path(f"{self.run_date}.json")
+        full_path = self._logging_dir / log_file_name
         with open(full_path, "w") as file:
-                try:
-                    json.dump(log, file, indent=2)
-                except Exception as e:
+            try:
+                json.dump(log, file, indent=2)
+            except Exception as e:
                     raise RuntimeError(f"Error while saving JSON log to {full_path}.") from e
         return
+    
+    def _save_new_logging_file(self, status: str = "SUCCESS", error: Exception | str = "none"):
+        log = self._create_log_dict(status, error)
+        self._save_logging_file_to_disk(log)
 # ----------------------------------
 # Calculate Metrics
 # ----------------------------------
