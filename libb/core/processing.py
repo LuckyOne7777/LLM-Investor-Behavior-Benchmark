@@ -174,4 +174,7 @@ class Processing:
     
     def get_order_status_count(self) -> Tuple[int, int]:
         return self.filled_orders, self.failed_orders
+    
+    def get_portfolio(self) -> pd.DataFrame:
+        return self.portfolio
             

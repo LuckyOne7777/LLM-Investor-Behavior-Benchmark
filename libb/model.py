@@ -202,7 +202,10 @@ class LIBBmodel:
                                 _portfolio_path=self.layout.portfolio_path, _model_path=self._model_path)
 
                 self.pending_trades, self.cash = processing.processing(self.pending_trades)
+
                 self.filled_orders, self.failed_orders = processing.get_order_status_count()
+                self.portfolio = processing.get_portfolio()
+                
                 self.writer._save_cash(self.cash)
                 self.save_orders(self.pending_trades)
                 self._save_new_logging_file()
@@ -240,6 +243,7 @@ class LIBBmodel:
 # ----------------------------------
 
     def _create_log_dict(self, status: str, error: Exception | str) -> Log:
+
 
         portfolio_equity = self.portfolio["market_value"].sum() + self.cash
 
