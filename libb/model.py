@@ -69,15 +69,25 @@ class LIBBmodel:
         self._hydrate_from_disk()
 
         self.writer = DiskWriter(
-                research_dir=self._research_dir,
-                deep_research_dir=self._deep_research_file_folder_path,
-                daily_reports_dir=self._daily_reports_file_folder_path,
-                pending_trades_path=self._pending_trades_path,
-                logging_dir=self._logging_dir,
-                _cash_path=self._cash_path,
-                run_date=self.run_date,
-                _logging_dir = self._logging_dir,
-                    )
+
+            research_dir=self._research_dir,
+            deep_research_dir=self._deep_research_file_folder_path,
+            daily_reports_dir=self._daily_reports_file_folder_path,
+            pending_trades_path=self._pending_trades_path,
+            logging_dir=self._logging_dir,
+            _cash_path=self._cash_path,
+            run_date=self.run_date,
+            _logging_dir=self._logging_dir,
+
+            portfolio_path=self._portfolio_path,
+            portfolio_history_path=self._portfolio_history_path,
+            trade_log_path=self._trade_log_path,
+            position_history_path=self._position_history_path,
+            performance_path=self._performance_path,
+            sentiment_path=self._sentiment_path,
+            behavior_path=self._behavior_path,
+                )
+
 
         self.filled_orders: int = 0
         self.failed_orders: int = 0
@@ -268,19 +278,6 @@ class LIBBmodel:
         behavior= self._load_json(self._behavior_path),
         sentiment= self._load_json(self._sentiment_path),
         )
-    def _load_snapshot_to_disk(self, snapshot: ModelSnapshot) -> None:
-        """Override CSV and JSON disk artifacts based on prior disk snapshot."""
-        
-        self._override_csv_file(snapshot.portfolio, self._portfolio_path)
-        self._override_csv_file(snapshot.portfolio_history, self._portfolio_history_path)
-        self._override_csv_file(snapshot.trade_log, self._trade_log_path)
-        self._override_csv_file(snapshot.position_history, self._position_history_path)
-
-        self._override_json_file(snapshot.performance, self._performance_path)
-        self._override_json_file(snapshot.sentiment, self._sentiment_path)
-        self._override_json_file(snapshot.pending_trades, self._pending_trades_path)
-        self._override_json_file(snapshot.behavior, self._behavior_path)
-        return
     
 
 # ----------------------------------
@@ -320,7 +317,7 @@ class LIBBmodel:
                 if self.STARTUP_DISK_SNAPSHOT is None:
                     raise RuntimeError("No startup disk snapshot available for rollback; disk may be corrupted.")
                 else:
-                    self._load_snapshot_to_disk(self.STARTUP_DISK_SNAPSHOT)
+                    self.writer._load_snapshot_to_disk(self.STARTUP_DISK_SNAPSHOT)
                 self._save_new_logging_file()
                 raise SystemError("Processing failed: disk state has been reset to snapshot created on startup.") from e
             else:
@@ -346,13 +343,6 @@ class LIBBmodel:
 
     def _save_cash(self, cash: float) -> None:
         self.writer._save_cash(cash)
-
-
-    def _override_json_file(self, data: list[dict] | dict[str, list[dict]], path: Path) -> None:
-        self.writer._override_json_file(data, path)
-    
-    def _override_csv_file(self, df: pd.DataFrame, path: Path) -> None:
-        self.writer._override_csv_file(df, path)
     
 
 # ----------------------------------
