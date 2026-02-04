@@ -253,7 +253,7 @@ class LIBBmodel:
 
                 self.pending_trades, self.cash = processing.processing(self.pending_trades)
                 self.filled_orders, self.failed_orders, self.skipped_orders = processing.get_order_status_count()
-                self._save_cash(self.cash)
+                self.writer._save_cash(self.cash)
                 self.save_orders(self.pending_trades)
                 self._save_new_logging_file()
             except Exception as e:
@@ -283,10 +283,6 @@ class LIBBmodel:
 
     def save_additional_log(self, file_name: str, text: str, folder: str="additional_logs", append: bool=False) -> None:
         self.writer.save_additional_log(file_name, text, folder, append)
-    
-
-    def _save_cash(self, cash: float) -> None:
-        self.writer._save_cash(cash)
     
 
 # ----------------------------------
