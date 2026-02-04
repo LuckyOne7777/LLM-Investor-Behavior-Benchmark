@@ -38,10 +38,10 @@ def get_market_data(ticker: str, date: str | date) -> MarketDataObject:
     if isinstance(ticker_data.columns, pd.MultiIndex):
              ticker_data.columns = ticker_data.columns.get_level_values(0)
     data: MarketDataObject = {
-            "Low": float(ticker_data["Low"].iloc[0]),
-            "High": float(ticker_data["High"].iloc[0]),
-            "Close": float(ticker_data["Close"].iloc[0]),
-            "Open": float(ticker_data["Open"].iloc[0]),
+            "Low": round(float(ticker_data["Low"].iloc[0]), 2),
+            "High": round(float(ticker_data["High"].iloc[0]), 2),
+            "Close": round(float(ticker_data["Close"].iloc[0]), 2),
+            "Open": round(float(ticker_data["Open"].iloc[0]), 2),
             "Volume": int(ticker_data["Volume"].iloc[0]),
             "Ticker": str(ticker)
         }
