@@ -76,6 +76,7 @@ class LIBBmodel:
                 logging_dir=self._logging_dir,
                 _cash_path=self._cash_path,
                 run_date=self.run_date,
+                _logging_dir = self._logging_dir,
                     )
 
         self.filled_orders: int = 0
@@ -400,19 +401,9 @@ class LIBBmodel:
 
         return log 
     
-    def _save_logging_file_to_disk(self, log: Log):
-        log_file_name = Path(f"{self.run_date}.json")
-        full_path = self._logging_dir / log_file_name
-        with open(full_path, "w") as file:
-            try:
-                json.dump(log, file, indent=2)
-            except Exception as e:
-                    raise RuntimeError(f"Error while saving JSON log to {full_path}.") from e
-        return
-    
     def _save_new_logging_file(self, status: str = "SUCCESS", error: Exception | str = "none"):
         log = self._create_log_dict(status, error)
-        self._save_logging_file_to_disk(log)
+        self.writer._save_logging_file_to_disk(log)
 # ----------------------------------
 # Calculate Metrics
 # ----------------------------------

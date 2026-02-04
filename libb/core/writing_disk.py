@@ -14,8 +14,10 @@ class DiskWriter:
         pending_trades_path: Path,
         run_date: date,
         logging_dir: Path,
-        _cash_path: Path):
+        _cash_path: Path,
+        _logging_dir: Path):
 
+        self._logging_dir = _logging_dir
         self.research_dir = research_dir
         self.deep_research_dir = deep_research_dir
         self.daily_reports_dir = daily_reports_dir
@@ -60,14 +62,18 @@ class DiskWriter:
             json.dump(orders, f, indent=2)
 
     # ----------------------------
-    # Log
+    # Logging
     # ----------------------------
-
-    def save_run_log(self, log: Log) -> Path:
-        path = self.logging_dir / f"{self.run_date}.json"
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(log, f, indent=2)
-        return path
+    
+    def _save_logging_file_to_disk(self, log: Log):
+        log_file_name = Path(f"{self.run_date}.json")
+        full_path = self._logging_dir / log_file_name
+        with open(full_path, "w") as file:
+            try:
+                json.dump(log, file, indent=2)
+            except Exception as e:
+                    raise RuntimeError(f"Error while saving JSON log to {full_path}.") from e
+        return
     
     # ----------------------------
     # Portfolio Artifact Saving
