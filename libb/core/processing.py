@@ -130,7 +130,7 @@ class Processing:
             last_total_equity = None
         else:
             last_total_equity = self.portfolio_history["equity"].iloc[-1]
-            return_pct = (present_total_equity / last_total_equity) - 1
+            return_pct = ((present_total_equity - last_total_equity) / last_total_equity) * 100
         log = {
         "date": str(self.run_date),
         "cash": self.cash,
