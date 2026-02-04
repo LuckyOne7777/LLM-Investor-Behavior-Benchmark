@@ -14,6 +14,7 @@ from libb.user_data.logs import _recent_execution_logs
 
 from libb.core.processing import Processing
 from libb.core.writing_disk import DiskWriter
+from libb.core.reading_disk import DiskReader
 
 class LIBBmodel:
 
@@ -88,12 +89,25 @@ class LIBBmodel:
             behavior_path=self._behavior_path,
                 )
 
+        self.reader = DiskReader(
+            cash_path=self._cash_path,
+
+            portfolio_path=self._portfolio_path,
+            portfolio_history_path=self._portfolio_history_path,
+            trade_log_path=self._trade_log_path,
+            position_history_path=self._position_history_path,
+            pending_trades_path=self._pending_trades_path,
+
+            performance_path=self._performance_path,
+            behavior_path=self._behavior_path,
+            sentiment_path=self._sentiment_path,
+                )
 
         self.filled_orders: int = 0
         self.failed_orders: int = 0
         self.skipped_orders: int = 0
 
-        self.STARTUP_DISK_SNAPSHOT: ModelSnapshot | None = self._save_disk_snapshot()
+        self.STARTUP_DISK_SNAPSHOT: ModelSnapshot | None = self.reader._save_disk_snapshot()
         self._instance_is_valid: bool = True
 
 # ----------------------------------
@@ -124,16 +138,16 @@ class LIBBmodel:
     
     def _hydrate_from_disk(self) -> None:
         "Match objects in memory from disk state."
-        self.portfolio: pd.DataFrame = self._load_csv(self._portfolio_path)
-        self.cash: float = self._load_cash()
-        self.portfolio_history: pd.DataFrame = self._load_csv(self._portfolio_history_path)
-        self.trade_log: pd.DataFrame = self._load_csv(self._trade_log_path)
-        self.position_history: pd.DataFrame = self._load_csv(self._position_history_path)
+        self.portfolio: pd.DataFrame = self.reader._load_csv(self._portfolio_path)
+        self.cash: float = self.reader._load_cash()
+        self.portfolio_history: pd.DataFrame = self.reader._load_csv(self._portfolio_history_path)
+        self.trade_log: pd.DataFrame = self.reader._load_csv(self._trade_log_path)
+        self.position_history: pd.DataFrame = self.reader._load_csv(self._position_history_path)
 
-        self.pending_trades: dict[str, list[dict]] = self._load_orders_dict(self._pending_trades_path)
-        self.performance: list[dict] = self._load_json(self._performance_path)
-        self.behavior: list[dict] = self._load_json(self._behavior_path)
-        self.sentiment: list[dict] = self._load_json(self._sentiment_path)
+        self.pending_trades: dict[str, list[dict]] = self.reader._load_orders_dict(self._pending_trades_path)
+        self.performance: list[dict] = self.reader._load_json(self._performance_path)
+        self.behavior: list[dict] = self.reader._load_json(self._behavior_path)
+        self.sentiment: list[dict] = self.reader._load_json(self._sentiment_path)
 
 
     def _reset_runtime_state(self) -> None:
@@ -195,7 +209,7 @@ class LIBBmodel:
             self.ensure_file_system()
             self._hydrate_from_disk()
             self._reset_runtime_state()
-            self.STARTUP_DISK_SNAPSHOT = self._save_disk_snapshot()
+            self.STARTUP_DISK_SNAPSHOT = self.reader._save_disk_snapshot()
             self._instance_is_valid = True
         return
 
@@ -209,76 +223,6 @@ class LIBBmodel:
         path.parent.mkdir(parents=True, exist_ok=True)
         if not path.exists():
             path.write_text(default_content, encoding="utf-8")
-
-# ----------------------------------
-# File Helpers
-# ----------------------------------
-
-
-    def _load_csv(self, path: Path) -> pd.DataFrame:
-        """Helper for loading CSV at a given path. Return empty DataFrame for invalid paths."""
-        if path.exists():
-            return pd.read_csv(path)
-        return pd.DataFrame()
-
-    def _load_json(self, path: Path) -> list[dict]:
-        "Helper for loading JSON files at a given path. Return empty list for invalid paths."
-        if path.exists():
-            with open(path, "r") as f:
-                return json.load(f)
-        return []
-    
-    def _load_orders_dict(self, path: Path) -> dict[str, list[dict]]:
-        if path.exists():
-            with open(path, "r") as f:
-                return json.load(f)
-        return {"orders": []}
-    
-    def _load_cash(self) -> float:
-        with open(self._cash_path, "r") as f:
-            data = json.load(f)
-
-        if "cash" not in data:
-            raise RuntimeError(
-                f"`cash.json` missing required key 'cash' at {self._cash_path}"
-            )
-
-        cash = data["cash"]
-
-        try:
-            return float(cash)
-        except (TypeError, ValueError):
-            raise RuntimeError(
-                f"Invalid cash value in {self._cash_path}: {cash!r}"
-            )
-    
-# ----------------------------------
-# Snapshot Behavior
-# ----------------------------------
-    
-    def _save_disk_snapshot(self) -> ModelSnapshot:
-        """
-        Capture a snapshot of the last committed on-disk model state.
-
-        This snapshot reflects persisted state only and is used for rollback
-        after processing failures. In-memory runtime mutations that have not
-        been flushed to disk are intentionally excluded.
-        """
-
-        return ModelSnapshot(
-        cash= self._load_cash(),
-
-        portfolio= self._load_csv(self._portfolio_path),
-        portfolio_history= self._load_csv(self._portfolio_history_path),
-        trade_log= self._load_csv(self._trade_log_path),
-        position_history=self._load_csv(self._position_history_path),
-        pending_trades= self._load_orders_dict(self._pending_trades_path),
-
-        performance= self._load_json(self._performance_path),
-        behavior= self._load_json(self._behavior_path),
-        sentiment= self._load_json(self._sentiment_path),
-        )
-    
 
 # ----------------------------------
 # Portfolio Processing
