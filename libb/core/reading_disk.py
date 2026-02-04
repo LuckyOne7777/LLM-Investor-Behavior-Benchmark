@@ -1,31 +1,12 @@
 from pathlib import Path
 import pandas as pd
-from libb.other.types_file import ModelSnapshot
+from libb.other.types_file import ModelSnapshot, DiskLayout
 import json
 
 class DiskReader:
-    def __init__(
-        self,
-        *,
-        cash_path: Path,
-        portfolio_path: Path,
-        portfolio_history_path: Path,
-        trade_log_path: Path,
-        position_history_path: Path,
-        pending_trades_path: Path,
-        performance_path: Path,
-        behavior_path: Path,
-        sentiment_path: Path,
-    ):
-        self._cash_path = cash_path
-        self._portfolio_path = portfolio_path
-        self._portfolio_history_path = portfolio_history_path
-        self._trade_log_path = trade_log_path
-        self._position_history_path = position_history_path
-        self._pending_trades_path = pending_trades_path
-        self._performance_path = performance_path
-        self._behavior_path = behavior_path
-        self._sentiment_path = sentiment_path
+    def __init__(self, layout: DiskLayout):
+        self.layout = layout
+
 
     # ----------------------------------
     # File Helpers
@@ -51,12 +32,12 @@ class DiskReader:
         return {"orders": []}
 
     def _load_cash(self) -> float:
-        with open(self._cash_path, "r") as f:
+        with open(self.layout.cash_path, "r") as f:
             data = json.load(f)
 
         if "cash" not in data:
             raise RuntimeError(
-                f"`cash.json` missing required key 'cash' at {self._cash_path}"
+                f"`cash.json` missing required key 'cash' at {self.layout.cash_path}"
             )
 
         cash = data["cash"]
@@ -65,7 +46,7 @@ class DiskReader:
             return float(cash)
         except (TypeError, ValueError):
             raise RuntimeError(
-                f"Invalid cash value in {self._cash_path}: {cash!r}"
+                f"Invalid cash value in {self.layout.cash_path}: {cash!r}"
             )
 
     # ----------------------------------
@@ -83,13 +64,13 @@ class DiskReader:
         return ModelSnapshot(
             cash=self._load_cash(),
 
-            portfolio=self._load_csv(self._portfolio_path),
-            portfolio_history=self._load_csv(self._portfolio_history_path),
-            trade_log=self._load_csv(self._trade_log_path),
-            position_history=self._load_csv(self._position_history_path),
-            pending_trades=self._load_orders_dict(self._pending_trades_path),
+            portfolio=self._load_csv(self.layout.portfolio_path),
+            portfolio_history=self._load_csv(self.layout.portfolio_history_path),
+            trade_log=self._load_csv(self.layout.trade_log_path),
+            position_history=self._load_csv(self.layout.position_history_path),
+            pending_trades=self._load_orders_dict(self.layout.pending_trades_path),
 
-            performance=self._load_json(self._performance_path),
-            behavior=self._load_json(self._behavior_path),
-            sentiment=self._load_json(self._sentiment_path),
+            performance=self._load_json(self.layout.performance_path),
+            behavior=self._load_json(self.layout.behavior_path),
+            sentiment=self._load_json(self.layout.sentiment_path),
         )

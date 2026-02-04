@@ -6,7 +6,7 @@ import json
 
 import pandas as pd
 
-from libb.other.types_file import ModelSnapshot, Log
+from libb.other.types_file import ModelSnapshot, Log, DiskLayout
 from libb.execution.utils import is_nyse_open
 from libb.metrics.sentiment_metrics import analyze_sentiment
 from libb.user_data.news import  _get_portfolio_news
@@ -44,64 +44,14 @@ class LIBBmodel:
         self._model_path: str = str(model_path)
         self.run_date: date = run_date
 
-        # directories
-        self._portfolio_dir: Path = self._root / "portfolio"
-        self._metrics_dir: Path = self._root / "metrics"
-        self._research_dir: Path = self._root / "research"
-        self._logging_dir: Path = self._root / "logging"
+        self.layout = DiskLayout.from_root(self._root)
 
-        self._deep_research_file_folder_path: Path = self._research_dir / "deep_research"
-        self._daily_reports_file_folder_path: Path = self._research_dir / "daily_reports"
+        self.writer = DiskWriter(layout=self.layout, run_date=self.run_date)
 
-        # paths in portfolio
-        self._portfolio_history_path: Path = self._portfolio_dir / "portfolio_history.csv"
-        self._pending_trades_path: Path = self._portfolio_dir / "pending_trades.json"
-        self._cash_path: Path = self._portfolio_dir / "cash.json"
-        self._portfolio_path: Path = self._portfolio_dir / "portfolio.csv"
-        self._trade_log_path: Path = self._portfolio_dir / "trade_log.csv"
-        self._position_history_path: Path = self._portfolio_dir / "position_history.csv"
-
-        # paths in metrics
-        self._behavior_path: Path = self._metrics_dir / "behavior.json"
-        self._performance_path: Path = self._metrics_dir / "performance.json"
-        self._sentiment_path: Path = self._metrics_dir / "sentiment.json"
+        self.reader = DiskReader(layout=self.layout)
 
         self.ensure_file_system()
         self._hydrate_from_disk()
-
-        self.writer = DiskWriter(
-
-            research_dir=self._research_dir,
-            deep_research_dir=self._deep_research_file_folder_path,
-            daily_reports_dir=self._daily_reports_file_folder_path,
-            pending_trades_path=self._pending_trades_path,
-            logging_dir=self._logging_dir,
-            _cash_path=self._cash_path,
-            run_date=self.run_date,
-            _logging_dir=self._logging_dir,
-
-            portfolio_path=self._portfolio_path,
-            portfolio_history_path=self._portfolio_history_path,
-            trade_log_path=self._trade_log_path,
-            position_history_path=self._position_history_path,
-            performance_path=self._performance_path,
-            sentiment_path=self._sentiment_path,
-            behavior_path=self._behavior_path,
-                )
-
-        self.reader = DiskReader(
-            cash_path=self._cash_path,
-
-            portfolio_path=self._portfolio_path,
-            portfolio_history_path=self._portfolio_history_path,
-            trade_log_path=self._trade_log_path,
-            position_history_path=self._position_history_path,
-            pending_trades_path=self._pending_trades_path,
-
-            performance_path=self._performance_path,
-            behavior_path=self._behavior_path,
-            sentiment_path=self._sentiment_path,
-                )
 
         self.filled_orders: int = 0
         self.failed_orders: int = 0
@@ -116,38 +66,38 @@ class LIBBmodel:
 
     def ensure_file_system(self):
         "Create and set up all files/folders needed for processing and metrics. Automatically called during construction."
-        for dir in [self._root, self._portfolio_dir, self._metrics_dir, self._research_dir, self._daily_reports_file_folder_path, 
-                    self._deep_research_file_folder_path, self._logging_dir]:
+        for dir in [self._root, self.layout.portfolio_dir, self.layout.metrics_dir, self.layout.research_dir, self.layout.daily_reports_dir, 
+                    self.layout.deep_research_dir, self.layout.logging_dir]:
             self._ensure_dir(dir)
 
         # portfolio files
-        self._ensure_file(self._portfolio_history_path, "date,equity,cash,positions_value,return_pct\n")
-        self._ensure_file(self._pending_trades_path, '{"orders": []}')
+        self._ensure_file(self.layout.portfolio_history_path, "date,equity,cash,positions_value,return_pct\n")
+        self._ensure_file(self.layout.pending_trades_path, '{"orders": []}')
 
-        self._ensure_file(self._cash_path, json.dumps({"cash": self.STARTING_CASH}) )
+        self._ensure_file(self.layout.cash_path, json.dumps({"cash": self.STARTING_CASH}) )
 
-        self._ensure_file(self._portfolio_path, "ticker,shares,buy_price,cost_basis,stop_loss,market_price,market_value,unrealized_pnl\n")
-        self._ensure_file(self._trade_log_path, "date,ticker,action,shares,price,cost_basis,PnL,rationale,confidence,status,reason\n")
-        self._ensure_file(self._position_history_path, "date,ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl\n")
+        self._ensure_file(self.layout.portfolio_path, "ticker,shares,buy_price,cost_basis,stop_loss,market_price,market_value,unrealized_pnl\n")
+        self._ensure_file(self.layout.trade_log_path, "date,ticker,action,shares,price,cost_basis,PnL,rationale,confidence,status,reason\n")
+        self._ensure_file(self.layout.position_history_path, "date,ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl\n")
 
         # metrics files
-        self._ensure_file(self._behavior_path, "[]")
-        self._ensure_file(self._performance_path, "[]")
-        self._ensure_file(self._sentiment_path, "[]")
+        self._ensure_file(self.layout.behavior_path, "[]")
+        self._ensure_file(self.layout.performance_path, "[]")
+        self._ensure_file(self.layout.sentiment_path, "[]")
         return
     
     def _hydrate_from_disk(self) -> None:
         "Match objects in memory from disk state."
-        self.portfolio: pd.DataFrame = self.reader._load_csv(self._portfolio_path)
+        self.portfolio: pd.DataFrame = self.reader._load_csv(self.layout.portfolio_path)
         self.cash: float = self.reader._load_cash()
-        self.portfolio_history: pd.DataFrame = self.reader._load_csv(self._portfolio_history_path)
-        self.trade_log: pd.DataFrame = self.reader._load_csv(self._trade_log_path)
-        self.position_history: pd.DataFrame = self.reader._load_csv(self._position_history_path)
+        self.portfolio_history: pd.DataFrame = self.reader._load_csv(self.layout.portfolio_history_path)
+        self.trade_log: pd.DataFrame = self.reader._load_csv(self.layout.trade_log_path)
+        self.position_history: pd.DataFrame = self.reader._load_csv(self.layout.position_history_path)
 
-        self.pending_trades: dict[str, list[dict]] = self.reader._load_orders_dict(self._pending_trades_path)
-        self.performance: list[dict] = self.reader._load_json(self._performance_path)
-        self.behavior: list[dict] = self.reader._load_json(self._behavior_path)
-        self.sentiment: list[dict] = self.reader._load_json(self._sentiment_path)
+        self.pending_trades: dict[str, list[dict]] = self.reader._load_orders_dict(self.layout.pending_trades_path)
+        self.performance: list[dict] = self.reader._load_json(self.layout.performance_path)
+        self.behavior: list[dict] = self.reader._load_json(self.layout.behavior_path)
+        self.sentiment: list[dict] = self.reader._load_json(self.layout.sentiment_path)
 
 
     def _reset_runtime_state(self) -> None:
@@ -246,13 +196,13 @@ class LIBBmodel:
         if is_nyse_open(self.run_date):
             try:
                 processing = Processing(run_date=self.run_date, portfolio=self.portfolio, cash=self.cash,
-                                _trade_log_path=self._trade_log_path, portfolio_history=self.portfolio_history, 
-                                _position_history_path=self._position_history_path,
-                                  _portfolio_history_path=self._portfolio_history_path,
-                                _portfolio_path=self._portfolio_path, _model_path=self._model_path)
+                                _trade_log_path=self.layout.trade_log_path, portfolio_history=self.portfolio_history, 
+                                _position_history_path=self.layout.position_history_path,
+                                  _portfolio_history_path=self.layout.portfolio_history_path,
+                                _portfolio_path=self.layout.portfolio_path, _model_path=self._model_path)
 
                 self.pending_trades, self.cash = processing.processing(self.pending_trades)
-                self.filled_orders, self.failed_orders, self.skipped_orders = processing.get_order_status_count()
+                self.filled_orders, self.failed_orders = processing.get_order_status_count()
                 self.writer._save_cash(self.cash)
                 self.save_orders(self.pending_trades)
                 self._save_new_logging_file()
@@ -356,7 +306,7 @@ class LIBBmodel:
         """
         log = analyze_sentiment(text, self.run_date, report_type=report_type)
         self.sentiment.append(log)
-        with open(self._sentiment_path, "w") as file:
+        with open(self.layout.sentiment_path, "w") as file:
             json.dump(self.sentiment, file, indent=2)
         return log
 
@@ -380,7 +330,7 @@ class LIBBmodel:
             effective_date = self.run_date
         else:
             effective_date = pd.Timestamp(date).date()
-        return _recent_execution_logs(self._trade_log_path, date=effective_date, look_back=look_back)
+        return _recent_execution_logs(self.layout.trade_log_path, date=effective_date, look_back=look_back)
     
     
     

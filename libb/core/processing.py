@@ -172,6 +172,6 @@ class Processing:
         self._append_position_history()
         return unexecuted_trades, self.cash
     
-    def get_order_status_count(self) -> Tuple[int, int, int]:
-        return self.filled_orders, self.failed_orders, self.skipped_orders
+    def get_order_status_count(self) -> Tuple[int, int]:
+        return self.filled_orders, self.failed_orders
             
