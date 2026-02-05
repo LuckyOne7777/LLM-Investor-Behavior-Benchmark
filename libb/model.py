@@ -71,7 +71,7 @@ class LIBBmodel:
             self._ensure_dir(dir)
 
         # portfolio files
-        self._ensure_file(self.layout.portfolio_history_path, "date,equity,cash,positions_value,daily_return_pct\n")
+        self._ensure_file(self.layout.portfolio_history_path, "date,equity,cash,positions_value,daily_return_pct,overall_return_pct\n")
         self._ensure_file(self.layout.pending_trades_path, '{"orders": []}')
 
         self._ensure_file(self.layout.cash_path, json.dumps({"cash": self.STARTING_CASH}) )
@@ -195,11 +195,12 @@ class LIBBmodel:
 
         if is_nyse_open(self.run_date):
             try:
-                processing = Processing(run_date=self.run_date, portfolio=self.portfolio, cash=self.cash,
-                                _trade_log_path=self.layout.trade_log_path, portfolio_history=self.portfolio_history, 
-                                _position_history_path=self.layout.position_history_path,
-                                  _portfolio_history_path=self.layout.portfolio_history_path,
-                                _portfolio_path=self.layout.portfolio_path, _model_path=self._model_path)
+                processing = Processing(run_date=self.run_date, portfolio=self.portfolio, cash=self.cash, 
+                                        STARTING_CASH=self.STARTING_CASH, _trade_log_path=self.layout.trade_log_path, 
+                                        portfolio_history=self.portfolio_history, 
+                                         _position_history_path=self.layout.position_history_path,
+                                          _portfolio_history_path=self.layout.portfolio_history_path,
+                                        _portfolio_path=self.layout.portfolio_path, _model_path=self._model_path)
 
                 self.pending_trades, self.cash = processing.processing(self.pending_trades)
 

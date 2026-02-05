@@ -16,7 +16,7 @@ from pathlib import Path
 # ----------------------------------
 
 class Processing:
-    def __init__(self, *, run_date, portfolio, cash, _trade_log_path, portfolio_history,
+    def __init__(self, *, run_date, portfolio, cash, STARTING_CASH, _trade_log_path, portfolio_history,
                  _position_history_path, _portfolio_history_path, _portfolio_path, _model_path) -> None:
         
         self.run_date: date = run_date
@@ -24,6 +24,7 @@ class Processing:
         self.portfolio: pd.DataFrame = portfolio
         self.portfolio_history: pd.DataFrame = portfolio_history
         self.cash: float = cash
+        self.STARTING_CASH = STARTING_CASH
 
         self._trade_log_path: Path = _trade_log_path
         self._position_history_path: Path = _position_history_path
@@ -131,10 +132,13 @@ class Processing:
         else:
             last_total_equity = self.portfolio_history["equity"].iloc[-1]
             daily_return_pct = round(((present_total_equity - last_total_equity) / last_total_equity) * 100, 2)
+
+        overall_return_pct = round(((present_total_equity - self.STARTING_CASH) / self.STARTING_CASH) * 100, 2)
         log = {
         "date": str(self.run_date),
         "cash": round(self.cash, 2),
         "equity": round(present_total_equity, 2),
+        "overall_return_pct": overall_return_pct,
         "daily_return_pct": daily_return_pct,
         "positions_value": round(market_equity, 2),
         }
