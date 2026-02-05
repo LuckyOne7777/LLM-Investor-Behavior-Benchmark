@@ -71,7 +71,7 @@ class LIBBmodel:
             self._ensure_dir(dir)
 
         # portfolio files
-        self._ensure_file(self.layout.portfolio_history_path, "date,equity,cash,positions_value,return_pct\n")
+        self._ensure_file(self.layout.portfolio_history_path, "date,equity,cash,positions_value,daily_return_pct\n")
         self._ensure_file(self.layout.pending_trades_path, '{"orders": []}')
 
         self._ensure_file(self.layout.cash_path, json.dumps({"cash": self.STARTING_CASH}) )

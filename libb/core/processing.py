@@ -135,7 +135,7 @@ class Processing:
         "date": str(self.run_date),
         "cash": round(self.cash, 2),
         "equity": round(present_total_equity, 2),
-        "return_pct": daily_return_pct,
+        "daily_return_pct": daily_return_pct,
         "positions_value": round(market_equity, 2),
         }
         try:
