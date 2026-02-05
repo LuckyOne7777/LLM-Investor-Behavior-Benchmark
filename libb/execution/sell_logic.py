@@ -57,7 +57,7 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
                 "action": "SELL",
                 "shares": shares,
                 "price": fill_price,
-                "PnL": pnl,
+                "PnL": round(pnl, 2),
                 "status": "FILLED",
                 "reason": ""
     })
@@ -79,7 +79,7 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
                 "action": "SELL",
                 "shares": shares,
                 "price": open_price,
-                "PnL": pnl,
+                "PnL": round(pnl, 2),
                 "status": "FILLED",
                 "reason": ""
         })
