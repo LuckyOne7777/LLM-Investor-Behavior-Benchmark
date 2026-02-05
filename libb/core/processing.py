@@ -130,13 +130,13 @@ class Processing:
             last_total_equity = None
         else:
             last_total_equity = self.portfolio_history["equity"].iloc[-1]
-            return_pct = ((present_total_equity - last_total_equity) / last_total_equity) * 100
+            return_pct = round(((present_total_equity - last_total_equity) / last_total_equity) * 100, 2)
         log = {
         "date": str(self.run_date),
-        "cash": self.cash,
-        "equity": present_total_equity,
+        "cash": round(self.cash, 2),
+        "equity": round(present_total_equity, 2),
         "return_pct": return_pct,
-        "positions_value": market_equity,
+        "positions_value": round(market_equity, 2),
         }
         try:
             append_log(self._portfolio_history_path, log)
