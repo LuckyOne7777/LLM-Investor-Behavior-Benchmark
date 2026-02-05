@@ -126,16 +126,16 @@ class Processing:
         market_equity = self.portfolio["market_value"].sum()
         present_total_equity = market_equity + self.cash
         if self.portfolio_history.empty:
-            return_pct = None
+            daily_return_pct = None
             last_total_equity = None
         else:
             last_total_equity = self.portfolio_history["equity"].iloc[-1]
-            return_pct = round(((present_total_equity - last_total_equity) / last_total_equity) * 100, 2)
+            daily_return_pct = round(((present_total_equity - last_total_equity) / last_total_equity) * 100, 2)
         log = {
         "date": str(self.run_date),
         "cash": round(self.cash, 2),
         "equity": round(present_total_equity, 2),
-        "return_pct": return_pct,
+        "return_pct": daily_return_pct,
         "positions_value": round(market_equity, 2),
         }
         try:
