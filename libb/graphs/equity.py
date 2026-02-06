@@ -81,3 +81,46 @@ def plot_equity_vs_baseline(portfolio_path, baseline_ticker="^SPX") -> None:
     plt.grid(True)
 
     plt.show()
+
+def plot_equity(portfolio_path):
+    """Generate and display the comparison graph; return metrics."""
+    portfolio_history = pd.read_csv(portfolio_path)
+    portfolio_history["date"] = pd.to_datetime(portfolio_history["date"])
+
+    starting_equity = portfolio_history["equity"].iloc[0]
+
+    # plotting
+    plt.figure(figsize=(10, 6))
+    plt.style.use("seaborn-v0_8-whitegrid")
+
+    plt.plot(
+        portfolio_history["date"],
+        portfolio_history["equity"],
+        label=f"Portfolio (${starting_equity} Invested)",
+        marker="o",
+        color="blue",
+        linewidth=2,
+    )
+
+    # annotate final P/Ls
+    final_date = portfolio_history["date"].iloc[-1]
+    final_portfolio_value = float(portfolio_history["equity"].iloc[-1])
+    y_offset = (plt.ylim()[1] - plt.ylim()[0]) * 0.03
+
+    pct_return = (final_portfolio_value - starting_equity) / starting_equity * 100
+
+    plt.text(
+    final_date,
+    final_portfolio_value + y_offset,
+    f"{pct_return:.2f}%",
+    color="blue",
+            )
+
+    plt.title(f"Portfolio Balance")
+    plt.xlabel("Date")
+    plt.ylabel(f"Value of ${starting_equity} Investment")
+    plt.xticks(rotation=15)
+    plt.legend()
+    plt.grid(True)
+
+    plt.show()
