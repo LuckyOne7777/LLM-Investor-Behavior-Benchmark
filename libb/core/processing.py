@@ -169,16 +169,20 @@ class Processing:
 
         return
 
-    def processing(self, pending_trades: dict[str, list[dict]]) -> Tuple[dict[str, list[dict]], float]:
+    def processing(self, pending_trades: dict[str, list[dict]]) -> dict[str, list[dict]]:
         unexecuted_trades = self._process_orders(pending_trades)
         self._update_portfolio_market_data()
         self._append_portfolio_history()
         self._append_position_history()
-        return unexecuted_trades, self.cash
+
+        return unexecuted_trades
     
     def get_order_status_count(self) -> Tuple[int, int]:
         return self.filled_orders, self.failed_orders
     
     def get_portfolio(self) -> pd.DataFrame:
         return self.portfolio
+    
+    def get_cash(self) -> float:
+        return self.cash
             
