@@ -11,6 +11,7 @@ from libb.execution.utils import is_nyse_open
 from libb.metrics.sentiment_metrics import analyze_sentiment
 from libb.user_data.news import  _get_portfolio_news
 from libb.user_data.logs import _recent_execution_logs
+from libb.graphs.sentiment import plot_equity_and_sentiment
 
 from libb.core.processing import Processing
 from libb.core.writing_disk import DiskWriter
@@ -341,5 +342,9 @@ class LIBBmodel:
             effective_date = pd.Timestamp(date).date()
         return _recent_execution_logs(self.layout.trade_log_path, date=effective_date, look_back=look_back)
     
+# ----------------------------------
+# graphing
+# ----------------------------------
     
-    
+    def plot_equity_and_sentiment(self) -> None:
+        return plot_equity_and_sentiment(self.layout.portfolio_history_path, self.layout.sentiment_path)
