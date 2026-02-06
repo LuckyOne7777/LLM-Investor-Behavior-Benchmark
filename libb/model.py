@@ -178,6 +178,23 @@ class LIBBmodel:
 # Portfolio Processing
 # ----------------------------------
 
+    def process(self):
+        processing = Processing(run_date=self.run_date, portfolio=self.portfolio, cash=self.cash, 
+                                        STARTING_CASH=self.STARTING_CASH, _trade_log_path=self.layout.trade_log_path, 
+                                        portfolio_history=self.portfolio_history, 
+                                         _position_history_path=self.layout.position_history_path,
+                                          _portfolio_history_path=self.layout.portfolio_history_path,
+                                        _portfolio_path=self.layout.portfolio_path, _model_path=self._model_path)
+
+        self.pending_trades = processing.processing(self.pending_trades)
+
+        self.filled_orders, self.failed_orders = processing.get_order_status_count()
+        self.portfolio = processing.get_portfolio()
+        self.cash = processing.get_cash()
+                
+        self.writer._save_cash(self.cash)
+        self.save_orders(self.pending_trades)
+
 
     def process_portfolio(self) -> None:
         "Wrapper for all portfolio processing."
@@ -195,32 +212,18 @@ class LIBBmodel:
 
         if is_nyse_open(self.run_date):
             try:
-                processing = Processing(run_date=self.run_date, portfolio=self.portfolio, cash=self.cash, 
-                                        STARTING_CASH=self.STARTING_CASH, _trade_log_path=self.layout.trade_log_path, 
-                                        portfolio_history=self.portfolio_history, 
-                                         _position_history_path=self.layout.position_history_path,
-                                          _portfolio_history_path=self.layout.portfolio_history_path,
-                                        _portfolio_path=self.layout.portfolio_path, _model_path=self._model_path)
-
-                self.pending_trades = processing.processing(self.pending_trades)
-
-                self.filled_orders, self.failed_orders = processing.get_order_status_count()
-                self.portfolio = processing.get_portfolio()
-                self.cash = processing.get_cash()
-                
-                self.writer._save_cash(self.cash)
-                self.save_orders(self.pending_trades)
+                self.process()
                 self._save_new_logging_file()
             except Exception as e:
+                self._save_new_logging_file(status="FAILURE", error=e)
                 self._instance_is_valid = False
                 if self.STARTUP_DISK_SNAPSHOT is None:
                     raise RuntimeError("No startup disk snapshot available for rollback; disk may be corrupted.")
                 else:
                     self.writer._load_snapshot_to_disk(self.STARTUP_DISK_SNAPSHOT)
-                self._save_new_logging_file()
                 raise SystemError("Processing failed: disk state has been reset to snapshot created on startup.") from e
-            else:
-                self._save_new_logging_file()
+        else:
+            self._save_new_logging_file()
 
 # ----------------------------------
 # Disk Writing
