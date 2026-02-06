@@ -59,17 +59,21 @@ def plot_equity_vs_baseline(portfolio_path, baseline_ticker="^SPX") -> None:
     final_baseline_value = float(baseline["Adjusted Value"].iloc[-1])
     y_offset = (plt.ylim()[1] - plt.ylim()[0]) * 0.03
 
+    portfolio_pct_return = (final_portfolio_value - starting_equity) / starting_equity * 100
+    baseline_pct_return = (final_baseline_value - starting_equity) / starting_equity * 100
+
     plt.text(
     final_date,
     final_portfolio_value + y_offset,
-    f"{final_portfolio_value / starting_equity:.2f}%",
+    
+    f"{portfolio_pct_return:.2f}%",
     color="blue",
             )
 
     plt.text(
     final_date,
     final_baseline_value + y_offset,
-    f"{final_baseline_value / starting_equity:.2f}%",
+    f"{baseline_pct_return:.2f}%",
     color="orange",
             )
 
