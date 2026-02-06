@@ -12,7 +12,7 @@ from libb.metrics.sentiment_metrics import analyze_sentiment
 from libb.user_data.news import  _get_portfolio_news
 from libb.user_data.logs import _recent_execution_logs
 from libb.graphs.sentiment import plot_equity_and_sentiment
-from libb.graphs.equity import plot_equity_vs_baseline
+from libb.graphs.equity import plot_equity_vs_baseline, plot_equity
 
 from libb.core.processing import Processing
 from libb.core.writing_disk import DiskWriter
@@ -352,4 +352,7 @@ class LIBBmodel:
     
     def plot_equity_vs_baseline(self, baseline="^SPX"):
         return plot_equity_vs_baseline(self.layout.portfolio_history_path, baseline_ticker=baseline) 
+    
+    def plot_equity(self):
+        return plot_equity(self.layout.portfolio_history_path)
     
