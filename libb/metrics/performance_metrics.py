@@ -55,7 +55,7 @@ def compute_sortino(returns: pd.Series, rf_annual: float = 0.045) -> tuple[float
     downside = (returns - rf_daily).clip(upper=0)
 
     downside_std = (downside.pow(2).mean()) ** 0.5
-    if downside_std == 0:
+    if np.isclose(downside_std, 0):
         return float("nan"), float("nan")
 
     mean_r = float(returns.mean())
@@ -80,7 +80,7 @@ def compute_capm(returns: pd.Series, market_returns: pd.Series, rf_daily: float)
     x = rm.values
     y = rp.values
 
-    if np.std(x, ddof=1) == 0:
+    if np.isclose(np.std(x, ddof=1), 0):
         return float("nan"), float("nan"), float("nan")
 
     beta, alpha_daily = np.polyfit(x, y, 1)
