@@ -94,7 +94,7 @@ def total_performance_calculations(
     equity_series: pd.Series,
     market_returns: pd.Series,
     rf_daily: float,
-    date  | str: = pd.Timestamp.now().date() 
+    date: str | date | None = None, 
 ) -> dict:
     # ----- Risk & Return -----
     volatility = compute_volatility(returns)
