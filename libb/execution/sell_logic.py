@@ -3,7 +3,7 @@ from .utils import append_log, catch_missing_order_data
 from .update_data import get_market_data
 from pathlib import Path
 import pandas as pd
-from ..other.types_file import Order, TradeStatus
+from ..other.types_file import Order
 from typing import cast 
 
 def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log_path: Path) -> tuple[pd.DataFrame, float, bool]:

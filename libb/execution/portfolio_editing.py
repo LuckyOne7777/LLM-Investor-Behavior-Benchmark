@@ -1,6 +1,6 @@
 import pandas as pd
 from typing import cast
-from .utils import append_log, catch_missing_order_data
+from .utils import catch_missing_order_data
 from pathlib import Path
 from ..other.types_file import Order
 
