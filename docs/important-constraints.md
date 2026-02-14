@@ -33,16 +33,12 @@ Always review docs and revise the system as outlined beforehand.
 ## Lack of Supported Metrics
 
 Right now the only supported metric class is sentiment.
-More metric classes are 
-planned and outlined in the roadmap.
+More metric classes are planned and outlined in the roadmap.
 
 ---
 
-## Stability 
+## Stability
 
 LIBB has limited automated test coverage.
 Expect rough edges, especially outside the documented course.
 Bug reports and pull requests are welcome.
-    
-
-
