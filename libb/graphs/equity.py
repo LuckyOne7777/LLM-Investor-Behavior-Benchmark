@@ -13,6 +13,8 @@ def download_baseline(portfolio_df: pd.DataFrame, ticker: str, start_date: pd.Ti
         baseline.columns = baseline.columns.get_level_values(0)
 
     starting_price_data = yf.download(ticker, start=start_date, end=pd.Timestamp(start_date) + pd.Timedelta(days=1), auto_adjust=True, progress=False)
+    if starting_price_data is None:
+        raise RuntimeError(f"YahooFinance returned None while downloading baseline data (ticker: {ticker}). Check your internet or try again later.")
     if isinstance(starting_price_data.columns, pd.MultiIndex):
         starting_price_data.columns = starting_price_data.columns.droplevel(1)
     starting_price = starting_price_data.loc[starting_price_data.index[0], "Close"]
