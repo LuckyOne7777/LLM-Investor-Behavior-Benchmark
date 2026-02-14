@@ -65,6 +65,10 @@ Writes:
 ### Example Usage
 
 ```python
+from libb import LIBBmodel
+
+libb = LIBBmodel("user_side/runs/run_v1/model_a")
+
 daily_report = prompt_daily_report(libb)
 sentiment_log = libb.analyze_sentiment(
 daily_report,
