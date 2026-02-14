@@ -229,7 +229,7 @@ Examples:
 Using model wrapper methods:
 
 ```python
-from libb.model import LIBBmodel
+from libb import LIBBmodel
 
 libb = LIBBmodel("user_side/runs/run_v1/model_a")
 
