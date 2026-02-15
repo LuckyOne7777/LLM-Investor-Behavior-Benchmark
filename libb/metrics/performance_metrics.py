@@ -2,7 +2,26 @@ import numpy as np
 import pandas as pd
 import json
 from datetime import date
+from pathlib import Path
+import yfinance as yf
 
+def load_performance_data(portfolio_history_path: Path, baseline_ticker="^SPX") -> tuple[pd.Series[float], pd.Series[float], pd.Series[float]]:
+    raw_portfolio_log = pd.read_csv(portfolio_history_path)
+    if raw_portfolio_log.empty:
+        raise RuntimeError("Cannot generate performance metrics: `portfolio_history.csv` is empty.")
+    
+    first_date = raw_portfolio_log["date"].iloc[0]
+    last_date = raw_portfolio_log["date"].iloc[-1]
+
+    baseline_data = yf.download(baseline_ticker, start=first_date, end=last_date)
+    if baseline_data is None:
+        raise RuntimeError(f"Cannot generate performance metrics: ticker data {baseline_ticker} was type None.")
+
+    baseline_return_pct = baseline_data["Close"].pct_change().dropna()
+    portfolio_equity_series = raw_portfolio_log["equity"]
+    portfolio_return_pct = portfolio_equity_series.pct_change().dropna()
+    return portfolio_equity_series, portfolio_return_pct, baseline_return_pct
+    
 
 # ============================================================
 # 1. Max Drawdown
@@ -94,7 +113,7 @@ def total_performance_calculations(
     equity_series: pd.Series,
     market_returns: pd.Series,
     rf_daily: float,
-    date: str | date | None = None, 
+    date: str | date, 
 ) -> dict:
     # ----- Risk & Return -----
     volatility = compute_volatility(returns)
@@ -119,7 +138,7 @@ def total_performance_calculations(
         "beta": beta,
         "alpha_annual": alpha_annual,
         "r2": r2,
-        "date": pd.Timestamp.now().date()
+        "date": str(date)
     }
     metrics_log = json.load(metrics_log)
 
