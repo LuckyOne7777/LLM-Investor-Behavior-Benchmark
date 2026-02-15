@@ -115,6 +115,7 @@ def total_performance_calculations(
     market_returns: pd.Series,
     date: str | date, 
 ) -> dict:
+    
     # ----- Risk & Return -----
     volatility = compute_volatility(returns)
     sharpe_period, sharpe_annual = compute_sharpe(returns)
@@ -124,7 +125,7 @@ def total_performance_calculations(
     max_drawdown, max_drawdown_date = compute_max_drawdown(equity_series)
 
     # ----- CAPM -----
-    beta, alpha_annual, r2 = compute_capm(returns, market_returns, rf_daily)
+    beta, alpha_annual, r2 = compute_capm(returns, market_returns)
 
     # ----- Compile all metrics -----
     metrics_log = {
