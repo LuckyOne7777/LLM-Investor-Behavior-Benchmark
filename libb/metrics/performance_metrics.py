@@ -141,7 +141,5 @@ def total_performance_calculations(
         "r2": r2,
         "date_computed": str(date)
     }
-    
-    metrics_log = json.load(metrics_log)
 
     return metrics_log
