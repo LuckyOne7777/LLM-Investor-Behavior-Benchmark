@@ -3,7 +3,7 @@ import pandas as pd
 import yfinance as yf # type: ignore
 
 def download_baseline(portfolio_df: pd.DataFrame, ticker: str, start_date: pd.Timestamp, end_date: pd.Timestamp) -> pd.DataFrame:
-    """Download prices and normalise to a $100 baseline."""
+    """Download prices and normalise baseline to starting capital."""
 
     starting_capital = portfolio_df["equity"].iloc[0]
     baseline = yf.download(ticker, start=start_date, end=pd.Timestamp(end_date) + pd.Timedelta(days=1),
