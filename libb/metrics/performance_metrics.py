@@ -5,7 +5,7 @@ from datetime import date
 from pathlib import Path
 import yfinance as yf
 
-def load_performance_data(portfolio_history_path: Path, baseline_ticker="^SPX") -> tuple[pd.Series[float], pd.Series[float], pd.Series[float]]:
+def load_performance_data(portfolio_history_path: Path | str, baseline_ticker="^SPX") -> tuple[pd.Series[float], pd.Series[float], pd.Series[float]]:
     raw_portfolio_log = pd.read_csv(portfolio_history_path)
     if raw_portfolio_log.empty:
         raise RuntimeError("Cannot generate performance metrics: `portfolio_history.csv` is empty.")
@@ -110,11 +110,11 @@ def compute_capm(returns: pd.Series, market_returns: pd.Series, rf_annual: float
     return float(beta), float(alpha_annual), r2
 
 def total_performance_calculations(
-    returns: pd.Series,
-    equity_series: pd.Series,
-    market_returns: pd.Series,
-    date: str | date, 
+    portfolio_history_path: str | Path,
+    date: str | date,
+    baseline_ticker: str = "^SPX",
 ) -> dict:
+    equity_series, returns, market_returns = load_performance_data(portfolio_history_path, baseline_ticker=baseline_ticker)
     
     # ----- Risk & Return -----
     volatility = compute_volatility(returns)
@@ -141,6 +141,7 @@ def total_performance_calculations(
         "r2": r2,
         "date_computed": str(date)
     }
+    
     metrics_log = json.load(metrics_log)
 
     return metrics_log
