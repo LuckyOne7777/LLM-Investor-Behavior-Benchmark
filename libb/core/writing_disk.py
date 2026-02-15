@@ -48,6 +48,14 @@ class DiskWriter:
             json.dump(orders, f, indent=2)
 
     # ----------------------------
+    # Metrics
+    # ----------------------------
+
+    def save_performance(self, performance_dict: dict) -> None:
+        with open(self.layout.performance_path, "w") as f:
+            json.dump(performance_dict, f, indent=2)
+
+    # ----------------------------
     # Logging
     # ----------------------------
     
