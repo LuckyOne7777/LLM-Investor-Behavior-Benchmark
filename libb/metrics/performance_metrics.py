@@ -6,14 +6,15 @@ from pathlib import Path
 import yfinance as yf
 
 def load_performance_data(portfolio_history_path: Path | str, baseline_ticker: str) -> tuple[pd.Series, pd.Series, pd.Series]:
-    raw_portfolio_log = pd.read_csv(portfolio_history_path)
+    raw_portfolio_log = pd.read_csv(portfolio_history_path, parse_dates=["date"])
+    raw_portfolio_log = raw_portfolio_log.set_index("date")
     if raw_portfolio_log.empty:
         raise RuntimeError("Cannot generate performance metrics: `portfolio_history.csv` is empty.")
     
-    first_date = raw_portfolio_log["date"].iloc[0]
-    last_date = raw_portfolio_log["date"].iloc[-1]
+    first_date = raw_portfolio_log.index[0]
+    last_date = raw_portfolio_log.index[-1]
 
-    baseline_data = yf.download(baseline_ticker, start=first_date, end=last_date)
+    baseline_data = yf.download(baseline_ticker, start=first_date, end=last_date, auto_adjust=True, progress=False)
     if baseline_data is None:
         raise RuntimeError(f"Cannot generate performance metrics: ticker data {baseline_ticker} was type None.")
 
@@ -99,6 +100,10 @@ def compute_capm(returns: pd.Series, market_returns: pd.Series, rf_annual: float
 
     x = rm.values
     y = rp.values
+
+    x = rm.to_numpy().ravel()
+    y = rp.to_numpy().ravel()
+
 
     if np.isclose(np.std(x, ddof=1), 0):
         return float("nan"), float("nan"), float("nan")
