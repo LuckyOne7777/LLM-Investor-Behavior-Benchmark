@@ -144,7 +144,7 @@ def total_performance_calculations(
         "beta": beta,
         "alpha_annual": alpha_annual,
         "r2": r2,
-        "date_computed": str(date)
+        "run_date_computed": str(date)
     }
 
     return metrics_log
