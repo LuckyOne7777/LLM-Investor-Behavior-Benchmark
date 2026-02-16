@@ -134,20 +134,28 @@ def total_performance_calculations(
 
     # ----- Compile all metrics -----
     metrics_log = {
-        "volatility": volatility,
-        "sharpe_period": sharpe_period,
-        "sharpe_annual": sharpe_annual,
-        "sortino_period": sortino_period,
-        "sortino_annual": sortino_annual,
-        "max_drawdown": max_drawdown,
-        "max_drawdown_date": str(max_drawdown_date),
-        "beta": beta,
-        "alpha_annual": alpha_annual,
-        "r2": r2,
-        "portfolio_start_date": str(equity_series.index[0]),
-        "portfolio_end_date": str(equity_series.index[-1]),
-        "days_of_data": len(equity_series),  
-        "run_date_generated": str(date)
-    }
+    # --- Risk Metrics ---
+    "volatility_daily": volatility,
+    "sharpe_ratio_daily": sharpe_period,
+    "sharpe_ratio_annualized": sharpe_annual,
+    "sortino_ratio_daily": sortino_period,
+    "sortino_ratio_annualized": sortino_annual,
+
+    # --- Drawdown ---
+    "max_drawdown_pct": max_drawdown,
+    "max_drawdown_date": str(max_drawdown_date),
+
+    # --- CAPM ---
+    "capm_beta": beta,
+    "capm_alpha_annualized": alpha_annual,
+    "capm_r_squared": r2,
+
+    # --- Metadata ---
+    "start_date": str(equity_series.index[0]),
+    "end_date": str(equity_series.index[-1]),
+    "observation_count": len(equity_series),
+    "generated_at": str(date)
+}
+
 
     return metrics_log
