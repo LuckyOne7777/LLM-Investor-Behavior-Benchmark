@@ -144,7 +144,10 @@ def total_performance_calculations(
         "beta": beta,
         "alpha_annual": alpha_annual,
         "r2": r2,
-        "run_date_computed": str(date)
+        "portfolio_start_date": str(equity_series.index[0]),
+        "portfolio_end_date": str(equity_series.index[-1]),
+        "days_of_data": len(equity_series),  
+        "run_date_generated": str(date)
     }
 
     return metrics_log
