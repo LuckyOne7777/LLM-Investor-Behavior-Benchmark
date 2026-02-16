@@ -13,6 +13,7 @@ from libb.user_data.news import  _get_portfolio_news
 from libb.user_data.logs import _recent_execution_logs
 from libb.graphs.sentiment import plot_equity_and_sentiment
 from libb.graphs.equity import plot_equity_vs_baseline, plot_equity
+from libb.metrics.performance_metrics import total_performance_calculations
 
 from libb.core.processing import Processing
 from libb.core.writing_disk import DiskWriter
@@ -59,7 +60,7 @@ class LIBBmodel:
         self.failed_orders: int = 0
         self.skipped_orders: int = 0
 
-        self.STARTUP_DISK_SNAPSHOT: ModelSnapshot | None = self.reader._save_disk_snapshot()
+        self.STARTUP_DISK_SNAPSHOT: ModelSnapshot | None = self.reader.save_disk_snapshot()
         self._instance_is_valid: bool = True
 
 # ----------------------------------
@@ -90,16 +91,16 @@ class LIBBmodel:
     
     def _hydrate_from_disk(self) -> None:
         "Match objects in memory from disk state."
-        self.portfolio: pd.DataFrame = self.reader._load_csv(self.layout.portfolio_path)
-        self.cash: float = self.reader._load_cash()
-        self.portfolio_history: pd.DataFrame = self.reader._load_csv(self.layout.portfolio_history_path)
-        self.trade_log: pd.DataFrame = self.reader._load_csv(self.layout.trade_log_path)
-        self.position_history: pd.DataFrame = self.reader._load_csv(self.layout.position_history_path)
+        self.portfolio: pd.DataFrame = self.reader.load_csv(self.layout.portfolio_path)
+        self.cash: float = self.reader.load_cash()
+        self.portfolio_history: pd.DataFrame = self.reader.load_csv(self.layout.portfolio_history_path)
+        self.trade_log: pd.DataFrame = self.reader.load_csv(self.layout.trade_log_path)
+        self.position_history: pd.DataFrame = self.reader.load_csv(self.layout.position_history_path)
 
-        self.pending_trades: dict[str, list[dict]] = self.reader._load_orders_dict(self.layout.pending_trades_path)
-        self.performance: list[dict] = self.reader._load_json(self.layout.performance_path)
-        self.behavior: list[dict] = self.reader._load_json(self.layout.behavior_path)
-        self.sentiment: list[dict] = self.reader._load_json(self.layout.sentiment_path)
+        self.pending_trades: dict[str, list[dict]] = self.reader.load_orders_dict(self.layout.pending_trades_path)
+        self.performance: list[dict] = self.reader.load_json(self.layout.performance_path)
+        self.behavior: list[dict] = self.reader.load_json(self.layout.behavior_path)
+        self.sentiment: list[dict] = self.reader.load_json(self.layout.sentiment_path)
 
 
     def _reset_runtime_state(self) -> None:
@@ -161,7 +162,7 @@ class LIBBmodel:
             self.ensure_file_system()
             self._hydrate_from_disk()
             self._reset_runtime_state()
-            self.STARTUP_DISK_SNAPSHOT = self.reader._save_disk_snapshot()
+            self.STARTUP_DISK_SNAPSHOT = self.reader.save_disk_snapshot()
             self._instance_is_valid = True
         return
 

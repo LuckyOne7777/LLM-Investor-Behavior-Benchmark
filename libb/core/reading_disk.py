@@ -12,26 +12,26 @@ class DiskReader:
     # File Helpers
     # ----------------------------------
 
-    def _load_csv(self, path: Path) -> pd.DataFrame:
+    def load_csv(self, path: Path) -> pd.DataFrame:
         """Helper for loading CSV at a given path. Return empty DataFrame for invalid paths."""
         if path.exists():
             return pd.read_csv(path)
         return pd.DataFrame()
 
-    def _load_json(self, path: Path) -> list[dict]:
+    def load_json(self, path: Path) -> list[dict]:
         """Helper for loading JSON files at a given path. Return empty list for invalid paths."""
         if path.exists():
             with open(path, "r") as f:
                 return json.load(f)
         return []
 
-    def _load_orders_dict(self, path: Path) -> dict[str, list[dict]]:
+    def load_orders_dict(self, path: Path) -> dict[str, list[dict]]:
         if path.exists():
             with open(path, "r") as f:
                 return json.load(f)
         return {"orders": []}
 
-    def _load_cash(self) -> float:
+    def load_cash(self) -> float:
         with open(self.layout.cash_path, "r") as f:
             data = json.load(f)
 
@@ -53,7 +53,7 @@ class DiskReader:
     # Snapshot Behavior
     # ----------------------------------
 
-    def _save_disk_snapshot(self) -> ModelSnapshot:
+    def save_disk_snapshot(self) -> ModelSnapshot:
         """
         Capture a snapshot of the last committed on-disk model state.
 
@@ -62,15 +62,15 @@ class DiskReader:
         been flushed to disk are intentionally excluded.
         """
         return ModelSnapshot(
-            cash=self._load_cash(),
+            cash=self.load_cash(),
 
-            portfolio=self._load_csv(self.layout.portfolio_path),
-            portfolio_history=self._load_csv(self.layout.portfolio_history_path),
-            trade_log=self._load_csv(self.layout.trade_log_path),
-            position_history=self._load_csv(self.layout.position_history_path),
-            pending_trades=self._load_orders_dict(self.layout.pending_trades_path),
+            portfolio=self.load_csv(self.layout.portfolio_path),
+            portfolio_history=self.load_csv(self.layout.portfolio_history_path),
+            trade_log=self.load_csv(self.layout.trade_log_path),
+            position_history=self.load_csv(self.layout.position_history_path),
+            pending_trades=self.load_orders_dict(self.layout.pending_trades_path),
 
-            performance=self._load_json(self.layout.performance_path),
-            behavior=self._load_json(self.layout.behavior_path),
-            sentiment=self._load_json(self.layout.sentiment_path),
+            performance=self.load_json(self.layout.performance_path),
+            behavior=self.load_json(self.layout.behavior_path),
+            sentiment=self.load_json(self.layout.sentiment_path),
         )
