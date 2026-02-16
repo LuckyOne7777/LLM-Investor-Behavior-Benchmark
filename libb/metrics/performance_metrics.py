@@ -31,7 +31,7 @@ def load_performance_data(portfolio_history_path: Path | str, baseline_ticker: s
 def compute_max_drawdown(equity_series: pd.Series) -> tuple[float, pd.Timestamp]:
     running_max = equity_series.cummax()
     drawdown = (equity_series / running_max) - 1
-    return float(drawdown.min()), drawdown.idxmin()
+    return float(drawdown.min()), pd.Timestamp(drawdown.idxmin())
 
 
 # ============================================================
@@ -90,7 +90,7 @@ def compute_sortino(returns: pd.Series, rf_annual: float = 0.045) -> tuple[float
 # ============================================================
 
 def compute_capm(returns: pd.Series, market_returns: pd.Series, rf_annual: float = 0.045) -> tuple[float, float, float]:
-    
+
     rf_daily = (1 + rf_annual) ** (1 / 252) - 1
     common = returns.index.intersection(market_returns.index)
     if len(common) < 2:
