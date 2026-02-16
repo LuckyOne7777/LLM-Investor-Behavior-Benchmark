@@ -90,7 +90,8 @@ def compute_sortino(returns: pd.Series, rf_annual: float = 0.045) -> tuple[float
 # ============================================================
 
 def compute_capm(returns: pd.Series, market_returns: pd.Series, rf_annual: float = 0.045) -> tuple[float, float, float]:
-    rf_daily = ((1 + rf_annual)** 1/252) - 1
+    
+    rf_daily = (1 + rf_annual) ** (1 / 252) - 1
     common = returns.index.intersection(market_returns.index)
     if len(common) < 2:
         return float("nan"), float("nan"), float("nan")
