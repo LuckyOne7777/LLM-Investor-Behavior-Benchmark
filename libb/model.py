@@ -47,11 +47,11 @@ class LIBBmodel:
         self._model_path: str = str(model_path)
         self.run_date: date = run_date
 
-        self.layout = DiskLayout.from_root(self._root)
+        self.layout: DiskLayout = DiskLayout.from_root(self._root)
 
-        self.writer = DiskWriter(layout=self.layout, run_date=self.run_date)
+        self.writer: DiskWriter = DiskWriter(layout=self.layout, run_date=self.run_date)
 
-        self.reader = DiskReader(layout=self.layout)
+        self.reader: DiskReader = DiskReader(layout=self.layout)
 
         self.ensure_file_system()
         self._hydrate_from_disk()
@@ -296,6 +296,7 @@ class LIBBmodel:
     def _save_new_logging_file(self, status: str = "SUCCESS", error: Exception | str = "none"):
         log = self._create_log_dict(status, error)
         self.writer._save_logging_file_to_disk(log)
+
 # ----------------------------------
 # Calculate Metrics
 # ----------------------------------
@@ -356,4 +357,6 @@ class LIBBmodel:
     
     def plot_equity(self):
         return plot_equity(self.layout.portfolio_history_path)
+    
+
     
