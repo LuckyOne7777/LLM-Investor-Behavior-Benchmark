@@ -14,7 +14,7 @@ def load_performance_data(portfolio_history_path: Path | str, baseline_ticker: s
     first_date = raw_portfolio_log.index[0]
     last_date = raw_portfolio_log.index[-1]
 
-    baseline_data = yf.download(baseline_ticker, start=first_date, end=last_date, auto_adjust=True, progress=False)
+    baseline_data = yf.download(baseline_ticker, start=first_date, end=last_date + pd.Timedelta(days=1), auto_adjust=True, progress=False)
     if baseline_data is None:
         raise RuntimeError(f"Cannot generate performance metrics: ticker data {baseline_ticker} was type None.")
 
