@@ -212,6 +212,7 @@ class LIBBmodel:
             )
         if not self._instance_is_valid:
                 raise RuntimeError("LIBBmodel instance is invalid after failure; create a new instance to avoid divergence from state.")
+        
 
         if is_nyse_open(self.run_date):
             try:
@@ -287,7 +288,7 @@ class LIBBmodel:
             orders_failed=self.failed_orders,
             orders_skipped=self.skipped_orders,
             portfolio_value=portfolio_equity,
-            error=error,
+            error=str(error),
                 )
 
 
@@ -359,4 +360,11 @@ class LIBBmodel:
         return plot_equity(self.layout.portfolio_history_path)
     
 
-    
+# ----------------------------------
+# metrics
+# ----------------------------------
+
+    def generate_performance_metrics(self, baseline_ticker = "^SPX") -> None:
+        performance_log = total_performance_calculations(self.layout.portfolio_history_path, self.run_date, baseline_ticker)
+        self.writer.save_performance(performance_log)
+        return
