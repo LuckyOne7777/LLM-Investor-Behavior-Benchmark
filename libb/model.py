@@ -214,6 +214,8 @@ class LIBBmodel:
                 raise RuntimeError("LIBBmodel instance is invalid after failure; create a new instance to avoid divergence from state.")
         
 
+        
+
         if is_nyse_open(self.run_date):
             try:
                 self.process()
@@ -227,7 +229,7 @@ class LIBBmodel:
                     self.writer._load_snapshot_to_disk(self.STARTUP_DISK_SNAPSHOT)
                 raise SystemError("Processing failed: disk state has been reset to snapshot created on startup.") from e
         else:
-            self._save_new_logging_file()
+            self._save_new_logging_file(status="SKIPPED", error="nyse closed on run date")
 
 # ----------------------------------
 # Disk Writing
