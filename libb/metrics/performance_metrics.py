@@ -74,7 +74,7 @@ def compute_sortino(returns: pd.Series, rf_annual: float = 0.045) -> tuple[float
     rf_daily = (1 + rf_annual) ** (1 / 252) - 1
     downside = (returns - rf_daily).clip(upper=0)
 
-    downside_std = (downside.pow(2).mean()) ** 0.5
+    downside_std = downside.std(ddof=1)
     if np.isclose(downside_std, 0):
         return float("nan"), float("nan")
 
