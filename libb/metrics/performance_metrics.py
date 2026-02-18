@@ -8,6 +8,9 @@ import yfinance as yf
 def load_performance_data(portfolio_history_path: Path | str, baseline_ticker: str) -> tuple[pd.Series, pd.Series, pd.Series]:
     raw_portfolio_log = pd.read_csv(portfolio_history_path, parse_dates=["date"])
     raw_portfolio_log = raw_portfolio_log.set_index("date")
+
+    assert raw_portfolio_log.index.is_unique, "Duplicate processed dates within portfolio log."
+
     if raw_portfolio_log.empty:
         raise RuntimeError("Cannot generate performance metrics: `portfolio_history.csv` is empty.")
     
@@ -22,7 +25,7 @@ def load_performance_data(portfolio_history_path: Path | str, baseline_ticker: s
 
     portfolio_equity_series = raw_portfolio_log["equity"]
 
-    # find the first day the portfolio equity changes from its initial value
+    # find the first day the portfolio equity changes from its initial value and slice onward
     first_active = portfolio_equity_series.ne(portfolio_equity_series.iloc[0]).idxmax()
     equity_series = portfolio_equity_series.loc[first_active:]
 
