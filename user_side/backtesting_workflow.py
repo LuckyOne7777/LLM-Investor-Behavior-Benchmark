@@ -10,20 +10,24 @@ def weekly_flow(date):
     for model in MODELS:
         libb = LIBBmodel(f"user_side/runs/run_v1/{model}", run_date=date)
         libb.process_portfolio()
+        
         deep_research_report = prompt_deep_research(libb)
+
+        libb.analyze_sentiment(deep_research_report)
         libb.save_deep_research(deep_research_report)
 
         orders_json = parse_json(deep_research_report, "ORDERS_JSON")
 
         libb.save_orders(orders_json)
-        libb.analyze_sentiment(deep_research_report)
     return
 
 def daily_flow(date):
     for model in MODELS:
         libb = LIBBmodel(f"user_side/runs/run_v1/{model}", run_date=date)
         libb.process_portfolio()
+
         daily_report = prompt_daily_report(libb)
+
         libb.analyze_sentiment(daily_report)
         libb.save_daily_update(daily_report)
 
@@ -33,8 +37,8 @@ def daily_flow(date):
     return
 
 def main():
-    start_date = pd.Timestamp("2026-01-05")
-    for i in range(10):
+    start_date = pd.Timestamp("2026-01-22")
+    for i in range(1):
         run_date = start_date + pd.Timedelta(days=i)    
         day_num = run_date.weekday()
 
