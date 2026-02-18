@@ -213,8 +213,11 @@ class LIBBmodel:
         if not self._instance_is_valid:
                 raise RuntimeError("LIBBmodel instance is invalid after failure; create a new instance to avoid divergence from state.")
         
-
-        
+        if str(self.run_date) in self.portfolio_history["date"].values:
+            self._instance_is_valid = False
+            raise RuntimeError(
+                f"Portfolio snapshot for {self.run_date} already exists. "
+                "Refusing to overwrite historical ledger.")
 
         if is_nyse_open(self.run_date):
             try:
