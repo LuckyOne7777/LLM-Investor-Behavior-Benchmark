@@ -99,9 +99,6 @@ def compute_capm(returns: pd.Series, market_returns: pd.Series, rf_annual: float
     rp = (returns.reindex(common).astype(float) - rf_daily)
     rm = (market_returns.reindex(common).astype(float) - rf_daily)
 
-    x = rm.values
-    y = rp.values
-
     x = rm.to_numpy().ravel()
     y = rp.to_numpy().ravel()
 
