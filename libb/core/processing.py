@@ -33,6 +33,7 @@ class Processing:
         self._model_path: Path = _model_path
 
         self.filled_orders = 0;
+        self.skipped_orders = 0;
         self.failed_orders = 0;        
         
     def _process_orders(self, pending_trades: dict[str, list[dict]]) -> dict[str, list[dict]]:
@@ -177,8 +178,8 @@ class Processing:
 
         return unexecuted_trades
     
-    def get_order_status_count(self) -> Tuple[int, int]:
-        return self.filled_orders, self.failed_orders
+    def get_order_status_count(self) -> Tuple[int, int, int]:
+        return self.filled_orders, self.failed_orders, self.skipped_orders
     
     def get_portfolio(self) -> pd.DataFrame:
         return self.portfolio

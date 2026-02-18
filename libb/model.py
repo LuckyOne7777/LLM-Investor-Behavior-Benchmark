@@ -191,7 +191,7 @@ class LIBBmodel:
 
         self.pending_trades = processing.processing(self.pending_trades)
 
-        self.filled_orders, self.failed_orders = processing.get_order_status_count()
+        self.filled_orders, self.failed_orders, self.skipped_orders = processing.get_order_status_count()
         self.portfolio = processing.get_portfolio()
         self.cash = processing.get_cash()
                 
