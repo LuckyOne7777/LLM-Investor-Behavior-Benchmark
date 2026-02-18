@@ -151,7 +151,7 @@ def total_performance_calculations(
     # --- Metadata ---
     "start_date": str(equity_series.index[0]),
     "end_date": str(equity_series.index[-1]),
-    "observation_count": len(equity_series),
+    "observation_count": len(returns),
     "generated_at": str(date)
 }
 
