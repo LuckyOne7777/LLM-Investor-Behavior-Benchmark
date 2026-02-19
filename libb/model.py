@@ -369,7 +369,7 @@ class LIBBmodel:
 # metrics
 # ----------------------------------
 
-    def generate_performance_metrics(self, baseline_ticker = "^SPX") -> None:
+    def generate_performance_metrics(self, baseline_ticker = "^SPX") -> dict:
         performance_log = total_performance_calculations(self.layout.portfolio_history_path, self.run_date, baseline_ticker)
         self.writer.save_performance(performance_log)
-        return
+        return performance_log
