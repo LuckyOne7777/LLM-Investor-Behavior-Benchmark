@@ -181,7 +181,7 @@ class LIBBmodel:
 # Portfolio Processing
 # ----------------------------------
 
-    def process(self):
+    def _process(self):
         processing = Processing(run_date=self.run_date, portfolio=self.portfolio, cash=self.cash, 
                                         STARTING_CASH=self.STARTING_CASH, _trade_log_path=self.layout.trade_log_path, 
                                         portfolio_history=self.portfolio_history, 
@@ -221,7 +221,7 @@ class LIBBmodel:
 
         if is_nyse_open(self.run_date):
             try:
-                self.process()
+                self._process()
                 self._save_new_logging_file()
             except Exception as e:
                 self._save_new_logging_file(status="FAILURE", error=e)
