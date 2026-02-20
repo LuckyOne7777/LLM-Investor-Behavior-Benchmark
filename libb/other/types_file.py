@@ -80,7 +80,7 @@ class MarketConfig:
     @classmethod
     def from_env(cls):
         return cls(
-            alpha_vantage_key=os.getenv("ALPHA_VANTAGE_KEY"),
+            alpha_vantage_key=os.getenv("ALPHA_VANTAGE_API_KEY"),
             finnhub_key=os.getenv("FINNHUB_API_KEY"),
         )
     
