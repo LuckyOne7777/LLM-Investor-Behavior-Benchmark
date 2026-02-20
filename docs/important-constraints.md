@@ -30,10 +30,10 @@ Always review docs and revise the system as outlined beforehand.
 
 ---
 
-## Lack of Supported Metrics
+## Lack of Behavioral Metrics
 
-Right now the only supported metric class is sentiment.
-More metric classes are planned and outlined in the roadmap.
+Right now the only supported metric classes are sentiment and performance.
+Behavioral metrics are currently in development.
 
 ---
 
