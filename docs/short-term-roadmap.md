@@ -10,23 +10,7 @@ This document is intentionally limited in scope and subject to change.
 
 ## Top Priorities
 
-### 1. Performance Metrics
-
-Incorporate portfolio performance metrics to enable quantitative evaluation of
-model behavior over time.
-
-Planned focus areas:
-
-- returns and drawdowns
-- risk-adjusted performance measures
-- time-series tracking of portfolio value
-
-Performance metrics are advisory and do not influence trading decisions unless
-explicitly used by the user.
-
----
-
-### 2. Behavioral Metrics
+### 1. Behavioral Metrics
 
 Complete the behavioral metrics framework to quantify patterns in model
 decision-making.
@@ -41,7 +25,7 @@ Behavioral metrics are intended for research and analysis, not enforcement.
 
 ---
 
-### 3. Multiple Data Source Support
+### 2. Multiple Data Source Support
 
 Add support for multiple market data sources.
 
@@ -53,7 +37,7 @@ Goals:
 
 ---
 
-### 4. Data Source Fallbacks
+### 3. Data Source Fallbacks
 
 Provide automatic or user-defined fallback mechanisms when a primary data source
 fails or returns incomplete data.
@@ -68,7 +52,7 @@ Fallback behavior should be explicit and auditable.
 
 ---
 
-### 5. Fractional Share Support
+### 4. Fractional Share Support
 
 Add first-class support for fractional share trading across order handling,
 portfolio state, and accounting logic.
