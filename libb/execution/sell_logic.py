@@ -1,6 +1,6 @@
 from .portfolio_editing import reduce_position
 from .utils import append_log, catch_missing_order_data
-from .update_data import get_market_data
+from libb.execution.get_market_data import download_data_on_given_date
 from pathlib import Path
 import pandas as pd
 from ..other.types_file import Order
@@ -10,7 +10,7 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
     ticker = order["ticker"].upper()
     order_type = order["order_type"]
     date = order["date"]
-    ticker_data = get_market_data(ticker, date)
+    ticker_data = download_data_on_given_date(ticker, date)
 
     high = ticker_data["High"]
     open_price = ticker_data["Open"]

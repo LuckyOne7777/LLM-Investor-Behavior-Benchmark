@@ -1,6 +1,6 @@
 from .portfolio_editing import add_or_update_position
 from .utils import append_log, catch_missing_order_data
-from .update_data import get_market_data
+from libb.execution.get_market_data import download_data_on_given_date
 import pandas as pd
 from ..other.types_file import Order
 from pathlib import Path
@@ -13,7 +13,7 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
     intended_limit_price = order["limit_price"]
     stop_loss = 0 if order["stop_loss"] is None else order["stop_loss"]
 
-    ticker_data = get_market_data(ticker, date)
+    ticker_data = download_data_on_given_date(ticker, date)
     market_low = ticker_data["Low"]
     market_open = ticker_data["Open"]
 
