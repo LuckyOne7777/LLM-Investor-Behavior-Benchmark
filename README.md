@@ -15,23 +15,23 @@ So I developed a library designed to support rigorous evaluation of LLM-driven t
 
 ## Features
 
-- **Persistent portfolio state**  
+- **Persistent Portfolio State**  
   All portfolio data is explicitly stored on disk, enabling inspection,
   reproducibility, and post-hoc analysis across runs.
 
-- **Sentiment analysis metrics**  
+- **Sentiment Analysis**  
   Built-in support for sentiment analysis, with results persisted as
   first-class research artifacts.
 
-- **Performance tracking (in progress)**  
-  Infrastructure for performance metrics is included, with ongoing
-  integration into the core model workflow. Behavioral analytics is still being devolopped.
+- **Performance Metrics**  
+  Calculation of key performance evaluation metrics (Sharpe, Sortino, Drawdown, R², etc.)
+  based on the first day of portfolio activity. Behavioral analytics is still being developed.
 
-- **Reproducible run structure**  
+- **Reproducible Run Structure**  
   Each model run follows a consistent on-disk directory layout, making
   experiments easy to reproduce, compare, and archive.
 
-- **Flexible execution workflows**  
+- **Flexible Execution Workflows**  
   Execution logic remains fully user-controlled, allowing researchers
   to integrate custom strategies, models, or data sources.
 
@@ -40,7 +40,7 @@ So I developed a library designed to support rigorous evaluation of LLM-driven t
 LIBB operates as a file-backed execution loop where portfolio state,
 analytics, and research artifacts are explicitly persisted to disk.
 
-For each run, the framework:
+For each run, the engine:
 
 1. Loads and processes existing portfolio state
 2. Recieves inputs (e.g., via an LLM)
