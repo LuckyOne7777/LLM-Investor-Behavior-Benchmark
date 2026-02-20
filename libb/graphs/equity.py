@@ -7,7 +7,7 @@ def download_baseline(portfolio_df: pd.DataFrame, ticker: str, start_date: pd.Ti
 
     starting_capital = portfolio_df["equity"].iloc[0]
 
-    baseline = yf.download(ticker, start=start_date, end=pd.Timestamp(start_date) + pd.Timedelta(days=1), auto_adjust=True, progress=False)
+    baseline = yf.download(ticker, start=start_date, end=pd.Timestamp(end_date) + pd.Timedelta(days=1), auto_adjust=True, progress=False)
     if baseline is None:
         raise RuntimeError(f"YahooFinance returned None while downloading baseline data (ticker: {ticker}). Check your internet or try again later.")    
     baseline = baseline.reset_index()
