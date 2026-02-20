@@ -29,7 +29,7 @@ def load_performance_data(portfolio_history_path: Path | str, baseline_ticker: s
     first_active = portfolio_equity_series.ne(portfolio_equity_series.iloc[0]).idxmax()
     equity_series = portfolio_equity_series.loc[first_active:]
 
-    portfolio_return_pct = portfolio_equity_series.pct_change().dropna()
+    portfolio_return_pct = equity_series.pct_change().dropna()
     return equity_series, portfolio_return_pct, baseline_return_pct
     
 
