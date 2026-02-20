@@ -213,11 +213,20 @@ class LIBBmodel:
         if not self._instance_is_valid:
                 raise RuntimeError("LIBBmodel instance is invalid after failure; create a new instance to avoid divergence from state.")
         
-        if not self.portfolio_history.empty and str(self.run_date) in self.portfolio_history["date"]:
-            self._instance_is_valid = False
-            raise RuntimeError(
-                f"Portfolio snapshot for {self.run_date} already exists. "
-                "Refusing to overwrite historical ledger.")
+        if not self.portfolio_history.empty:
+            if str(self.run_date) in self.portfolio_history["date"]:
+                self._instance_is_valid = False
+                raise RuntimeError(
+                    f"Portfolio snapshot for {self.run_date} already exists. "
+                    "Refusing to overwrite historical ledger.")
+        
+            last_run_date = pd.to_datetime(self.portfolio_history["date"]).max().date()
+      
+            if self.run_date <= last_run_date:
+                raise RuntimeError(
+                    f"Backjump Error: Current run_date ({self.run_date}) is on or before "
+                    f"the last recorded date ({last_run_date}). Dates must move forward."
+                )
 
         if is_nyse_open(self.run_date):
             try:
