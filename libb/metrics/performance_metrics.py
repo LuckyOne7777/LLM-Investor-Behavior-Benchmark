@@ -25,9 +25,18 @@ def load_performance_data(portfolio_history_path: Path | str, baseline_ticker: s
 
     portfolio_equity_series = raw_portfolio_log["equity"]
 
-    # find the first day the portfolio equity changes from its initial value and slice onward
-    first_active = portfolio_equity_series.ne(portfolio_equity_series.iloc[0]).idxmax()
-    equity_series = portfolio_equity_series.loc[first_active:]
+    first_active = portfolio_equity_series.ne(
+    portfolio_equity_series.iloc[0]
+)
+
+    if first_active.any():
+        # find first True value
+        start_idx = first_active.idxmax()
+    else:
+        raise RuntimeError("Cannot generate performance metrics: portfolio equity never changed.")
+
+    equity_series = portfolio_equity_series.loc[start_idx:]
+
 
     portfolio_return_pct = equity_series.pct_change().dropna()
     return equity_series, portfolio_return_pct, baseline_return_pct
