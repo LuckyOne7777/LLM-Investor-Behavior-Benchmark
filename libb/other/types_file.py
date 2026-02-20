@@ -19,12 +19,27 @@ class Order(TypedDict):
     confidence: float                       # 0-1
 
 class MarketDataObject(TypedDict):
+     
      Low: float
      High: float
      Close: float
      Open: float
      Volume: int
      Ticker: str
+
+class MarketHistoryObject(TypedDict):
+     
+     
+     Low: pd.Series
+     High: pd.Series
+     Close: pd.Series
+     Open: pd.Series
+     Volume: pd.Series
+
+     Ticker: str
+     start_date: str
+     end_date: str
+
 
 @dataclass (frozen=True)
 class ModelSnapshot:
