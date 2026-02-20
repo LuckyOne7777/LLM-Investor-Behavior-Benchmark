@@ -1,6 +1,7 @@
 import pandas as pd 
 import yfinance as yf
 from ..other.types_file import MarketDataObject
+from libb.execution.get_market_data import download_data_on_given_date
 from datetime import date
 
 #TODO: ticker range fails on weekends
@@ -49,8 +50,7 @@ def get_market_data(ticker: str, date: str | date) -> MarketDataObject:
          raise RuntimeError(f"{ticker} data for 'Close' is None")
     return data
 
-def update_market_value_columns(portfolio: pd.DataFrame, 
-                               date: str | date | None = None) -> pd.DataFrame:
+def update_market_value_columns(portfolio: pd.DataFrame, date: str | date) -> pd.DataFrame:
     portfolio = portfolio.copy()
 
     for i, row in portfolio.iterrows():
@@ -58,11 +58,11 @@ def update_market_value_columns(portfolio: pd.DataFrame,
         shares = row["shares"]
         cost_basis = portfolio.at[i, "cost_basis"]
 
-        ticker_data = get_market_data(ticker, date)
+        ticker_data = download_data_on_given_date(ticker, date)
         close_price = ticker_data["Close"]
 
         portfolio.at[i, "market_price"] = close_price
-        portfolio.at[i, "market_value"] = close_price * shares
-        portfolio.at[i, "unrealized_pnl"] = portfolio.at[i, "market_value"] - cost_basis
+        portfolio.at[i, "market_value"] = round(close_price * shares, 2)
+        portfolio.at[i, "unrealized_pnl"] = round(portfolio.at[i, "market_value"] - cost_basis, 2)
 
     return portfolio
