@@ -26,7 +26,30 @@ Behavioral metrics are intended for research and analysis, not enforcement.
 
 ---
 
-### 2. Multiple Data Source Support
+## 2. Config File Creation
+
+Introduce a structured JSON configuration system to centralize experiment
+parameters and backend behavior controls.
+
+Goals:
+
+- create a default configuration schema covering:
+  - market assumptions (risk-free rate, baseline ticker, trading days)
+  - portfolio parameters (initial capital, fractional shares, cash buffer)
+  - LLM execution settings (temperature, seed, determinism)
+  - data source preferences
+  - metric toggles
+- auto-generate a default config file if none exists
+- allow partial overrides without requiring full specification
+- enforce schema validation to prevent silent misconfiguration
+- ensure all experiments are reproducible via serialized config snapshot
+
+The configuration system will serve as the backbone for experimental control
+while preserving flexibility for research use cases.
+
+---
+
+### 3. Multiple Data Source Support
 
 Add support for multiple market data sources besides Stooq and `yfinance`.
 
@@ -38,7 +61,7 @@ Goals:
 
 ---
 
-### 3. Fractional Share Support
+### 4. Fractional Share Support
 
 Add first-class support for fractional share trading across order handling,
 portfolio state, and accounting logic.
