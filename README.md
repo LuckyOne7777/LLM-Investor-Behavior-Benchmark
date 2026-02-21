@@ -329,7 +329,7 @@ python -m user_side.workflow
 pip uninstall libb
 ```
 
-Notes
+### Notes
 
 Dependencies may remain installed if they were already present.
 
