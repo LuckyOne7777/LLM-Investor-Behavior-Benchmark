@@ -106,7 +106,7 @@ def weekly_flow():
         libb.save_orders(orders_json)
 
         # Optional post-processing
-        libb.analyze_sentiment(deep_research_report)
+        libb.analyze_sentiment(deep_research_report, report_type="deep_research")
     return
 ```
 
@@ -118,16 +118,17 @@ def weekly_flow():
 def daily_flow():
     for model in MODELS:
         libb = LIBBmodel(f"user_side/runs/run_v1/{model}")
-
         libb.process_portfolio()
 
         daily_report = prompt_daily_report(libb)
 
-        libb.analyze_sentiment(daily_report)
         libb.save_daily_update(daily_report)
 
         orders_json = parse_json(daily_report, "ORDERS_JSON")
         libb.save_orders(orders_json)
+
+        libb.analyze_sentiment(daily_report, report_type="daily")
+
     return
 ```
 

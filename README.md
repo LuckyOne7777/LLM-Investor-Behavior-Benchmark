@@ -75,18 +75,18 @@ MODELS = ["deepseek", "gpt-4.1"]
 
 def daily_flow():
     for model in MODELS:
-        libb = LIBBmodel(f"<example_dir>/runs/run_v1/{model}")
-
+        libb = LIBBmodel(f"user_side/runs/run_v1/{model}")
         libb.process_portfolio()
 
-        # user created function
         daily_report = prompt_daily_report(libb)
 
-        libb.analyze_sentiment(daily_report)
         libb.save_daily_update(daily_report)
 
         orders_json = parse_json(daily_report, "ORDERS_JSON")
         libb.save_orders(orders_json)
+
+        libb.analyze_sentiment(daily_report, report_type="daily")
+
     return
 ```
 
