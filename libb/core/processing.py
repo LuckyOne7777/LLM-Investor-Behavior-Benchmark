@@ -5,7 +5,7 @@ import pandas as pd
 from libb.other.types_file import Order, TradeStatus
 from libb.execution.utils import append_log, is_nyse_open
 from libb.execution.process_order import process_order
-from libb.execution.update_data import update_market_value_columns
+from libb.execution.get_market_data import download_data_on_given_date
 
 from typing import Tuple
 from datetime import date
@@ -149,9 +149,24 @@ class Processing:
             raise SystemError(f"""Error saving to portfolio_history for {self._model_path}. 
                               You may have called 'reset_run()` without calling `ensure_file_system()` immediately after.""") from e
         return
+    
+    def update_market_value_columns(self):
+
+        for i, row in self.portfolio.iterrows():
+            ticker = row["ticker"]
+            shares = row["shares"]
+            cost_basis = self.portfolio.at[i, "cost_basis"]
+
+            ticker_data = download_data_on_given_date(ticker, self.run_date)
+            close_price = ticker_data["Close"]
+
+            self.portfolio.at[i, "market_price"] = close_price
+            self.portfolio.at[i, "market_value"] = round(close_price * shares, 2)
+            self.portfolio.at[i, "unrealized_pnl"] = round(self.portfolio.at[i, "market_value"] - cost_basis, 2)
+
     def _update_portfolio_market_data(self) -> None:
         """Update market portfolio value and cash. Save new values to disk."""
-        self.portfolio = update_market_value_columns(self.portfolio, date=self.run_date)
+        self.update_market_value_columns()
 
         self.portfolio.to_csv(self._portfolio_path, index=False)
         
