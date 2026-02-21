@@ -20,6 +20,7 @@ Planned focus areas:
 - bias-related signals
 - consistency and repetition analysis
 - response patterns across similar conditions
+- add wrapper in main class
 
 Behavioral metrics are intended for research and analysis, not enforcement.
 
@@ -27,32 +28,17 @@ Behavioral metrics are intended for research and analysis, not enforcement.
 
 ### 2. Multiple Data Source Support
 
-Add support for multiple market data sources.
+Add support for multiple market data sources besides Stooq and `yfinance`.
 
 Goals:
 
-- configurable primary data source
-- ability to switch sources without code changes
-- consistent data interface across sources
+- add functions supporting other APIs
+- ensure returned data matches existing format (MarketHistoryObject/MarketDataObject)
+- rewire functions into the main orchestrator
 
 ---
 
-### 3. Data Source Fallbacks
-
-Provide automatic or user-defined fallback mechanisms when a primary data source
-fails or returns incomplete data.
-
-Goals:
-
-- improve robustness of runs
-- reduce silent failures
-- preserve reproducibility across environments
-
-Fallback behavior should be explicit and auditable.
-
----
-
-### 4. Fractional Share Support
+### 3. Fractional Share Support
 
 Add first-class support for fractional share trading across order handling,
 portfolio state, and accounting logic.

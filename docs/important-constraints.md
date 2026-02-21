@@ -5,11 +5,10 @@ users should be aware of when working with LIBB.
 
 ---
 
-## Market Data Source
+## Lack of Market Data Sources
 
-Yahoo Finance (`yfinance`) is currently the sole supported market data
-source. Data availability, accuracy, and rate limits are therefore
-subject to Yahoo Finance constraints.
+Yahoo Finance (`yfinance`) and Stooq are currently the sole supported market data
+sources. Support for other data APIs is under development.
 
 ---
 
