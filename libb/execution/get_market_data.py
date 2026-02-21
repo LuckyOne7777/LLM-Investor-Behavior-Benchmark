@@ -51,22 +51,6 @@ def download_data_on_given_range(ticker: str, start_date: date | str, end_date: 
                 except Exception as e:
                     print(f"Failed download from yf: {e}")
 
-            case "finnhub":
-                try:
-                    data = download_finnhub_data(ticker, start_date, end_date, config)
-                    if data is not None:
-                        return cast(MarketHistoryObject, data)
-                except Exception as e:
-                    print(f"Failed download from finnhub: {e}")
-
-            case "alpha_vantage":
-                try:
-                    data = download_alpha_vantage_data(ticker, start_date, end_date, config)
-                    if data is not None:
-                        return cast(MarketHistoryObject, data)
-                except Exception as e:
-                    print(f"Failed download from alpha vantage: {e}")
-            
             case "stooq":
                 try:
                     data = download_stooq_data(ticker, start_date, end_date)
@@ -244,7 +228,7 @@ def download_stooq_data(
         raise ValueError(f"No Stooq data returned for {ticker}")
 
     try:
-        df = pd.read_csv(io.common.StringIO(response.text))
+        df = pd.read_csv(io.StringIO(response.text))
     except Exception as e:
         raise RuntimeError(f"Failed to parse Stooq CSV for {ticker}") from e
 
