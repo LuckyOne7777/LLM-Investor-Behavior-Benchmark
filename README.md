@@ -19,13 +19,10 @@ So I developed a library designed to support rigorous evaluation of LLM-driven t
   All portfolio data is explicitly stored on disk, enabling inspection,
   reproducibility, and post-hoc analysis across runs.
 
-- **Sentiment Analysis**  
-  Built-in support for sentiment analysis, with results persisted as
-  first-class research artifacts.
-
-- **Performance Metrics**  
+- **Built-In Performance & Sentiment Analysis**  
   Calculation of key performance evaluation metrics (Sharpe, Sortino, Drawdown, R², etc.)
-  based on the first day of portfolio activity. Behavioral analytics is still being developed.
+  and sentiment analysis with results persisted as
+  first-class research artifacts. Behavioral analytics is still being developed.
 
 - **Reproducible Run Structure**  
   Each model run follows a consistent on-disk directory layout, making
