@@ -13,7 +13,7 @@ def weekly_flow(date):
         
         deep_research_report = prompt_deep_research(libb)
 
-        libb.analyze_sentiment(deep_research_report)
+        libb.analyze_sentiment(deep_research_report, report_type="Deep_Research")
         libb.save_deep_research(deep_research_report)
 
         orders_json = parse_json(deep_research_report, "ORDERS_JSON")
@@ -28,7 +28,7 @@ def daily_flow(date):
 
         daily_report = prompt_daily_report(libb)
 
-        libb.analyze_sentiment(daily_report)
+        libb.analyze_sentiment(daily_report, report_type="Daily")
         libb.save_daily_update(daily_report)
 
         orders_json = parse_json(daily_report, "ORDERS_JSON")
