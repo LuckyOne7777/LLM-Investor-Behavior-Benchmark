@@ -7,6 +7,7 @@ import requests
 from typing import cast, Tuple
 
 #TODO: Set properly set up config
+#TODO: Fix functions for Finnhub and Alpha Vantage, then call get_valid_data_sources()
 
 def get_valid_data_sources() -> Tuple[list[str], MarketConfig]:
     config = MarketConfig.from_env()
@@ -39,7 +40,7 @@ def download_data_on_given_date(ticker: str, date: date | str) -> MarketDataObje
     return snapshot
 
 def download_data_on_given_range(ticker: str, start_date: date | str, end_date: date | str) -> MarketHistoryObject:
-    valid_data_sources, config = get_valid_data_sources()
+    valid_data_sources = ["yf", "stooq"]
     for source in valid_data_sources:
         match source:
 
