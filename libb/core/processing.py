@@ -156,13 +156,18 @@ class Processing:
             ticker = row["ticker"]
             shares = row["shares"]
             cost_basis = self.portfolio.at[i, "cost_basis"]
+            
+            value = self.portfolio.at[i, "market_value"]
+
+            value = cast(float, value)
+            cost = cast(float, cost_basis)
 
             ticker_data = download_data_on_given_date(ticker, self.run_date)
             close_price = ticker_data["Close"]
 
             self.portfolio.at[i, "market_price"] = close_price
             self.portfolio.at[i, "market_value"] = round(close_price * shares, 2)
-            self.portfolio.at[i, "unrealized_pnl"] = round(self.portfolio.at[i, "market_value"] - cost_basis, 2)
+            self.portfolio.at[i, "unrealized_pnl"] = round(value - cost, 2)
 
     def _update_portfolio_market_data(self) -> None:
         """Update market portfolio value and cash. Save new values to disk."""
