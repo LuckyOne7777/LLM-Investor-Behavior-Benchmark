@@ -2,6 +2,7 @@ import yfinance as yf
 from libb.other.types_file import MarketConfig, MarketDataObject, MarketHistoryObject
 from datetime import date
 import pandas as pd
+import io
 import requests
 from typing import cast, Tuple
 
@@ -10,7 +11,7 @@ from typing import cast, Tuple
 def get_valid_data_sources() -> Tuple[list[str], MarketConfig]:
     config = MarketConfig.from_env()
 
-    valid_data_sources = ["yf"]
+    valid_data_sources = ["yf", "stooq"]
 
     if config.finnhub_key is not None:
         valid_data_sources.append("finnhub")
@@ -65,12 +66,18 @@ def download_data_on_given_range(ticker: str, start_date: date | str, end_date: 
                         return cast(MarketHistoryObject, data)
                 except Exception as e:
                     print(f"Failed download from alpha vantage: {e}")
+            
+            case "stooq":
+                try:
+                    data = download_stooq_data(ticker, start_date, end_date)
+                    if data is not None:
+                        return cast(MarketHistoryObject, data)
+                except Exception as e:
+                    print(f"Failed download from stooq: {e}")
 
     raise RuntimeError(f"""All valid data sources ({valid_data_sources}) failed to return valid data. 
                        Try setting more valid API keys in your environment or checking your internet.""")
 
-
-            
 
 def download_yf_data(ticker: str, start_date: date | str, end_date: date | str) -> MarketHistoryObject:
 
@@ -191,4 +198,73 @@ def download_alpha_vantage_data(ticker: str, start_date: date | str, end_date: d
         "start_date": str(start_date),
         "end_date": str(end_date)
     }
+    return data
+
+def download_stooq_data(
+    ticker: str,
+    start_date: date | str,
+    end_date: date | str,
+) -> MarketHistoryObject:
+    """
+    Download daily historical data from Stooq.
+    Stooq does not require an API key.
+
+    Notes:
+    - Dates must be formatted as YYYYMMDD
+    - Stooq expects lowercase tickers
+    - US tickers usually work as-is (e.g. AAPL)
+    - Some exchanges require suffixes (e.g. .us, .pl)
+    """
+
+    ticker = ticker.lower()
+
+    # If no exchange suffix, assume US
+    if "." not in ticker:
+        ticker_stooq = f"{ticker}.us"
+
+    # Convert dates to YYYYMMDD format
+    start_str = pd.Timestamp(start_date).strftime("%Y%m%d")
+    end_str = pd.Timestamp(end_date).strftime("%Y%m%d")
+
+    url = "https://stooq.com/q/d/l/"
+    params = {
+        "s": ticker_stooq,
+        "i": "d",  # daily interval
+        "d1": start_str,
+        "d2": end_str,
+    }
+
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+    except Exception as e:
+        raise RuntimeError(f"Stooq request failed for {ticker}") from e
+
+    if not response.text.strip():
+        raise ValueError(f"No Stooq data returned for {ticker}")
+
+    try:
+        df = pd.read_csv(io.common.StringIO(response.text))
+    except Exception as e:
+        raise RuntimeError(f"Failed to parse Stooq CSV for {ticker}") from e
+
+    if df.empty:
+        raise ValueError(f"Empty Stooq dataset for {ticker}")
+
+    # Stooq returns columns:
+    # Date,Open,High,Low,Close,Volume
+    df["Date"] = pd.to_datetime(df["Date"])
+    df = df.sort_values("Date").set_index("Date")
+
+    data: MarketHistoryObject = {
+        "Low": df["Low"].round(2),
+        "High": df["High"].round(2),
+        "Close": df["Close"].round(2),
+        "Open": df["Open"].round(2),
+        "Volume": df["Volume"].fillna(0).astype(int),
+        "Ticker": ticker,
+        "start_date": str(start_date),
+        "end_date": str(end_date),
+    }
+
     return data
