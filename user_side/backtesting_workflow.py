@@ -48,7 +48,7 @@ def main():
         elif day_num < 4:
             print("Regular Weekday: Running Daily Flow...")
             daily_flow(run_date) # Mon-Thursday
-        else:  # Weekend
+        else:  # Weekend (optional, LIBB will automatically skip weekends)
             print("Weekend: Skipping...")
         print("Success!")
 
