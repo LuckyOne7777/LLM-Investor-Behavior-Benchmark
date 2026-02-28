@@ -15,6 +15,8 @@ def load_behavioral_metrics_data(trade_df_path: Path | str, positions_df_path: P
 
     if empty_dfs:
         raise RuntimeError(f"Cannot generate behavioral metrics: {", ".join(empty_dfs)}")
+    
+    assert "date" in trade_df.columns and positions_df.columns and equity_df.columns
 
     
 
