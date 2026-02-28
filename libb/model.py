@@ -313,32 +313,6 @@ class LIBBmodel:
         self.writer._save_logging_file_to_disk(log)
 
 # ----------------------------------
-# Calculate Metrics
-# ----------------------------------
-
-    
-    def analyze_sentiment(self, text: str, report_type: str="Unknown") -> dict:
-        """
-        Analyze sentiment for the given text and persist the result.
-
-        The sentiment log is appended to the in-memory sentiment list
-        and written to disk as JSON.
-
-        Args:
-            text (`str`, required): Text to analyze.
-            report_type (`str`, optional): Type or source of the report.
-                Defaults to "Unknown".
-
-        Returns:
-            dict: Sentiment analysis log for the given text.
-        """
-        log = analyze_sentiment(text, self.run_date, report_type=report_type)
-        self.sentiment.append(log)
-        with open(self.layout.sentiment_path, "w") as file:
-            json.dump(self.sentiment, file, indent=2)
-        return log
-
-# ----------------------------------
 # News
 # ----------------------------------
 
@@ -382,3 +356,24 @@ class LIBBmodel:
         performance_log = total_performance_calculations(self.layout.portfolio_history_path, self.run_date, baseline_ticker)
         self.writer.save_performance(performance_log)
         return performance_log
+    
+    def analyze_sentiment(self, text: str, report_type: str="Unknown") -> dict:
+        """
+        Analyze sentiment for the given text and persist the result.
+
+        The sentiment log is appended to the in-memory sentiment list
+        and written to disk as JSON.
+
+        Args:
+            text (`str`, required): Text to analyze.
+            report_type (`str`, optional): Type or source of the report.
+                Defaults to "Unknown".
+
+        Returns:
+            dict: Sentiment analysis log for the given text.
+        """
+        log = analyze_sentiment(text, self.run_date, report_type=report_type)
+        self.sentiment.append(log)
+        with open(self.layout.sentiment_path, "w") as file:
+            json.dump(self.sentiment, file, indent=2)
+        return log
