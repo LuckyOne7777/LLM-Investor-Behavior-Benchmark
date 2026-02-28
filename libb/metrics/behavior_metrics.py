@@ -1,4 +1,12 @@
 import pandas as pd
+from pathlib import Path
+
+def load_behavioral_metrics_data(trade_df_path: Path | str, positions_df_path: Path | str, equity_df_path: Path | str) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    trade_df = pd.read_csv(trade_df_path)
+    positions_df = pd.read_csv(positions_df_path)
+    equity_df = pd.read_csv(equity_df_path)
+
+    return trade_df, positions_df, equity_df
 
 def risk_aversion(df_equity, df_trades):
     """
