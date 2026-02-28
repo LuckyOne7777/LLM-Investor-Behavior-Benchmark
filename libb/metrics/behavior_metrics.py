@@ -7,6 +7,17 @@ def load_behavioral_metrics_data(trade_df_path: Path | str, positions_df_path: P
     positions_df = pd.read_csv(positions_df_path)
     equity_df = pd.read_csv(equity_df_path)
 
+    df_dict: dict = {"trade_df": trade_df,
+            "positions_df": positions_df,
+            "equity_df": equity_df}
+    
+    empty_dfs = [df_name for df_name, df_content in df_dict.items() if df_content.empty]
+
+    if empty_dfs:
+        raise RuntimeError(f"Cannot generate behavioral metrics: {", ".join(empty_dfs)}")
+
+    
+
     return trade_df, positions_df, equity_df
 
 def risk_aversion(df_equity: pd.DataFrame, df_trades: pd.DataFrame) -> float:
