@@ -1,5 +1,6 @@
 import pandas as pd
 from pathlib import Path
+from typing import Any
 
 def load_behavioral_metrics_data(trade_df_path: Path | str, positions_df_path: Path | str, equity_df_path: Path | str) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     trade_df = pd.read_csv(trade_df_path)
@@ -8,7 +9,7 @@ def load_behavioral_metrics_data(trade_df_path: Path | str, positions_df_path: P
 
     return trade_df, positions_df, equity_df
 
-def risk_aversion(df_equity, df_trades):
+def risk_aversion(df_equity: pd.DataFrame, df_trades: pd.DataFrame) -> float:
     """
     Measures how often the model reduces risk after losses.
     Input:
@@ -43,7 +44,7 @@ def loss_aversion(trades_log: pd.DataFrame) -> None | float:
     return avg_loss / avg_gain
 
 
-def concentration_ratio(df_positions, df_equity):
+def concentration_ratio(df_positions: pd.DataFrame, df_equity: pd.DataFrame) -> float:
     """
     Computes average portfolio concentration based on Herfindahl-Hirschman Index (HII).
     Input:
@@ -58,7 +59,7 @@ def concentration_ratio(df_positions, df_equity):
     return float(daily_hii.mean())
 
 
-def momentum_factor(df_prices, df_trades, lookback=3):
+def momentum_factor(df_prices: pd.DataFrame, df_trades: pd.DataFrame, lookback: int=3) -> float:
     """
     Measures correlation between past k-day return and buy decisions.
     Input:
@@ -71,7 +72,7 @@ def momentum_factor(df_prices, df_trades, lookback=3):
     return 0.0
 
 
-def over_under_reaction_score(df_positions, df_prices, events):
+def over_under_reaction_score(df_positions: pd.DataFrame, df_prices: pd.DataFrame, events: Any) -> float:
     """
     Event study: (Δposition weight) / (abnormal return)
     Input:
@@ -84,7 +85,7 @@ def over_under_reaction_score(df_positions, df_prices, events):
     # TODO: implement
     return 0.0
 
-def catalyst_sensitivity(df_positions, events):
+def catalyst_sensitivity(df_positions: pd.DataFrame, events: Any) -> float:
     """
     Measures how much the model adjusts positions around catalysts.
     Input:
@@ -97,7 +98,7 @@ def catalyst_sensitivity(df_positions, events):
     return 0.0
 
 
-def volatility_tolerance(df_positions, df_prices):
+def volatility_tolerance(df_positions: pd.DataFrame, df_prices: pd.DataFrame) -> float:
     """
     Measures how willing the model is to hold volatile stocks.
     Input:
