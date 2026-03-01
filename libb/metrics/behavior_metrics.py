@@ -97,11 +97,19 @@ def volatility_tolerance(df_positions: pd.DataFrame, df_prices: pd.DataFrame) ->
     # TODO: implement
     return 0.0
 
+def turnover_ratio(df_trades: pd.DataFrame, df_equity: pd.DataFrame) -> float:
+    filled_trades = df_trades[df_trades["status"] == "FILLED"]
+    total_trade_value = (filled_trades["price"] * filled_trades["shares"]).sum()
+    avg_equity = df_equity["equity"].mean()
+    return total_trade_value / avg_equity
+
 def total_behavioral_metrics(trade_df_path: Path | str, positions_df_path: Path | str, equity_df_path: Path | str, date: str | date):
 
     trade_df, positions_df, equity_df = load_behavioral_metrics_data(trade_df_path, positions_df_path, equity_df_path)
+
     hhi_index = concentration_ratio(positions_df, equity_df)
     loss_aversion_score = loss_aversion(trade_df)
+    turnover = turnover_ratio(trade_df, equity_df)
 
     average_cash_pct = round((equity_df["cash"].mean() / equity_df["equity"].mean()) * 100, 2)
     median_cash_pct = round((equity_df["cash"].median() / equity_df["equity"].median()) * 100, 2)
@@ -112,6 +120,7 @@ def total_behavioral_metrics(trade_df_path: Path | str, positions_df_path: Path 
     metrics_log = {
             "loss_aversion_score": loss_aversion_score,
             "hhi_index": float(hhi_index),
+            "turnover_ratio": float(turnover),
 
             "avg_cash_pct": float(average_cash_pct),
             "med_cash_pct": float(median_cash_pct),
