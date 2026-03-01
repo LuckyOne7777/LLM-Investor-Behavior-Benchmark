@@ -1,6 +1,7 @@
 import pandas as pd
 from pathlib import Path
 from typing import Any
+from datetime import date
 
 def load_behavioral_metrics_data(trade_df_path: Path | str, positions_df_path: Path | str, equity_df_path: Path | str) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     trade_df = pd.read_csv(trade_df_path)
@@ -122,3 +123,35 @@ def volatility_tolerance(df_positions: pd.DataFrame, df_prices: pd.DataFrame) ->
     """
     # TODO: implement
     return 0.0
+
+def total_behavioral_metrics(trade_df_path: Path | str, positions_df_path: Path | str, equity_df_path: Path | str, date: str | date):
+
+    trade_df, positions_df, equity_df = load_behavioral_metrics_data(trade_df_path, positions_df_path, equity_df_path)
+    hhi_index = concentration_ratio(positions_df, equity_df)
+    loss_aversion_score = loss_aversion(trade_df)
+
+    average_cash_pct = round((equity_df["cash"].mean() / equity_df["equity"].mean()) * 100, 2)
+    median_cash_pct = round((equity_df["cash"].median() / equity_df["equity"].median()) * 100, 2)
+
+    average_positions = len(positions_df) / positions_df["date"].nunique()
+    median_positions = round((positions_df.groupby("date").size().median()), 2)
+
+    metrics_log = {
+            "loss_aversion_score": loss_aversion_score,
+            "hhi_index": float(hhi_index),
+
+            "avg_cash_pct": float(average_cash_pct),
+            "med_cash_pct": float(median_cash_pct),
+
+            "avg_positions_per_day": average_positions,
+            "median_positions": median_positions,
+
+            "total_buy_count": int(len(trade_df[trade_df["action"] == "BUY"])),
+            "total_sell_count": int(len(trade_df[trade_df["action"] == "SELL"])),
+
+            "start_date": str(equity_df["date"].iloc[0]),
+            "end_date": str(equity_df["date"].iloc[-1]),
+            "observation_count": len(equity_df),
+            "generated_at": str(date),
+        }
+    return metrics_log
