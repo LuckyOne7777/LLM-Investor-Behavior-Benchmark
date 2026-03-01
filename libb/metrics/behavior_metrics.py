@@ -58,7 +58,7 @@ def loss_aversion(trades_log: pd.DataFrame) -> None | float:
 
 def concentration_ratio(df_positions: pd.DataFrame, df_equity: pd.DataFrame) -> float:
     """
-    Computes average portfolio concentration based on Herfindahl-Hirschman Index (HII).
+    Computes average portfolio concentration based on Herfindahl-Hirschman Index (HHI).
     Input:
         df_positions: daily position values
         df_equity: total equity
@@ -67,8 +67,8 @@ def concentration_ratio(df_positions: pd.DataFrame, df_equity: pd.DataFrame) -> 
     """
 
     weights = df_positions.div(df_equity, axis=0)
-    daily_hii = (weights**2).sum(axis=1)
-    return float(daily_hii.mean())
+    daily_hhi = (weights**2).sum(axis=1)
+    return float(daily_hhi.mean())
 
 
 def momentum_factor(df_prices: pd.DataFrame, df_trades: pd.DataFrame, lookback: int=3) -> float:
