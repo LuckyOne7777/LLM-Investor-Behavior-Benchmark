@@ -29,7 +29,7 @@ class Order(TypedDict):
     action: Literal["b", "s", "u"]     # "b" = buy, "s" = sell, "u" = update stop-loss
     ticker: str
     shares: int
-    order_type: Literal["limit", "market", "update"]
+    order_type: Literal["LIMIT", "MARKET", "UPDATE"]
     limit_price: Optional[float]
     time_in_force: Optional[str]
     date: str                               # YYYY-MM-DD
@@ -88,7 +88,7 @@ class Order(TypedDict):
       "action": "b",
       "ticker": "MSFT",
       "shares": 40,
-      "order_type": "limit",
+      "order_type": "LIMIT",
       "limit_price": 250.00,
       "time_in_force": "DAY",
       "date": "2025-12-16",
