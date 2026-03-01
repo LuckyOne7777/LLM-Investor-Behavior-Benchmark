@@ -116,6 +116,7 @@ def total_behavioral_metrics(trade_df_path: Path | str, positions_df_path: Path 
 
     average_positions = len(positions_df) / positions_df["date"].nunique()
     median_positions = round((positions_df.groupby("date").size().median()), 2)
+    max_positions = positions_df.groupby("date").size().max()
 
     metrics_log = {
             "loss_aversion_score": loss_aversion_score,
@@ -127,6 +128,7 @@ def total_behavioral_metrics(trade_df_path: Path | str, positions_df_path: Path 
 
             "avg_positions_per_day": average_positions,
             "median_positions_per_day": median_positions,
+            "max_positions_in_a_day": max_positions,
 
             "total_buy_count": int(len(trade_df[trade_df["action"] == "BUY"])),
             "total_sell_count": int(len(trade_df[trade_df["action"] == "SELL"])),
