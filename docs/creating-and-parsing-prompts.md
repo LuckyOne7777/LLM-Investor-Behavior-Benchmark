@@ -26,12 +26,12 @@ Each order must conform to the following schema:
 
 ```python
 class Order(TypedDict):
-    action: Literal["b", "s", "u"]     # "b" = buy, "s" = sell, "u" = update stop-loss
-    ticker: str
+    action: Literal["b", "s", "u"]          # "b" = buy, "s" = sell, "u" = update stop-loss
+    ticker: str                             # uppercase
     shares: int
     order_type: Literal["LIMIT", "MARKET", "UPDATE"]
     limit_price: Optional[float]
-    time_in_force: Optional[str]
+    time_in_force: Optional[str]            # "DAY"
     date: str                               # YYYY-MM-DD
     stop_loss: Optional[float]
     rationale: str                          # short reasoning message (currently not enforced)
@@ -41,41 +41,43 @@ class Order(TypedDict):
 
 ### Field Notes
 
-- action  
+- `action`  
   - "b" → buy  
   - "s" → sell  
   - "u" → update stop-loss only  
 
-- order_type  
-  - "limit" or "market" for buy/sell  
+- `order_type`  
+  - "LIMIT" or "MARKET" for buy/sell  
   - "update" for stop-loss updates  
 
-- limit_price  
-  - required when order_type == "limit"  
+- `limit_price`
+  - required when order_type == "LIMIT"  
   - must be null otherwise  
 
-- shares  
+- `shares`  
   - must always be an integer  
   - use 0 when action == "u" if shares are not relevant
  
-- stop loss
+- `stop_loss`
   - Needed for buy and update orders
   - For buys, stoploss will default to 0
   - Obviously an explict value is required for updates
      
 
-- date  
+- `date`  
   - must be formatted as YYYY-MM-DD  
-  - only orders with the same date as the processing will be processed
-  - orders past the current running date *will be deleted*  
+  - only orders with the same date as the processing date will be processed
+  - orders past the current running date *will be deleted and logged*  
 
-- rationale and confidence  
+- `rationale/confidence`  
   - currently recorded but not enforced  
   - included for future extensibility and auditing
  
-- time in force
+- `time_in_force`
   - Currently the only supported type is "DAY"
   - time in force is not currently read by the system and will default to "DAY"  
+
+
 
 ---
 
