@@ -21,18 +21,6 @@ def load_behavioral_metrics_data(trade_df_path: Path | str, positions_df_path: P
 
     return trade_df, positions_df, equity_df
 
-def risk_aversion(df_equity: pd.DataFrame, df_trades: pd.DataFrame) -> float:
-    """
-    Measures how often the model reduces risk after losses.
-    Input:
-        df_equity: DataFrame with daily equity
-        df_trades: DataFrame with trades + position sizes
-    Output:
-        float (0 to 1)
-    """
-    # TODO: implement
-    return 0.0
-
 def loss_aversion(trades_log: pd.DataFrame) -> None | float:
     """
     Computes loss aversion λ = avg loss magnitude / avg gain magnitude.
@@ -69,31 +57,6 @@ def concentration_ratio(df_positions: pd.DataFrame, df_equity: pd.DataFrame) -> 
     weights = df_positions.div(df_equity, axis=0)
     daily_hhi = (weights**2).sum(axis=1)
     return float(daily_hhi.mean())
-
-
-def momentum_factor(df_prices: pd.DataFrame, df_trades: pd.DataFrame, lookback: int=3) -> float:
-    """
-    Measures correlation between past k-day return and buy decisions.
-    Input:
-        df_prices: price history
-        df_trades: trade log
-    Output:
-        float (-1 to 1)
-    """
-    # TODO: implement
-    return 0.0
-
-def volatility_tolerance(df_positions: pd.DataFrame, df_prices: pd.DataFrame) -> float:
-    """
-    Measures how willing the model is to hold volatile stocks.
-    Input:
-        df_positions: position sizes
-        df_prices: volatility data
-    Output:
-        float
-    """
-    # TODO: implement
-    return 0.0
 
 def turnover_ratio(df_trades: pd.DataFrame, df_equity: pd.DataFrame) -> float:
     filled_trades = df_trades[df_trades["status"] == "FILLED"]
@@ -137,3 +100,43 @@ def total_behavioral_metrics(trade_df_path: Path | str, positions_df_path: Path 
             "generated_at": str(date),
         }
     return metrics_log
+
+# ----------------------------------
+# Possible Additional Metrics
+# ----------------------------------
+
+def risk_aversion(df_equity: pd.DataFrame, df_trades: pd.DataFrame) -> float:
+    """
+    Measures how often the model reduces risk after losses.
+    Input:
+        df_equity: DataFrame with daily equity
+        df_trades: DataFrame with trades + position sizes
+    Output:
+        float (0 to 1)
+    """
+    # TODO: implement
+    return 0.0
+
+def momentum_factor(df_prices: pd.DataFrame, df_trades: pd.DataFrame, lookback: int=3) -> float:
+    """
+    Measures correlation between past k-day return and buy decisions.
+    Input:
+        df_prices: price history
+        df_trades: trade log
+    Output:
+        float (-1 to 1)
+    """
+    # TODO: implement
+    return 0.0
+
+def volatility_tolerance(df_positions: pd.DataFrame, df_prices: pd.DataFrame) -> float:
+    """
+    Measures how willing the model is to hold volatile stocks.
+    Input:
+        df_positions: position sizes
+        df_prices: volatility data
+    Output:
+        float
+    """
+    # TODO: implement
+    return 0.0
