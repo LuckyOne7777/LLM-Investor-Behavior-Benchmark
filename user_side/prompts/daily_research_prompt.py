@@ -152,6 +152,33 @@ STRICT RULE:
 The JSON MUST be pure and contain no extra text or comments.
 """
 
+orders_section = """<ORDERS_JSON>
+{
+  "orders": [
+      {
+  "action": "b" | "s" | "u",
+  "ticker": "XYZ",
+  "shares": 1,
+  "order_type": "LIMIT" | "MARKET" | "UPDATE",
+  "limit_price": 10.25 | null,
+  "time_in_force": "DAY" | null,
+  "date": "YYYY-MM-DD",
+  "stop_loss": 8.90 | null,
+  "rationale": "short justification",
+  "confidence": 0.80
+      }
+  ]
+}
+</ORDERS_JSON>
+
+If no trade is taken:
+
+<ORDERS_JSON>
+{
+  "orders": []
+}
+</ORDERS_JSON>"""
+
 
 # -------------------------------------------------------------------
 # MAIN FUNCTION
@@ -177,34 +204,6 @@ def create_daily_prompt(libb: LIBBmodel):
         if not isinstance(logs, str) and not logs.empty
         else "No recent trade logs."
     )
-
-    # because of the string formatting, the json block must be passed in
-    orders_section = """<ORDERS_JSON>
-{
-  "orders": [
-      {
-  "action": "b" | "s" | "u",
-  "ticker": "XYZ",
-  "shares": 1,
-  "order_type": "limit" | "market" | "update",
-  "limit_price": 10.25 | null,
-  "time_in_force": "DAY" | null,
-  "date": "YYYY-MM-DD",
-  "stop_loss": 8.90 | null,
-  "rationale": "short justification",
-  "confidence": 0.80
-      }
-  ]
-}
-</ORDERS_JSON>
-
-If no trade is taken:
-
-<ORDERS_JSON>
-{
-  "orders": []
-}
-</ORDERS_JSON>"""
 
     daily_prompt = (
         SYSTEM_HEADER.format(today=today)

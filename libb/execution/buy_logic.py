@@ -8,7 +8,7 @@ from pathlib import Path
 def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log_path: Path) -> tuple[pd.DataFrame, float, bool]:
     ticker = order["ticker"].upper()
     date = order["date"]
-    order_type = order["order_type"]
+    order_type = order["order_type"].upper()
     shares = int(order["shares"])
     intended_limit_price = order["limit_price"]
     stop_loss = 0 if order["stop_loss"] is None else order["stop_loss"]
@@ -18,7 +18,7 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
     market_open = ticker_data["Open"]
 
     # ---------- LIMIT BUY ----------
-    if order_type == "limit":
+    if order_type == "LIMIT":
 
         required_cols = [
             "limit_price",
@@ -75,7 +75,7 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
         return portfolio_df, cash, True
 
     # ---------- MARKET BUY ----------
-    elif order_type == "market":
+    elif order_type == "MARKET":
 
         required_cols = [
             "shares",

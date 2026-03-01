@@ -109,7 +109,36 @@ Rationale: one short justification sentence
  Action
       “b” = buy  
     • “s” = sell  
-    • “u” = update stop-loss  
+    • “u” = update stop-loss
+
+Formatting:
+
+<ORDERS_JSON>
+{
+  "orders": [
+      {
+  "action": "b" | "s" | "u",
+  "ticker": "XYZ",
+  "shares": 1,
+  "order_type": "LIMIT" | "MARKET" | "UPDATE",
+  "limit_price": 10.25 | null,
+  "time_in_force": "DAY" | null,
+  "date": "YYYY-MM-DD",
+  "stop_loss": 8.90 | null,
+  "rationale": "short justification",
+  "confidence": 0.80
+      }
+  ]
+}
+</ORDERS_JSON>
+
+If no trade is taken:
+
+<ORDERS_JSON>
+{
+  "orders": []
+}
+</ORDERS_JSON>  
 """
 
 
@@ -162,6 +191,51 @@ STRICT RULE:
 The JSON MUST contain only valid JSON. No extra text, comments, or formatting.
 """
 
+CONTEXT_BLOCK = """
+---------------------------------------------------------------------------
+CONTEXT PROVIDED TO YOU
+---------------------------------------------------------------------------
+
+• Current Portfolio State:
+  [{portfolio}]
+
+• Portfolio News (if any):
+  [{portfolio_news}]
+
+• US Macro Headlines (if any):
+  [{us_news}]
+
+• Execution Log from Previous Week (including failed orders):
+  [{execution_log}]
+"""
+
+
+EXAMPLE_ORDERS_JSON = """
+
+Here are the exact options for each 
+
+  <ORDERS_JSON>
+{
+  "orders": [
+    {
+      "action": "b",
+      "ticker": "SPY",
+      "shares": 1,
+      "order_type": "limit",
+      "limit_price": 10.25,
+      "time_in_force": "DAY",
+      "date": "2025-05-12",
+      "stop_loss": 8.90,
+      "rationale": "short justification",
+      "confidence": 0.80
+    }, 
+
+    ...
+
+  ]
+}
+</ORDERS_JSON>
+"""
 
 # -------------------------------------------------------------------
 # MAIN FUNCTION
@@ -186,45 +260,6 @@ def create_deep_research_prompt(libb: LIBBmodel):
 
     us_news = get_macro_news()
 
-    example_orders_json = """
-  <ORDERS_JSON>
-{
-  "orders": [
-    {
-      "action": "b",
-      "ticker": "XYZ",
-      "shares": 1,
-      "order_type": "limit",
-      "limit_price": 10.25,
-      "time_in_force": "DAY",
-      "date": "YYYY-MM-DD",
-      "stop_loss": 8.90,
-      "rationale": "short justification",
-      "confidence": 0.80
-    }
-  ]
-}
-</ORDERS_JSON>
-"""
-
-    context_block = f"""
----------------------------------------------------------------------------
-CONTEXT PROVIDED TO YOU
----------------------------------------------------------------------------
-
-• Current Portfolio State:
-  [{portfolio}]
-
-• Portfolio News (if any):
-  [{portfolio_news}]
-
-• US Macro Headlines (if any):
-  [{us_news}]
-
-• Execution Log from Previous Week (including failed orders):
-  [{execution_log}]
-"""
-
     deep_research_prompt = (
         SYSTEM_HEADER.format(today=today)
         + CAPITAL_RULES
@@ -233,9 +268,10 @@ CONTEXT PROVIDED TO YOU
         + DEEP_RESEARCH_REQUIREMENTS
         + ORDER_SPEC_FORMAT
         + ANALYSIS_REQUIREMENTS
-        + context_block
+        + CONTEXT_BLOCK.format(portfolio=portfolio, portfolio_news=portfolio_news, 
+                               us_news=us_news, execution_log=execution_log)
         + OUTPUT_REQUIREMENTS
-        + OUTPUT_TEMPLATE.format(example_orders_json=example_orders_json)
+        + OUTPUT_TEMPLATE.format(example_orders_json=EXAMPLE_ORDERS_JSON)
     )
 
     return deep_research_prompt

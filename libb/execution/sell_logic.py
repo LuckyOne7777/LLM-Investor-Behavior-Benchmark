@@ -8,7 +8,7 @@ from typing import cast
 
 def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log_path: Path) -> tuple[pd.DataFrame, float, bool]:
     ticker = order["ticker"].upper()
-    order_type = order["order_type"]
+    order_type = order["order_type"].upper()
     date = order["date"]
     ticker_data = download_data_on_given_date(ticker, date)
 
@@ -29,7 +29,7 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
         })
         return portfolio_df, cash, False
     
-    if order_type == "limit" and high < limit_price:
+    if order_type == "LIMIT" and high < limit_price:
 
         append_log(trade_log_path, {
             "date": order["date"],
@@ -40,7 +40,7 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
         })
         return portfolio_df, cash, False
 
-    elif order_type == "limit":
+    elif order_type == "LIMIT":
         required_col = ["ticker", "limit_price", "shares"]
         if not catch_missing_order_data(order, required_col, trade_log_path):
                 return portfolio_df, cash, False
@@ -63,7 +63,7 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
     })
         return portfolio_df, cash, True
             
-    elif order_type == "market":
+    elif order_type == "MARKET":
         required_col = ["ticker", "shares"]
         if not catch_missing_order_data(order, required_col, trade_log_path):
                 return portfolio_df, cash, False
