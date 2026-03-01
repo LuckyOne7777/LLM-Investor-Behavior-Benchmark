@@ -3,10 +3,10 @@ from pathlib import Path
 from typing import Any
 from datetime import date
 
-def load_behavioral_metrics_data(trade_df_path: Path | str, positions_df_path: Path | str, equity_df_path: Path | str) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def load_behavioral_metrics_data(trade_df_path: Path | str, positions_df_path: Path | str, position_history_df_path: Path | str) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     trade_df = pd.read_csv(trade_df_path)
     positions_df = pd.read_csv(positions_df_path)
-    equity_df = pd.read_csv(equity_df_path)
+    equity_df = pd.read_csv(position_history_df_path)
 
     df_dict: dict = {"trade_df": trade_df,
             "positions_df": positions_df,
@@ -18,8 +18,6 @@ def load_behavioral_metrics_data(trade_df_path: Path | str, positions_df_path: P
         raise RuntimeError(f"Cannot generate behavioral metrics: {", ".join(empty_dfs)}")
     
     assert "date" in trade_df.columns and positions_df.columns and equity_df.columns
-
-    
 
     return trade_df, positions_df, equity_df
 
@@ -103,9 +101,9 @@ def turnover_ratio(df_trades: pd.DataFrame, df_equity: pd.DataFrame) -> float:
     avg_equity = df_equity["equity"].mean()
     return total_trade_value / avg_equity
 
-def total_behavioral_metrics(trade_df_path: Path | str, positions_df_path: Path | str, equity_df_path: Path | str, date: str | date):
+def total_behavioral_metrics(trade_df_path: Path | str, positions_df_path: Path | str, portfolio_history_df_path: Path | str, date: str | date):
 
-    trade_df, positions_df, equity_df = load_behavioral_metrics_data(trade_df_path, positions_df_path, equity_df_path)
+    trade_df, positions_df, equity_df = load_behavioral_metrics_data(trade_df_path, positions_df_path, portfolio_history_df_path)
 
     hhi_index = concentration_ratio(positions_df, equity_df)
     loss_aversion_score = loss_aversion(trade_df)
