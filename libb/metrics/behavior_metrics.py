@@ -85,33 +85,6 @@ def momentum_factor(df_prices: pd.DataFrame, df_trades: pd.DataFrame, lookback: 
     # TODO: implement
     return 0.0
 
-
-def over_under_reaction_score(df_positions: pd.DataFrame, df_prices: pd.DataFrame, events: Any) -> float:
-    """
-    Event study: (Δposition weight) / (abnormal return)
-    Input:
-        df_positions: portfolio weights
-        df_prices: price data for each ticker
-        events: list of (ticker, event_date)
-    Output:
-        float
-    """
-    # TODO: implement
-    return 0.0
-
-def catalyst_sensitivity(df_positions: pd.DataFrame, events: Any) -> float:
-    """
-    Measures how much the model adjusts positions around catalysts.
-    Input:
-        df_positions: daily weights
-        events: list of catalyst dates
-    Output:
-        float
-    """
-    # TODO: implement
-    return 0.0
-
-
 def volatility_tolerance(df_positions: pd.DataFrame, df_prices: pd.DataFrame) -> float:
     """
     Measures how willing the model is to hold volatile stocks.
@@ -144,7 +117,7 @@ def total_behavioral_metrics(trade_df_path: Path | str, positions_df_path: Path 
             "med_cash_pct": float(median_cash_pct),
 
             "avg_positions_per_day": average_positions,
-            "median_positions": median_positions,
+            "median_positions_per_day": median_positions,
 
             "total_buy_count": int(len(trade_df[trade_df["action"] == "BUY"])),
             "total_sell_count": int(len(trade_df[trade_df["action"] == "SELL"])),
