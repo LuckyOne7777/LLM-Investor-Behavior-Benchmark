@@ -67,7 +67,8 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
             "ticker": ticker,
             "action": "BUY",
             "shares": shares,
-            "price": fill_price,
+            "limit_price": fill_price,
+            "executed_price": fill_price,
             "status": "FILLED",
             "reason": ""
         })
@@ -102,7 +103,7 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
             "ticker": ticker,
             "action": "BUY",
             "shares": shares,
-            "price": market_open,
+            "executed_price": market_open,
             "status": "FILLED",
             "reason": ""
         })
@@ -123,7 +124,7 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
             "ticker": ticker,
             "action": "BUY",
             "shares": shares,
-            "price": intended_limit_price,
+            "limit_price": intended_limit_price,
             "status": "FAILED",
             "reason": f"ORDER TYPE UNKNOWN: {order_type}"
         })

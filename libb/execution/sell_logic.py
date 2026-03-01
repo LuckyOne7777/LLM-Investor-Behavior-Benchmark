@@ -56,7 +56,8 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
                 "ticker": ticker,
                 "action": "SELL",
                 "shares": shares,
-                "price": fill_price,
+                "limit_price": fill_price,
+                "executed_price": fill_price,
                 "PnL": round(pnl, 2),
                 "status": "FILLED",
                 "reason": ""
@@ -78,7 +79,7 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
                 "ticker": ticker,
                 "action": "SELL",
                 "shares": shares,
-                "price": open_price,
+                "executed_price": open_price,
                 "PnL": round(pnl, 2),
                 "status": "FILLED",
                 "reason": ""
@@ -89,6 +90,7 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
             "date": order["date"],
             "ticker": ticker,
             "action": "SELL",
+            "order_type": order_type,
             "status": "FAILED",
             "reason": f"ORDER TYPE UNKNOWN: {order_type}"
         })
