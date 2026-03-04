@@ -80,7 +80,7 @@ class LIBBmodel:
         self._ensure_file(self.layout.cash_path, json.dumps({"cash": self.STARTING_CASH}) )
 
         self._ensure_file(self.layout.portfolio_path, "ticker,shares,buy_price,cost_basis,stop_loss,market_price,market_value,unrealized_pnl\n")
-        self._ensure_file(self.layout.trade_log_path, "date,ticker,action,order_type,shares,limit_price,executed_price,cost_basis,PnL,rationale,confidence,status,reason\n")
+        self._ensure_file(self.layout.trade_log_path, "date,ticker,action,order_type,shares,limit_price,executed_price,stop_loss,cost_basis,PnL,rationale,confidence,status,reason\n")
         self._ensure_file(self.layout.position_history_path, "date,ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl\n")
 
         # metrics files
