@@ -102,17 +102,9 @@ class Processing:
     def _append_portfolio_history(self) -> None:
         """Append portfolio history CSV based on portfolio data."""
 
-        defaults = {
-            "ticker": "",
-            "shares": 0,
-            "buy_price": 0.0,
-            "cost_basis": 0.0,
-            "stop_loss": 0.0,
-                }
-
-        for col, default in defaults.items():
-            if col not in self.portfolio.columns:
-                self.portfolio[col] = default
+        portfolio_history_columns = ["ticker", "shares", "buy_price", "cost_basis", "stop_loss"]
+        missing_cols = set(portfolio_history_columns) - set(self.portfolio.columns)
+        assert not missing_cols, f"Missing Columns: {missing_cols}"
 
         if "market_value" not in self.portfolio.columns and not self.portfolio.empty:
             raise RuntimeError("`market_value` not computed before portfolio history update.")
