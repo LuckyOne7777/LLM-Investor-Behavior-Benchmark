@@ -3,6 +3,7 @@ from pathlib import Path
 from ..other.types_file import Order
 import datetime as dt
 import pandas_market_calendars as mcal
+import math
 
 def load_df(path: Path) -> pd.DataFrame:
     if not path.exists():
@@ -25,6 +26,39 @@ def append_log(path: Path, row: dict | pd.DataFrame) -> None:
     else:
         raise RuntimeError(f"Invalid data type given for append_log(): {type(row)}. Row must be either a DataFrame or dict.")
     return
+
+# TODO: Use enum codes for error reasoning instead of formatted strings
+
+def order_to_trade_schema(order: Order,  *, executed_price: float | None, PnL: float | None, status: str, reason: str) -> dict:
+
+        valid_order_actions_map = {"b": "BUY", "s": "SELL", "u": "UPDATE"}
+        order_action = order.get("action").lower()
+        validated_order_action = valid_order_actions_map.get(order_action, "MISSING")
+        if executed_price is not None:
+            cost_basis = executed_price * order.get("shares", math.nan)
+        else:
+            cost_basis = math.nan
+
+        order_dict = {
+            "date": order.get("date", "MISSING"),
+            "ticker": order.get("ticker", "MISSING"),
+            "action": validated_order_action,
+            "order_type": order.get("order_type", "MISSING"),
+            "shares": order.get("shares", math.nan),
+            "limit_price": order.get("limit_price", math.nan),
+            "executed_price": executed_price,
+            "stop_loss": order.get("stop_loss", math.nan),
+            "cost_basis": cost_basis,
+            "PnL": PnL,
+            "rationale": order.get("rationale", "MISSING"),
+            "confidence": order.get("confidence", "MISSING"),
+            "status": status,
+            "reason": reason,
+                                }
+
+                
+
+        return order_dict
 
 def catch_missing_order_data(order: Order, required_cols: list, trade_log_path: Path) -> bool:
     """Log failures for missing or null data required for order.
