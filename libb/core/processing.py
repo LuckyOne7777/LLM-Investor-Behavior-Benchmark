@@ -94,7 +94,7 @@ class Processing:
         portfolio_copy = self.portfolio.copy()
         portfolio_copy["date"] = self.run_date
         assert (portfolio_copy["shares"] != 0).all() 
-        portfolio_copy["avg_cost"] = portfolio_copy["cost_basis"] / portfolio_copy["shares"]
+        portfolio_copy["avg_cost"] = round(portfolio_copy["cost_basis"] / portfolio_copy["shares"], 2)
         portfolio_copy.drop(columns=["buy_price", "cost_basis"], inplace=True)
         append_log(self._position_history_path, portfolio_copy)
         return
