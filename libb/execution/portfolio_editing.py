@@ -29,8 +29,11 @@ def add_or_update_position(df: pd.DataFrame, ticker: str, shares: int, price: fl
             "ticker": ticker,
             "shares": shares,
             "buy_price": price,
-            "cost_basis": cost,
+            "cost_basis": round(cost, 2),
             "stop_loss": stop_loss,
+            "market_price": price,
+            "market_value": round(price * shares, 2),
+            "unrealized_pnl": None
         }
         if not df.empty:
             df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
