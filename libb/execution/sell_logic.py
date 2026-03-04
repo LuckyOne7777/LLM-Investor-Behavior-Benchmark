@@ -1,5 +1,5 @@
 from .portfolio_editing import reduce_position
-from .utils import append_log, catch_missing_order_data
+from .utils import append_log, catch_missing_order_data, order_to_trade_schema
 from libb.execution.get_market_data import download_data_on_given_date
 from pathlib import Path
 import pandas as pd
@@ -20,24 +20,17 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
 
     row = portfolio_df.loc[portfolio_df["ticker"] == ticker].iloc[0]
     if shares > row["shares"]:
-        append_log(trade_log_path, {
-            "date": order["date"],
-            "ticker": ticker,
-            "action": "SELL",
-            "status": "FAILED",
-            "reason": f"INSUFFICIENT SHARES: REQUESTED {shares}, AVAILABLE {row['shares']}"
-        })
+        reason = f"INSUFFICIENT SHARES: REQUESTED {shares}, AVAILABLE {row['shares']}"
+        trade_dict = order_to_trade_schema(order, executed_price=None, PnL=None,
+                                           status="FAILED", reason=reason)
+        append_log(trade_log_path, trade_dict)
         return portfolio_df, cash, False
     
     if order_type == "LIMIT" and high < limit_price:
-
-        append_log(trade_log_path, {
-            "date": order["date"],
-            "ticker": ticker,
-            "action": "SELL",
-            "status": "FAILED",
-            "reason": f"limit price of {limit_price} not met. (High: {high})"
-        })
+        reason = f"limit price of {limit_price} not met. (High: {high})"
+        trade_dict = order_to_trade_schema(order, executed_price=None, PnL=None,
+                                           status="FAILED", reason=reason)
+        append_log(trade_log_path, trade_dict)
         return portfolio_df, cash, False
 
     elif order_type == "LIMIT":
@@ -50,18 +43,9 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
         cash += proceeds
 
         pnl = proceeds - (buy_price * shares)
-
-        append_log(trade_log_path, {
-                "date": order["date"],
-                "ticker": ticker,
-                "action": "SELL",
-                "shares": shares,
-                "limit_price": fill_price,
-                "executed_price": fill_price,
-                "PnL": round(pnl, 2),
-                "status": "FILLED",
-                "reason": ""
-    })
+        trade_dict = order_to_trade_schema(order, executed_price=fill_price, PnL=pnl,
+                                           status="FILLED", reason="")
+        append_log(trade_log_path, trade_dict)
         return portfolio_df, cash, True
             
     elif order_type == "MARKET":
@@ -74,26 +58,15 @@ def process_sell(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_lo
         cash += proceeds
 
         pnl = proceeds - (buy_price * shares)
-        append_log(trade_log_path, {
-                "date": order["date"],
-                "ticker": ticker,
-                "action": "SELL",
-                "shares": shares,
-                "executed_price": open_price,
-                "PnL": round(pnl, 2),
-                "status": "FILLED",
-                "reason": ""
-        })
+        trade_dict = order_to_trade_schema(order, executed_price=open_price, PnL=pnl,
+                                           status="FILLED", reason="")
+        append_log(trade_log_path, trade_dict)
         return portfolio_df, cash, True
     else:
-        append_log(trade_log_path, {
-            "date": order["date"],
-            "ticker": ticker,
-            "action": "SELL",
-            "order_type": order_type,
-            "status": "FAILED",
-            "reason": f"ORDER TYPE UNKNOWN: {order_type}"
-        })
+        reason = f"ORDER TYPE UNKNOWN: {order_type}"
+        trade_dict = order_to_trade_schema(order, executed_price=None, PnL=None,
+                                           status="FAILED", reason=reason)
+        append_log(trade_log_path, trade_dict)
 
 
         return portfolio_df, cash, False

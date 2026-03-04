@@ -1,5 +1,5 @@
 from .portfolio_editing import add_or_update_position
-from .utils import append_log, catch_missing_order_data
+from .utils import append_log, catch_missing_order_data, order_to_trade_schema
 from libb.execution.get_market_data import download_data_on_given_date
 import pandas as pd
 from ..other.types_file import Order
@@ -32,46 +32,33 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
         
         assert intended_limit_price is not None
         intended_limit_price = float(intended_limit_price)
-        # limit buy fails if price never trades at or below limit
+
         if market_low > intended_limit_price:
-            append_log(trade_log_path, {
-                "date": order["date"],
-                "ticker": ticker,
-                "action": "BUY",
-                "status": "FAILED",
-                "reason": f"limit price of {intended_limit_price} not met. (Low: {market_low})"
-            })
+            reason = f"limit price of {intended_limit_price} not met. (Low: {market_low})"
+            trade_dict = order_to_trade_schema(order, executed_price=None, PnL=None,
+                                               status="FAILED", reason=reason)
+            append_log(trade_log_path, trade_dict)
             return portfolio_df, cash, False
 
-        # realistic fill price
         fill_price = market_open if market_open <= intended_limit_price else intended_limit_price
         cost = shares * fill_price
 
         if cost > cash:
-            append_log(trade_log_path, {
-                "date": order["date"],
-                "ticker": ticker,
-                "action": "BUY",
-                "status": "FAILED",
-                "reason": "Insufficient cash"
-            })
+            reason = f"Insufficient cash"
+            trade_dict = order_to_trade_schema(order, executed_price=None, PnL=None,
+                                               status="FAILED", reason=reason)
+            append_log(trade_log_path, trade_dict)
             return portfolio_df, cash, False
+
+
+        trade_dict = order_to_trade_schema(order, executed_price=fill_price, PnL=None,
+                                               status="FILLED", reason="")
+        append_log(trade_log_path, trade_dict)
 
         portfolio_df = add_or_update_position(
             portfolio_df, ticker, shares, fill_price, stop_loss
         )
         cash -= cost
-
-        append_log(trade_log_path, {
-            "date": order["date"],
-            "ticker": ticker,
-            "action": "BUY",
-            "shares": shares,
-            "limit_price": fill_price,
-            "executed_price": fill_price,
-            "status": "FILLED",
-            "reason": ""
-        })
 
         return portfolio_df, cash, True
 
@@ -88,25 +75,16 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
         cost = shares * market_open
 
         if cost > cash:
-            append_log(trade_log_path, {
-                "date": order["date"],
-                "ticker": ticker,
-                "action": "BUY",
-                "status": "FAILED",
-                "reason": "Insufficient cash"
-            })
+            reason = f"Insufficient cash"
+            trade_dict = order_to_trade_schema(order, executed_price=None, PnL=None,
+                                               status="FAILED", reason=reason)
+            append_log(trade_log_path, trade_dict)
             return portfolio_df, cash, False
 
 
-        append_log(trade_log_path, {
-            "date": order["date"],
-            "ticker": ticker,
-            "action": "BUY",
-            "shares": shares,
-            "executed_price": market_open,
-            "status": "FILLED",
-            "reason": ""
-        })
+        trade_dict = order_to_trade_schema(order, executed_price=market_open, PnL=None,
+                                               status="FILLED", reason="")
+        append_log(trade_log_path, trade_dict)
 
         portfolio_df = add_or_update_position(
             portfolio_df, ticker, shares, market_open, stop_loss
@@ -119,14 +97,8 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
 
 
     else:
-        append_log(trade_log_path, {
-            "date": order["date"],
-            "ticker": ticker,
-            "action": "BUY",
-            "shares": shares,
-            "limit_price": intended_limit_price,
-            "status": "FAILED",
-            "reason": f"ORDER TYPE UNKNOWN: {order_type}"
-        })
+        reason = f"ORDER TYPE UNKNOWN"
+        trade_dict = order_to_trade_schema(order, executed_price=None, PnL=None,
+                                               status="FAILED", reason=reason)
 
         return portfolio_df, cash, False

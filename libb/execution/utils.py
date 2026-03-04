@@ -64,8 +64,6 @@ def catch_missing_order_data(order: Order, required_cols: list, trade_log_path: 
     """Log failures for missing or null data required for order.
     Return True if needed data exists; False otherwise.
     """
-    action_map = {"b": "BUY", "s": "SELL", "u": "UPDATE"}
-    action = action_map.get(order["action"], order["action"])
 
     missing_cols = []
     for col in required_cols:
@@ -73,13 +71,10 @@ def catch_missing_order_data(order: Order, required_cols: list, trade_log_path: 
             missing_cols.append(col)
 
     if missing_cols:
-        append_log(trade_log_path, {
-            "date": order["date"],
-            "ticker": order["ticker"],
-            "action": action,
-            "status": "FAILED",
-            "reason": f"MISSING OR NULL ORDER INFO: {missing_cols}"
-        })
+        reason = f"MISSING OR NULL ORDER INFO: {missing_cols}"
+        trade_dict = order_to_trade_schema(order, executed_price=None, 
+                                           PnL=None, status="FAILED", reason=reason)
+        append_log(trade_log_path, trade_dict)
         return False
 
     return True

@@ -3,7 +3,7 @@ from typing import cast
 import pandas as pd
 
 from libb.other.types_file import Order, TradeStatus
-from libb.execution.utils import append_log, is_nyse_open
+from libb.execution.utils import append_log, is_nyse_open, order_to_trade_schema
 from libb.execution.process_order import process_order
 from libb.execution.get_market_data import download_data_on_given_date
 
@@ -47,34 +47,25 @@ class Processing:
             order_date = pd.Timestamp(order["date"]).date()
             # drop orders in the past
             if order_date < self.run_date:
-                append_log(self._trade_log_path, {
-                    "date": order["date"],
-                    "ticker": order["ticker"],
-                    "action": order["action"],
-                    "status": "REJECTED",
-                    "reason": f"ORDER DATE ({order_date}) IS PAST RUN DATE ({self.run_date})"
-                                                    })
+                reason = f"ORDER DATE PAST RUN DATE"
+                trade_dict = order_to_trade_schema(order, executed_price=None, PnL=None,
+                                               status="REJECTED", reason=reason)
+                append_log(self._trade_log_path, trade_dict)
                 self.failed_orders += 1
                 continue
             # drop orders on weekends and holidays
             if not is_nyse_open(order_date):
-                append_log(self._trade_log_path, {
-                    "date": order["date"],
-                    "ticker": order["ticker"],
-                    "action": order["action"],
-                    "status": "REJECTED",
-                    "reason": f"NYSE CLOSED ON ORDER DATE"
-                                                    })
+                reason = f"NYSE NOT OPEN"
+                trade_dict = order_to_trade_schema(order, executed_price=None, PnL=None,
+                                               status="REJECTED", reason=reason)
+                append_log(self._trade_log_path, trade_dict)
                 self.failed_orders += 1
                 continue
             if not isinstance(order["shares"], int) and order["shares"] is not None:
-                append_log(self._trade_log_path, {
-                    "date": order["date"],
-                    "ticker": order["ticker"],
-                    "action": order["action"],
-                    "status": "FAILED",
-                    "reason": f"SHARES NOT INT: ({order['shares']})"
-                                                    })
+                reason = f"SHARES NOT INT"
+                trade_dict = order_to_trade_schema(order, executed_price=None, PnL=None,
+                                               status="FAILED", reason=reason)
+                append_log(self._trade_log_path, trade_dict)
                 self.failed_orders += 1
                 continue
             if order_date == self.run_date:
