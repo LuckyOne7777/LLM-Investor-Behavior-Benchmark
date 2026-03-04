@@ -14,6 +14,8 @@ from libb.user_data.logs import _recent_execution_logs
 from libb.graphs.sentiment import plot_equity_and_sentiment
 from libb.graphs.equity import plot_equity_vs_baseline, plot_equity
 from libb.metrics.performance_metrics import total_performance_calculations
+from libb.metrics.behavior_metrics import total_behavioral_metrics
+
 
 from libb.core.processing import Processing
 from libb.core.writing_disk import DiskWriter
@@ -356,6 +358,7 @@ class LIBBmodel:
         performance_log = total_performance_calculations(self.layout.portfolio_history_path, self.run_date, baseline_ticker)
         self.writer.save_performance(performance_log)
         return performance_log
+ 
     
     def analyze_sentiment(self, text: str, report_type: str="Unknown") -> dict:
         """
@@ -372,8 +375,7 @@ class LIBBmodel:
         Returns:
             dict: Sentiment analysis log for the given text.
         """
-        log = analyze_sentiment(text, self.run_date, report_type=report_type)
-        self.sentiment.append(log)
-        with open(self.layout.sentiment_path, "w") as file:
-            json.dump(self.sentiment, file, indent=2)
-        return log
+        sentiment_log = analyze_sentiment(text, self.run_date, report_type=report_type)
+        self.sentiment.append(sentiment_log)
+        self.writer.save_sentiment(sentiment_log)
+        return sentiment_log
