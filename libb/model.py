@@ -358,7 +358,6 @@ class LIBBmodel:
         performance_log = total_performance_calculations(self.layout.portfolio_history_path, self.run_date, baseline_ticker)
         self.writer.save_performance(performance_log)
         return performance_log
- 
     
     def analyze_sentiment(self, text: str, report_type: str="Unknown") -> dict:
         """
@@ -376,6 +375,5 @@ class LIBBmodel:
             dict: Sentiment analysis log for the given text.
         """
         sentiment_log = analyze_sentiment(text, self.run_date, report_type=report_type)
-        self.sentiment.append(sentiment_log)
         self.writer.save_sentiment(sentiment_log)
         return sentiment_log
