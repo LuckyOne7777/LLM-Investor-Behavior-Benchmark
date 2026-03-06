@@ -55,7 +55,7 @@ class DiskWriter:
         with open(self.layout.performance_path, "w") as f:
             json.dump(performance_dict, f, indent=2)
 
-    def save_behavior(self, behavior_dict: dict) -> None:
+    def save_behavior(self, behavior_dict: list[dict]) -> None:
         with open(self.layout.behavior_path, "w") as f:
             json.dump(behavior_dict, f, indent=2)
 
