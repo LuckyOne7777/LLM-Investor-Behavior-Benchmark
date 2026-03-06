@@ -17,7 +17,9 @@ def load_behavioral_metrics_data(trade_df_path: Path | str, positions_df_path: P
     if empty_dfs:
         raise RuntimeError(f"Cannot generate behavioral metrics: {", ".join(empty_dfs)}")
     
-    assert "date" in trade_df.columns and positions_df.columns and equity_df.columns
+    assert "date" in trade_df.columns
+    assert "date" in positions_df.columns 
+    assert "date" in equity_df.columns
 
     return trade_df, positions_df, equity_df
 
@@ -45,22 +47,28 @@ def loss_aversion(trades_log: pd.DataFrame) -> None | float:
 
 
 def concentration_ratio(df_positions: pd.DataFrame, df_equity: pd.DataFrame) -> float:
-    """
-    Computes average portfolio concentration based on Herfindahl-Hirschman Index (HHI).
-    Input:
-        df_positions: daily position values
-        df_equity: total equity
-    Output:
-        float (0 to 1)
-    """
+    wide_positions = df_positions.pivot_table(
+        index="date", 
+        columns="ticker", 
+        values="market_value", 
+        aggfunc="sum",
+        fill_value=0
+    )
+    
+    equity_series = df_equity.set_index("date")["equity"]
+    equity_series = equity_series.reindex(wide_positions.index)
 
-    weights = df_positions.div(df_equity, axis=0)
+    positions_total = wide_positions.sum(axis=1)
+    wide_positions["__cash__"] = equity_series - positions_total
+    
+    weights = wide_positions.div(equity_series, axis=0)
     daily_hhi = (weights**2).sum(axis=1)
+
     return float(daily_hhi.mean())
 
 def turnover_ratio(df_trades: pd.DataFrame, df_equity: pd.DataFrame) -> float:
     filled_trades = df_trades[df_trades["status"] == "FILLED"]
-    total_trade_value = (filled_trades["price"] * filled_trades["shares"]).sum()
+    total_trade_value = (filled_trades["executed_price"] * filled_trades["shares"]).sum()
     avg_equity = df_equity["equity"].mean()
     return total_trade_value / avg_equity
 
@@ -77,7 +85,7 @@ def total_behavioral_metrics(trade_df_path: Path | str, positions_df_path: Path 
 
     average_positions = len(positions_df) / positions_df["date"].nunique()
     median_positions = round((positions_df.groupby("date").size().median()), 2)
-    max_positions = positions_df.groupby("date").size().max()
+    max_positions = int(positions_df.groupby("date").size().max())
 
     metrics_log = {
             "loss_aversion_score": loss_aversion_score,
@@ -92,7 +100,7 @@ def total_behavioral_metrics(trade_df_path: Path | str, positions_df_path: Path 
             "max_positions_in_a_day": max_positions,
 
             "total_buy_count": int(len(trade_df[trade_df["action"] == "BUY"])),
-            "total_sell_count": int(len(trade_df[trade_df["action"] == "SELL"])),
+            "total_sell_count": int(len(trade_df[trade_df["action"] == "SELL" ])),
 
             "start_date": str(equity_df["date"].iloc[0]),
             "end_date": str(equity_df["date"].iloc[-1]),
