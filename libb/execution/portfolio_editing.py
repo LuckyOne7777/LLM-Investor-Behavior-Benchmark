@@ -1,4 +1,6 @@
 import pandas as pd
+import math
+
 from typing import cast
 from .utils import catch_missing_order_data
 from pathlib import Path
@@ -33,7 +35,7 @@ def add_or_update_position(df: pd.DataFrame, ticker: str, shares: int, price: fl
             "stop_loss": stop_loss,
             "market_price": price,
             "market_value": round(price * shares, 2),
-            "unrealized_pnl": None
+            "unrealized_pnl": math.nan,
         }
         if not df.empty:
             df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
