@@ -176,13 +176,15 @@ class Processing:
         return
     
     def _check_stoplosses(self):
+        if self.portfolio.empty:
+            return
         for i, row in self.portfolio.iterrows():
             ticker = row["ticker"]
             shares = row["shares"]
             ticker_data = download_data_on_given_date(row["ticker"], self.run_date)
             open_price = ticker_data["Open"]
             low = ticker_data["Low"]
-            stoploss = row["stoploss"]
+            stoploss = row["stop_loss"]
 
             if low <= stoploss:
             
