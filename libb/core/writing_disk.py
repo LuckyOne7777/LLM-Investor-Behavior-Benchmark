@@ -51,7 +51,7 @@ class DiskWriter:
     # Metrics
     # ----------------------------
 
-    def save_performance(self, performance_dict: dict) -> None:
+    def save_performance(self, performance_dict: list[dict]) -> None:
         with open(self.layout.performance_path, "w") as f:
             json.dump(performance_dict, f, indent=2)
 

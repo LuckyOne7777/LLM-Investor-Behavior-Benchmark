@@ -356,7 +356,8 @@ class LIBBmodel:
 
     def generate_performance_metrics(self, baseline_ticker = "^SPX") -> dict:
         performance_log = total_performance_calculations(self.layout.portfolio_history_path, self.run_date, baseline_ticker)
-        self.writer.save_performance(performance_log)
+        self.performance.append(performance_log)
+        self.writer.save_performance(self.performance)
         return performance_log
     
     def analyze_sentiment(self, text: str, report_type: str="Unknown") -> dict:
