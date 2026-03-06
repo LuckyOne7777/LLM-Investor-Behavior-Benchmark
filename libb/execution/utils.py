@@ -35,9 +35,12 @@ def order_to_trade_schema(order: Order,  *, executed_price: float | None, PnL: f
         order_action = order.get("action").lower()
         validated_order_action = valid_order_actions_map.get(order_action, "MISSING")
         if executed_price is not None:
-            cost_basis = executed_price * order.get("shares", math.nan)
+            cost_basis = round(executed_price * order.get("shares", math.nan), 2)
         else:
             cost_basis = math.nan
+        
+        if PnL is not None:
+            PnL = round(PnL, 2)
 
         order_dict = {
             "date": order.get("date", "MISSING"),
