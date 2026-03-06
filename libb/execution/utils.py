@@ -38,7 +38,7 @@ def order_to_trade_schema(order: Order,  *, executed_price: float | None, PnL: f
             cost_basis = round(executed_price * order.get("shares", math.nan), 2)
         else:
             cost_basis = math.nan
-        
+
         if PnL is not None:
             PnL = round(PnL, 2)
 
