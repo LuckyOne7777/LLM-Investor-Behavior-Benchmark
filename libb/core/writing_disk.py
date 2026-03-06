@@ -60,7 +60,7 @@ class DiskWriter:
             json.dump(behavior_dict, f, indent=2)
 
 
-    def save_sentiment(self, sentiment_dict: dict) -> None:
+    def save_sentiment(self, sentiment_dict: list[dict]) -> None:
         with open(self.layout.sentiment_path, "w") as f:
             json.dump(sentiment_dict, f, indent=2)            
 

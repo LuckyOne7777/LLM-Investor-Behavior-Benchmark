@@ -375,5 +375,6 @@ class LIBBmodel:
             dict: Sentiment analysis log for the given text.
         """
         sentiment_log = analyze_sentiment(text, self.run_date, report_type=report_type)
-        self.writer.save_sentiment(sentiment_log)
+        self.sentiment.append(sentiment_log)
+        self.writer.save_sentiment(self.sentiment)
         return sentiment_log
