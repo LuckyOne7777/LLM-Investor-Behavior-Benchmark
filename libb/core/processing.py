@@ -175,7 +175,7 @@ class Processing:
 
         return
     
-    def check_stoplosses(self):
+    def _check_stoplosses(self):
         for i, row in self.portfolio.iterrows():
             ticker = row["ticker"]
             shares = row["shares"]
@@ -211,6 +211,7 @@ class Processing:
 
     def processing(self, pending_trades: dict[str, list[dict]]) -> dict[str, list[dict]]:
         unexecuted_trades = self._process_orders(pending_trades)
+        self._check_stoplosses()
         self._update_portfolio_market_data()
         self._append_portfolio_history()
         self._append_position_history()
