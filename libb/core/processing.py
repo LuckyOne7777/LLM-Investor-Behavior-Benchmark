@@ -1,11 +1,13 @@
 from typing import cast
 
 import pandas as pd
+import math
 
 from libb.other.types_file import Order, TradeStatus
 from libb.execution.utils import append_log, is_nyse_open, order_to_trade_schema
 from libb.execution.process_order import process_order
 from libb.execution.get_market_data import download_data_on_given_date
+from libb.execution.portfolio_editing import reduce_position
 
 from typing import Tuple
 from datetime import date
@@ -171,6 +173,40 @@ class Processing:
         "Null values found in required portfolio columns:\n"
         f"{self.portfolio[required_cols]}")
 
+        return
+    
+    def check_stoplosses(self):
+        for i, row in self.portfolio.iterrows():
+            ticker = row["ticker"]
+            shares = row["shares"]
+            ticker_data = download_data_on_given_date(row["ticker"], self.run_date)
+            open_price = ticker_data["Open"]
+            low = ticker_data["Low"]
+            stoploss = row["stoploss"]
+
+            if low <= stoploss:
+            
+                fill_price = open_price if open_price <= stoploss else stoploss
+                proceeds = shares * fill_price
+                self.portfolio, buy_price = reduce_position(self.portfolio, ticker, shares)
+                self.cash += proceeds
+                pnl = proceeds - (buy_price * shares)
+
+                order: Order = {"action": "s",
+                                "ticker": ticker,
+                                "shares": shares,
+                                "order_type": "STOPLOSS_MET",
+                                "limit_price": math.nan,
+                                "time_in_force": "",
+                                "date": str(self.run_date),
+                                "stop_loss": stoploss,
+                                "rationale": "",
+                                "confidence": math.nan,
+                                }
+                
+                trade_dict = order_to_trade_schema(order, executed_price=fill_price, PnL=pnl,
+                                           status="FILLED", reason="")
+                append_log(self._trade_log_path, trade_dict)
         return
 
     def processing(self, pending_trades: dict[str, list[dict]]) -> dict[str, list[dict]]:
