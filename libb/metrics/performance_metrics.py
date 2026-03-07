@@ -135,6 +135,52 @@ def total_performance_calculations(
     date: str | date,
     baseline_ticker,
 ) -> dict:
+    """
+    Compute all performance metrics from portfolio equity history.
+
+    Loads portfolio equity history from disk, downloads benchmark data,
+    and computes a fixed set of risk, return, drawdown, and CAPM metrics
+    over the full active observation period.
+
+    The observation period begins at the first date where portfolio equity
+    changed from its initial value, excluding the flat pre-trade period.
+
+    Args:
+        portfolio_history_path (str or Path): Path to portfolio_history.csv.
+            Required columns: date, equity
+        date (str or date): The run date, recorded as metadata in the output.
+        baseline_ticker (str): Market benchmark ticker used for CAPM
+            calculations. Must be accessible via yfinance (e.g. "^SPX").
+
+    Returns:
+        dict: A flat dictionary of performance metrics containing:
+            - volatility_daily (float): Standard deviation of daily returns.
+            - sharpe_ratio_daily (float): Daily Sharpe ratio, risk-free
+              adjusted at 4.5% annualized.
+            - sharpe_ratio_annualized (float): Annualized Sharpe ratio
+              scaled by sqrt(252).
+            - sortino_ratio_daily (float): Daily Sortino ratio using
+              downside deviation only.
+            - sortino_ratio_annualized (float): Annualized Sortino ratio
+              scaled by sqrt(252).
+            - max_drawdown_pct (float): Maximum observed peak-to-trough
+              equity decline as a negative percentage.
+            - max_drawdown_date (str): Date of maximum drawdown.
+            - capm_beta (float): Sensitivity of portfolio returns to
+              benchmark returns.
+            - capm_alpha_annualized (float): Annualized excess return
+              beyond CAPM expectation.
+            - capm_r_squared (float): Goodness of fit to the market factor.
+            - start_date (str): First active equity date.
+            - end_date (str): Last portfolio history date.
+            - observation_count (int): Number of daily return observations.
+            - generated_at (str): Run date at time of generation.
+
+    Raises:
+        RuntimeError: If portfolio_history.csv is empty, if equity never
+            changed from its initial value, or if benchmark data cannot
+            be downloaded.
+    """
     equity_series, returns, market_returns = load_performance_data(portfolio_history_path, baseline_ticker)
     
     # ----- Risk & Return -----
