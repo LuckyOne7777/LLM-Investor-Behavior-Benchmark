@@ -360,6 +360,43 @@ class LIBBmodel:
         self.writer.save_performance(self.performance)
         return performance_log
     
+    def generate_behavior_metrics(self) -> dict:
+        """
+        Compute behavioral metrics for the current run and persist the result.
+
+        Analyzes trade execution logs, position history, and portfolio equity
+        history to produce a snapshot of LLM decision-making behavior up to
+        the current run date.
+
+        The behavior log is appended to the in-memory behavior list and
+        written to disk as JSON.
+
+        Returns:
+            dict: Behavioral metrics log for the current run. See
+                `libb.metrics.behavior_metrics.total_behavioral_metrics`
+                for full metric definitions.
+
+        Requirements:
+            - `process_portfolio()` must have been called at least once
+            - trade_log.csv, position_history.csv, and portfolio_history.csv
+            must not be empty
+
+        State Interaction:
+            Reads:
+                - self.layout.trade_log_path
+                - self.layout.position_history_path
+                - self.layout.portfolio_history_path
+                - self.run_date
+
+            Writes:
+                - self.behavior
+                - self.layout.behavior_path
+        """
+        behavior_log = total_behavioral_metrics(self.layout.trade_log_path, self.layout.position_history_path, self.layout.portfolio_history_path, self.run_date)
+        self.behavior.append(behavior_log)
+        self.writer.save_behavior(self.behavior)
+        return behavior_log
+    
     def analyze_sentiment(self, text: str, report_type: str="Unknown") -> dict:
         """
         Analyze sentiment for the given text and persist the result.
