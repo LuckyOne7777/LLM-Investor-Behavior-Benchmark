@@ -34,6 +34,32 @@ def evaluate_sentiment(score: dict, tokens: list, date: date, report_type: str="
     return log
 
 def analyze_sentiment(text: str, date: date, report_type: str="Unknown") -> dict:
+    """
+    Analyze sentiment for the given text using the Loughran-McDonald
+    financial sentiment lexicon.
+
+    Args:
+        text (str): Text to analyze. Typically raw model output from
+            a daily or weekly research report.
+        date (date): The run date, recorded as metadata in the output.
+        report_type (str): Identifier describing the source or type of
+            the report. Defaults to "Unknown".
+
+    Returns:
+        dict: Sentiment log containing:
+            - subjectivity (float): Ratio of opinion-bearing tokens to
+              total tokens. Range 0.0 to 1.0.
+            - polarity (float): Net sentiment score, positive minus
+              negative normalized by total tokens. Range -1.0 to 1.0.
+            - positive_count (int): Number of positive tokens identified
+              by the Loughran-McDonald lexicon.
+            - negative_count (int): Number of negative tokens identified
+              by the Loughran-McDonald lexicon.
+            - token_count (int): Total number of tokens in the text.
+            - report_type (str): Source or type of the report as provided.
+            - date (str): Run date at time of analysis.
+    """
+
     score, tokens = get_score(text)
     return evaluate_sentiment(score, tokens, date, report_type=report_type)
 
