@@ -36,7 +36,13 @@ class Processing:
 
         self.filled_orders = 0;
         self.skipped_orders = 0;
-        self.failed_orders = 0;        
+        self.failed_orders = 0;
+
+
+# ----------------------------------
+# Step 1: Process Orders
+# ----------------------------------
+        
         
     def _process_orders(self, pending_trades: dict[str, list[dict]]) -> dict[str, list[dict]]:
         """Process all pending orders for the current date.
@@ -91,6 +97,95 @@ class Processing:
             pending_trades = unexecuted_trades
         return pending_trades
     
+
+# ----------------------------------
+# Step 2: Check Stoplosses
+# ----------------------------------    
+    
+    def _check_stoplosses(self):
+        if self.portfolio.empty:
+            return
+        for i, row in self.portfolio.iterrows():
+            ticker = row["ticker"]
+            shares = row["shares"]
+            ticker_data = download_data_on_given_date(row["ticker"], self.run_date)
+            open_price = ticker_data["Open"]
+            low = ticker_data["Low"]
+            stoploss = row["stop_loss"]
+
+            if low <= stoploss:
+            
+                fill_price = open_price if open_price <= stoploss else stoploss
+                proceeds = shares * fill_price
+                self.portfolio, buy_price = reduce_position(self.portfolio, ticker, shares)
+                self.cash += proceeds
+                pnl = proceeds - (buy_price * shares)
+
+                order: Order = {"action": "s",
+                                "ticker": ticker,
+                                "shares": shares,
+                                "order_type": "STOPLOSS_MET",
+                                "limit_price": math.nan,
+                                "time_in_force": "",
+                                "date": str(self.run_date),
+                                "stop_loss": stoploss,
+                                "rationale": "",
+                                "confidence": math.nan,
+                                }
+                
+                trade_dict = order_to_trade_schema(order, executed_price=fill_price, PnL=pnl,
+                                           status="FILLED", reason="")
+                append_log(self._trade_log_path, trade_dict)
+        return
+
+# ----------------------------------
+# Step 3: Update Portfolio Data 
+# ----------------------------------
+
+    def _update_portfolio_market_data(self) -> None:
+        """Update market portfolio value and cash. Save new values to disk."""
+        self.update_market_value_columns()
+
+        self.portfolio.to_csv(self._portfolio_path, index=False)
+        
+        required_cols = [
+            "ticker",
+            "shares",
+            "cost_basis",
+            "market_price",
+            "market_value",
+            "unrealized_pnl",
+            ]
+
+        assert self.portfolio[required_cols].notnull().all().all(), (
+        "Null values found in required portfolio columns:\n"
+        f"{self.portfolio[required_cols]}")
+
+        return
+    
+    def update_market_value_columns(self):
+
+        for i, row in self.portfolio.iterrows():
+            ticker = row["ticker"]
+            shares = row["shares"]
+            cost_basis = self.portfolio.at[i, "cost_basis"]
+            
+            value = self.portfolio.at[i, "market_value"]
+
+            value = cast(float, value)
+            cost = cast(float, cost_basis)
+
+            ticker_data = download_data_on_given_date(ticker, self.run_date)
+            close_price = ticker_data["Close"]
+
+            self.portfolio.at[i, "market_price"] = close_price
+            self.portfolio.at[i, "market_value"] = round(close_price * shares, 2)
+            self.portfolio.at[i, "unrealized_pnl"] = round(value - cost, 2)
+    
+# ----------------------------------
+# Step 4: Append Disk History
+# ----------------------------------
+    
     def _append_position_history(self) -> None:
         "Append position history CSV based on portfolio data."
         portfolio_copy = self.portfolio.copy()
@@ -135,81 +230,9 @@ class Processing:
                               You may have called 'reset_run()` without calling `ensure_file_system()` immediately after.""") from e
         return
     
-    def update_market_value_columns(self):
-
-        for i, row in self.portfolio.iterrows():
-            ticker = row["ticker"]
-            shares = row["shares"]
-            cost_basis = self.portfolio.at[i, "cost_basis"]
-            
-            value = self.portfolio.at[i, "market_value"]
-
-            value = cast(float, value)
-            cost = cast(float, cost_basis)
-
-            ticker_data = download_data_on_given_date(ticker, self.run_date)
-            close_price = ticker_data["Close"]
-
-            self.portfolio.at[i, "market_price"] = close_price
-            self.portfolio.at[i, "market_value"] = round(close_price * shares, 2)
-            self.portfolio.at[i, "unrealized_pnl"] = round(value - cost, 2)
-
-    def _update_portfolio_market_data(self) -> None:
-        """Update market portfolio value and cash. Save new values to disk."""
-        self.update_market_value_columns()
-
-        self.portfolio.to_csv(self._portfolio_path, index=False)
-        
-        required_cols = [
-            "ticker",
-            "shares",
-            "cost_basis",
-            "market_price",
-            "market_value",
-            "unrealized_pnl",
-            ]
-
-        assert self.portfolio[required_cols].notnull().all().all(), (
-        "Null values found in required portfolio columns:\n"
-        f"{self.portfolio[required_cols]}")
-
-        return
-    
-    def _check_stoplosses(self):
-        if self.portfolio.empty:
-            return
-        for i, row in self.portfolio.iterrows():
-            ticker = row["ticker"]
-            shares = row["shares"]
-            ticker_data = download_data_on_given_date(row["ticker"], self.run_date)
-            open_price = ticker_data["Open"]
-            low = ticker_data["Low"]
-            stoploss = row["stop_loss"]
-
-            if low <= stoploss:
-            
-                fill_price = open_price if open_price <= stoploss else stoploss
-                proceeds = shares * fill_price
-                self.portfolio, buy_price = reduce_position(self.portfolio, ticker, shares)
-                self.cash += proceeds
-                pnl = proceeds - (buy_price * shares)
-
-                order: Order = {"action": "s",
-                                "ticker": ticker,
-                                "shares": shares,
-                                "order_type": "STOPLOSS_MET",
-                                "limit_price": math.nan,
-                                "time_in_force": "",
-                                "date": str(self.run_date),
-                                "stop_loss": stoploss,
-                                "rationale": "",
-                                "confidence": math.nan,
-                                }
-                
-                trade_dict = order_to_trade_schema(order, executed_price=fill_price, PnL=pnl,
-                                           status="FILLED", reason="")
-                append_log(self._trade_log_path, trade_dict)
-        return
+# ----------------------------------
+# Wrapper
+# ----------------------------------
 
     def processing(self, pending_trades: dict[str, list[dict]]) -> dict[str, list[dict]]:
         unexecuted_trades = self._process_orders(pending_trades)
@@ -219,6 +242,10 @@ class Processing:
         self._append_position_history()
 
         return unexecuted_trades
+    
+# ----------------------------------
+# Class Variable Access
+# ----------------------------------
     
     def get_order_status_count(self) -> Tuple[int, int, int]:
         return self.filled_orders, self.failed_orders, self.skipped_orders
