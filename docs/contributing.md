@@ -9,6 +9,20 @@ by the principles outlined below.
 
 ---
 
+## Before Contributing
+
+Please read the following documents before submitting any contribution:
+
+- [docs/README.md](README.md) — recommended reading order for the full docs
+- [README.md](../README.md) — main project overview
+- [design-principles.md](design-principles.md) — core philosophy and tradeoffs
+- [important-constraints.md](important-constraints.md) — current design boundaries
+- [short-term-roadmap.md](short-term-roadmap.md) — what is and isn't planned
+
+Contributions are reviewed with these documents in mind.
+
+---
+
 ## Scope of Contributions
 
 - **Bug fixes**, documentation improvements, and fixes for existing
@@ -35,17 +49,9 @@ New features are considered selectively.
 
 ## Design Alignment
 
-Before contributing, please review:
+Contributions are reviewed with the design principles in mind.
 
-- The main README
-- The Design Principles documentation
-- Important Notes
-- Roadmap
-
-Contributions are 
-reviewed with these documents in mind.
-
-If you’re unsure whether a feature fits the project’s scope, please ask before implementing it.
+If you're unsure whether a feature fits the project's scope, please ask before implementing it.
 
 ---
 
@@ -107,8 +113,7 @@ shape project direction, and uphold core design principles.
 
 ## Final Note
 
-Not all contributions will be
-merged, and the decision to decline a proposal does not reflect on the
-quality of the idea or the effort involved.
+Not all contributions will be merged, and the decision to decline a
+proposal does not reflect on the quality of the idea or the effort involved.
 
 Thoughtful discussion and collaboration is always welcome!
