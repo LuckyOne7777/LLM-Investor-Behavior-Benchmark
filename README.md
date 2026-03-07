@@ -9,26 +9,31 @@ while still giving users flexibility over the system.
 
 This project originally began as a generic benchmark for LLM-based trading in U.S. equities. While surveying existing LLM trading projects (including my own), I noticed a consistent lack of rigorous sentiment, behavioral, and performance metrics; most projects reported little more than an equity curve.
 
-This raised a fundamental question: ***“Why isn’t LLM trading held to the same analytical standards as the rest of finance?”***
+This raised a fundamental question: ***"Why isn't LLM trading held to the same analytical standards as the rest of finance?"***
 
 So I developed a library designed to support rigorous evaluation of LLM-driven trading systems. The long-term goal is to provide a shared foundation for this work and, ultimately, to establish a community standard for this type of research.
 
 ## Features
 
-- **Persistent Portfolio State**  
+- **Persistent Portfolio State**
   All portfolio data is explicitly stored on disk, enabling inspection,
   reproducibility, and post-hoc analysis across runs.
 
-- **Built-In Performance & Sentiment Analysis**  
+- **Built-In Performance & Sentiment Analysis**
   Calculation of key performance evaluation metrics (Sharpe, Sortino, Drawdown, R², etc.)
   and sentiment analysis with results persisted as
-  first-class research artifacts. Behavioral analytics is still being developed.
+  first-class research artifacts.
 
-- **Reproducible Run Structure**  
+- **Behavioral Metrics**
+  Quantitative characterization of LLM decision-making patterns including
+  concentration (HHI), loss aversion, turnover, cash allocation, position
+  breadth, and order quality. Additional behavioral metrics are under development.
+
+- **Reproducible Run Structure**
   Each model run follows a consistent on-disk directory layout, making
   experiments easy to reproduce, compare, and archive.
 
-- **Flexible Execution Workflows**  
+- **Flexible Execution Workflows**
   Execution logic remains fully user-controlled, allowing researchers
   to integrate custom strategies, models, or data sources.
 
@@ -40,9 +45,9 @@ analytics, and research artifacts are explicitly persisted to disk.
 For each run, the engine:
 
 1. Loads and processes existing portfolio state
-2. Recieves inputs (e.g., via an LLM)
+2. Receives inputs (e.g., via an LLM)
 3. Computes and stores analytical signals (such as sentiment) via explicit user calls
-4. saves execution instructions (orders) by passing JSON block
+4. Saves execution instructions (orders) by passing a JSON block
 5. Persists all outputs for inspection and reuse
 
 Execution scheduling (e.g., daily vs. weekly runs) and model orchestration
@@ -51,7 +56,7 @@ maintaining a consistent on-disk state.
 
 ## Documentation
 
-New to LIBB?  
+New to LIBB?
 Start here → **[Documentation Guide](docs/README.md)**
 
 This guide explains the system philosophy, execution workflow,
@@ -62,7 +67,6 @@ and how to read the codebase effectively.
 ## Example Workflow
 
 ```python
-
 from libb import LIBBmodel
 from .prompt_orchestration.prompt_models import prompt_daily_report
 from libb.other.parse import parse_json
@@ -138,6 +142,9 @@ This guide shows two supported setup paths:
 
 Choose the option that best fits your workflow.
 
+> **Note:** Installation requires internet access. Dependencies including
+> `yfinance` and `pysentiment2` download data and lexicon files on first use.
+
 ---
 
 ## Option A: Virtual Environment (Recommended)
@@ -170,9 +177,7 @@ python -m venv .venv
 macOS / Linux:
 
 ```bash
-
 python3 -m venv .venv
-
 ```
 
 ### 3. Activate the Virtual Environment
@@ -252,8 +257,6 @@ python -m user_side.workflow
 
 ### 8. Exit the Virtual Environment
 
-Deactivate:
-
 To remove the virtual environment entirely:
 
 Linux / macOS:
@@ -304,7 +307,6 @@ pip install -e .
 Verify installation:
 
 ```bash
-
 python -c "import libb; print(libb.__file__)"
 ```
 
@@ -345,10 +347,12 @@ by ongoing areas of improvement rather than a fixed roadmap.
 
 Areas of current interest include:
 
+- Completion of remaining behavioral metric stubs (momentum factor,
+  volatility tolerance, risk aversion)
 - Deeper integration of performance analytics into the core workflow
-- Behavioral analysis derived from trading decisions and execution patterns
 - Expansion of sentiment analytics across multiple data sources
 - Improved tooling for comparing runs and strategies over time
+- Config system for centralizing experiment parameters and data source preferences
 - General design improvements for efficiency and code quality
 
 To see the current roadmap for major features, check out: [roadmap.md](docs/short-term-roadmap.md)
