@@ -355,6 +355,41 @@ class LIBBmodel:
 # ----------------------------------
 
     def generate_performance_metrics(self, baseline_ticker = "^SPX") -> dict:
+        """
+    Compute performance metrics for the current run and persist the result.
+
+    Downloads benchmark data and evaluates portfolio risk, return,
+    drawdown, and CAPM metrics against the specified baseline.
+
+    The performance log is appended to the in-memory performance list
+    and written to disk as JSON.
+
+    Args:
+        baseline_ticker (str): Market benchmark ticker for CAPM and
+            relative performance calculations. Defaults to "^SPX".
+            Must be accessible via yfinance.
+
+    Returns:
+        dict: Performance metrics log containing volatility, Sharpe,
+            Sortino, max drawdown, and CAPM metrics against the baseline.
+            See `libb.metrics.performance_metrics.total_performance_calculations`
+            for full metric definitions.
+
+    Requirements:
+        - `process_portfolio()` must have been called at least once
+        - portfolio_history.csv must not be empty
+        - Portfolio equity must have changed from its initial value
+        - Internet access required for benchmark download
+
+    State Interaction:
+        Reads:
+            - self.layout.portfolio_history_path
+            - self.run_date
+
+        Writes:
+            - self.performance
+            - self.layout.performance_path
+        """
         performance_log = total_performance_calculations(self.layout.portfolio_history_path, self.run_date, baseline_ticker)
         self.performance.append(performance_log)
         self.writer.save_performance(self.performance)
