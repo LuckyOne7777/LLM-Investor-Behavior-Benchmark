@@ -434,18 +434,32 @@ class LIBBmodel:
     
     def analyze_sentiment(self, text: str, report_type: str="Unknown") -> dict:
         """
-        Analyze sentiment for the given text and persist the result.
+    Analyze sentiment for the given text and persist the result.
 
-        The sentiment log is appended to the in-memory sentiment list
-        and written to disk as JSON.
+    Applies the Loughran-McDonald financial sentiment lexicon to the
+    provided text and appends the result to the in-memory sentiment
+    list and disk.
 
-        Args:
-            text (`str`, required): Text to analyze.
-            report_type (`str`, optional): Type or source of the report.
-                Defaults to "Unknown".
+    Args:
+        text (str): Text to analyze. Typically raw model output from
+            a daily or weekly research report.
+        report_type (str): Identifier describing the source or type of
+            the report. Defaults to "Unknown".
 
-        Returns:
-            dict: Sentiment analysis log for the given text.
+    Returns:
+        dict: Sentiment log containing subjectivity, polarity, positive
+            and negative token counts, total token count, report type,
+            and run date. See
+            `libb.metrics.sentiment_metrics.analyze_sentiment`
+            for full field definitions.
+
+    State Interaction:
+        Reads:
+            - self.run_date
+
+        Writes:
+            - self.sentiment
+            - self.layout.sentiment_path
         """
         sentiment_log = analyze_sentiment(text, self.run_date, report_type=report_type)
         self.sentiment.append(sentiment_log)
