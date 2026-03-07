@@ -100,7 +100,13 @@ def total_behavioral_metrics(trade_df_path: Path | str, positions_df_path: Path 
             "max_positions_in_a_day": max_positions,
 
             "total_buy_count": int(len(trade_df[trade_df["action"] == "BUY"])),
-            "total_sell_count": int(len(trade_df[trade_df["action"] == "SELL" ])),
+            "total_sell_count": int(len(trade_df[trade_df["action"] == "SELL"])),
+
+            "total_failed_buys": int(len(trade_df[(trade_df["action"] == "BUY") & (trade_df["status"] == "FAILED")])),
+            "total_failed_sells": int(len(trade_df[(trade_df["action"] == "SELL") & (trade_df["status"] == "FAILED")])),
+            
+            "total_rejected_buys": int(len(trade_df[(trade_df["action"] == "BUY") & (trade_df["status"] == "REJECTED")])),
+            "total_rejected_sells": int(len(trade_df[(trade_df["action"] == "SELL") & (trade_df["status"] == "REJECTED")])),
 
             "start_date": str(equity_df["date"].iloc[0]),
             "end_date": str(equity_df["date"].iloc[-1]),
