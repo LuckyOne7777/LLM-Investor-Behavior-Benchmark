@@ -1,6 +1,6 @@
 # File Interaction
 
-LIBB manages a structured on-disk file system for each run.  
+LIBB manages a structured on-disk file system for each run.
 This includes portfolio state, metrics, research outputs, logs, and cash state.
 
 File interaction is explicit, destructive when misused, and intentionally low-level. Users are expected to understand the consequences of invoking these methods.
@@ -15,7 +15,7 @@ libb.ensure_file_system() -> None
 
 Ensure all required directories and files exist for a run.
 
-Missing directories and files are created with default contents.  
+Missing directories and files are created with default contents.
 Existing files are never overwritten.
 
 This method is **automatically called during construction** of the `LIBBmodel` object and should not normally be invoked manually.
@@ -26,45 +26,45 @@ This method is **automatically called during construction** of the `LIBBmodel` o
 
 The following directories are created if missing:
 
-- Root run directory  
-- Portfolio directory  
-- Metrics directory  
-- Research directory  
-- Daily report directory  
-- Deep research directory  
-- Logging directory  
+- Root run directory
+- Portfolio directory
+- Metrics directory
+- Research directory
+- Daily report directory
+- Deep research directory
+- Logging directory
 
 The following files are created if missing:
 
 #### Portfolio Files
 
-- Portfolio history (CSV)  
+- Portfolio history (CSV)
   ```
   date,equity,cash,positions_value,daily_return_pct,overall_return_pct
   ```
 
-- Pending trades (JSON)  
+- Pending trades (JSON)
   ```json
   {"orders": []}
   ```
 
-- Cash state (JSON)  
+- Cash state (JSON)
   Initialized as:
   ```json
   {"cash": STARTING_CASH}
   ```
 
-- Current portfolio (CSV)  
+- Current portfolio (CSV)
   ```
   ticker,shares,buy_price,cost_basis,stop_loss,market_price,market_value,unrealized_pnl
   ```
 
-- Trade log (CSV)  
+- Trade log (CSV)
   ```
-  date,ticker,action,shares,price,cost_basis,PnL,rationale,confidence,status,reason
+  date,ticker,action,order_type,shares,limit_price,executed_price,stop_loss,cost_basis,PnL,rationale,confidence,status,reason
   ```
 
-- Position history (CSV)  
+- Position history (CSV)
   ```
   date,ticker,shares,avg_cost,stop_loss,market_price,market_value,unrealized_pnl
   ```
@@ -107,18 +107,18 @@ Delete **all files and folders inside the run root directory**.
 
 This method is destructive and irreversible.
 
-By default, it only deletes on-disk artifacts.  
+By default, it only deletes on-disk artifacts.
 The current `LIBBmodel` instance remains alive, but its runtime state is marked invalid until reinitialized.
 
 ---
 
 ### Parameters
 
-- `cli_check` (`bool`, optional)  
-  Require interactive confirmation before deleting files.  
+- `cli_check` (`bool`, optional)
+  Require interactive confirmation before deleting files.
   Defaults to `True`.
 
-- `auto_ensure` (`bool`, optional)  
+- `auto_ensure` (`bool`, optional)
   If `True`, performs a full logical reset after deletion:
   - Recreates required filesystem structure
   - Rehydrates disk-backed state into memory
