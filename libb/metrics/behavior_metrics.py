@@ -73,6 +73,50 @@ def turnover_ratio(df_trades: pd.DataFrame, df_equity: pd.DataFrame) -> float:
     return total_trade_value / avg_equity
 
 def total_behavioral_metrics(trade_df_path: Path | str, positions_df_path: Path | str, portfolio_history_df_path: Path | str, date: str | date):
+    """
+    Compute all behavioral metrics from raw portfolio artifacts.
+
+    Loads trade execution logs, position history, and portfolio equity
+    history from disk and computes a fixed set of behavioral statistics
+    describing LLM decision-making patterns over the full observation
+    period.
+
+    Args:
+        trade_df_path (Path or str): Path to trade_log.csv.
+            Required columns: date, action, status, PnL, executed_price, shares
+        positions_df_path (Path or str): Path to position_history.csv.
+            Required columns: date, ticker, market_value
+        portfolio_history_df_path (Path or str): Path to portfolio_history.csv.
+            Required columns: date, equity, cash
+        date (str or date): The run date, recorded as metadata in the output.
+
+    Returns:
+        dict: A flat dictionary of behavioral metrics containing:
+            - loss_aversion_score (float or None): Ratio of average loss
+              magnitude to average gain magnitude across filled sells.
+            - hhi_index (float): Average daily HHI across all observation
+              days. Cash treated as explicit position. Range 0.0 to 1.0.
+            - turnover_ratio (float): Total filled trade value divided by
+              average portfolio equity.
+            - avg_cash_pct (float): Mean daily cash as % of total equity.
+            - med_cash_pct (float): Median daily cash as % of total equity.
+            - avg_positions_per_day (float): Mean tickers held per day.
+            - median_positions_per_day (float): Median tickers held per day.
+            - max_positions_in_a_day (int): Peak concurrent positions.
+            - total_buy_count (int): Buy orders across all statuses.
+            - total_sell_count (int): Sell orders across all statuses.
+            - total_failed_buys (int): Buy orders with status FAILED.
+            - total_failed_sells (int): Sell orders with status FAILED.
+            - total_rejected_buys (int): Buy orders with status REJECTED.
+            - total_rejected_sells (int): Sell orders with status REJECTED.
+            - start_date (str): First date in portfolio history.
+            - end_date (str): Last date in portfolio history.
+            - observation_count (int): Total trading days observed.
+            - generated_at (str): Run date at time of generation.
+
+    Raises:
+        RuntimeError: If any of the three input DataFrames are empty.
+    """
 
     trade_df, positions_df, equity_df = load_behavioral_metrics_data(trade_df_path, positions_df_path, portfolio_history_df_path)
 
