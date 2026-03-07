@@ -12,24 +12,39 @@ This document is intentionally limited in scope and subject to change.
 
 ### 1. Behavioral Metrics
 
-Complete the behavioral metrics framework to quantify patterns in model
-decision-making.
+The core behavioral metrics framework is implemented and available via
+`libb.generate_behavior_metrics()`. The following metrics are complete:
 
-Planned focus areas:
+- HHI-based concentration (with cash as explicit position)
+- Loss aversion ratio
+- Turnover ratio
+- Cash allocation (average and median)
+- Position counts (average, median, max per day)
+- Order quality counts (filled, failed, rejected by side)
 
-- bias-related signals
-- consistency and repetition analysis
-- response patterns across similar conditions
-- add wrapper in main class
+The following metrics exist as stubs and are not yet implemented:
+
+- `momentum_factor` — correlation between past k-day return and buy decisions
+- `volatility_tolerance` — willingness to hold volatile positions
+- `risk_aversion` — frequency of risk reduction following losses
+
+Remaining work:
+
+- implement the stub metrics above
+- add wrapper in main class for any new metrics
+- add behavioral metrics to the docs metrics capability page
 
 Behavioral metrics are intended for research and analysis, not enforcement.
 
 ---
 
-## 2. Config File Creation
+### 2. Config File Creation
 
 Introduce a structured JSON configuration system to centralize experiment
 parameters and backend behavior controls.
+
+This is a prerequisite for the data source wiring in priority 3, as the
+config will manage API key preferences and source priority ordering.
 
 Goals:
 
@@ -37,7 +52,7 @@ Goals:
   - market assumptions (risk-free rate, baseline ticker, trading days)
   - portfolio parameters (initial capital, fractional shares, cash buffer)
   - LLM execution settings (temperature, seed, determinism)
-  - data source preferences
+  - data source preferences and priority ordering
   - metric toggles
 - auto-generate a default config file if none exists
 - allow partial overrides without requiring full specification
@@ -51,13 +66,20 @@ while preserving flexibility for research use cases.
 
 ### 3. Multiple Data Source Support
 
-Add support for multiple market data sources besides Stooq and `yfinance`.
+Wire existing market data source implementations into the main orchestrator.
+
+Finnhub and Alpha Vantage functions already exist in
+`libb/execution/get_market_data.py` but are not currently used.
+`download_data_on_given_range()` still hardcodes `["yf", "stooq"]` rather
+than calling `get_valid_data_sources()`.
 
 Goals:
 
-- add functions supporting other APIs
-- ensure returned data matches existing format (MarketHistoryObject/MarketDataObject)
-- rewire functions into the main orchestrator
+- complete the config system (priority 2) first to handle API key management
+  and source preference ordering
+- wire `get_valid_data_sources()` into `download_data_on_given_range()`
+- validate that Finnhub and Alpha Vantage return data matching the existing
+  `MarketHistoryObject` / `MarketDataObject` format
 
 ---
 
