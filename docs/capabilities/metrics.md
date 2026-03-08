@@ -155,10 +155,11 @@ persists the results to disk.
 
 This method:
 
-- Loads portfolio equity history
+- Loads portfolio equity history and trade execution log
 - Downloads benchmark data via `yfinance`
 - Computes risk and return statistics
 - Computes CAPM metrics
+- Computes trade-level statistics from filled sell orders
 - Appends the compiled metrics log to `metrics/performance.json`
 
 ---
@@ -185,6 +186,7 @@ This method:
 Reads:
 
 - `self.layout.portfolio_history_path`
+- `self.layout.trade_log_path`
 - `self.run_date`
 
 Writes:
@@ -208,6 +210,8 @@ this window.
 
 ### Metrics Computed
 
+#### Equity Curve
+
 - `volatility_daily`
   Standard deviation of daily returns (ddof=1).
 
@@ -225,7 +229,7 @@ this window.
 
 ---
 
-### Drawdown
+#### Drawdown
 
 - `max_drawdown_pct`
   Maximum observed peak-to-trough equity decline as a negative percentage.
@@ -235,7 +239,7 @@ this window.
 
 ---
 
-### CAPM Metrics
+#### CAPM
 
 - `capm_beta`
   Sensitivity of portfolio returns to benchmark returns.
@@ -249,7 +253,41 @@ this window.
 
 ---
 
-### Metadata
+#### Trade Level
+
+Computed from filled sell orders only. All fields return `null` if no
+filled sells exist.
+
+- `trade_count`
+  Total number of filled sell orders.
+
+- `win_rate`
+  Fraction of filled sells with positive PnL.
+
+- `avg_gain`
+  Mean PnL across winning trades.
+
+- `avg_loss`
+  Mean PnL across losing trades. Reported as a negative number.
+
+- `median_gain`
+  Median PnL across winning trades.
+
+- `median_loss`
+  Median PnL across losing trades. Reported as a negative number.
+
+- `profit_factor`
+  Sum of gains divided by absolute sum of losses. Values above 1.0
+  indicate total gains exceed total losses.
+
+- `expectancy`
+  Expected PnL per trade in USD:
+
+  expectancy = (avg_gain × win_rate) + (avg_loss × (1 - win_rate))
+
+---
+
+#### Metadata
 
 - `start_date`
   First active equity date (inception of trading activity).
@@ -266,7 +304,6 @@ this window.
 ---
 
 ### Example Usage
-
 ```python
 from libb import LIBBmodel
 
@@ -280,7 +317,6 @@ print(performance_log)
 ---
 
 ### Example Output
-
 ```python
 {
     "volatility_daily": 0.0123,
@@ -293,6 +329,14 @@ print(performance_log)
     "capm_beta": 1.12,
     "capm_alpha_annualized": 0.041,
     "capm_r_squared": 0.76,
+    "trade_count": 31,
+    "win_rate": 0.52,
+    "avg_gain": 4.21,
+    "avg_loss": -3.84,
+    "median_gain": 1.62,
+    "median_loss": -1.47,
+    "profit_factor": 1.14,
+    "expectancy": 0.34,
     "start_date": "2025-11-01",
     "end_date": "2026-02-15",
     "observation_count": 63,
@@ -309,6 +353,8 @@ print(performance_log)
 - Metrics are computed using daily returns
 - Annualization assumes 252 trading days
 - Alpha and beta may be unstable with short observation windows or low R²
+- Trade-level metrics are sensitive to outlier trades — inspect the raw
+  trade log alongside aggregate metrics when interpreting results
 - Results are advisory and informational only
 - LIBB does not internally consume these metrics
 
