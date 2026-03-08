@@ -46,7 +46,7 @@ def order_to_trade_schema(order: Order,  *, executed_price: float | None, PnL: f
             "date": order.get("date", "MISSING"),
             "ticker": order.get("ticker", "MISSING"),
             "action": validated_order_action,
-            "order_type": order.get("order_type", "MISSING"),
+            "order_type": order.get("order_type", "MISSING").upper(),
             "shares": order.get("shares", math.nan),
             "limit_price": order.get("limit_price", math.nan),
             "executed_price": executed_price,
