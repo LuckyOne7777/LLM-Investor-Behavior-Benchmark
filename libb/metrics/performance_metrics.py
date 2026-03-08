@@ -5,7 +5,7 @@ from datetime import date
 from pathlib import Path
 import yfinance as yf
 
-def load_performance_data(portfolio_history_path: Path | str, trade_log_path: Path | str, baseline_ticker: str) -> tuple[pd.Series, pd.Series, pd.Series]:
+def load_performance_data(portfolio_history_path: Path | str, trade_log_path: Path | str, baseline_ticker: str) -> tuple[pd.DataFrame, pd.Series, pd.Series, pd.Series]:
     raw_portfolio_log = pd.read_csv(portfolio_history_path, parse_dates=["date"])
     raw_trade_log = pd.read_csv(trade_log_path)
     raw_portfolio_log = raw_portfolio_log.set_index("date")
@@ -40,7 +40,7 @@ def load_performance_data(portfolio_history_path: Path | str, trade_log_path: Pa
 
 
     portfolio_return_pct = equity_series.pct_change().dropna()
-    return equity_series, portfolio_return_pct, baseline_return_pct
+    return raw_trade_log, equity_series, portfolio_return_pct, baseline_return_pct
     
 
 # ============================================================
@@ -131,6 +131,61 @@ def compute_capm(returns: pd.Series, market_returns: pd.Series, rf_annual: float
 
     return float(beta), float(alpha_annual), r2
 
+# ============================================================
+# 5. Trade Level Metrics
+# ============================================================
+
+def compute_trade_metrics(trade_log: pd.DataFrame) -> dict:
+    filled_sells = trade_log[
+        (trade_log["action"] == "SELL") & 
+        (trade_log["status"] == "FILLED") &
+        (trade_log["PnL"].notna())
+    ]
+
+    if filled_sells.empty:
+        return {
+            "win_rate": None,
+            "avg_gain": None,
+            "avg_loss": None,
+            "median_gain": None,
+            "median_loss": None,
+            "profit_factor": None,
+            "expectancy": None,
+            "trade_count": 0,
+        }
+
+    wins = filled_sells[filled_sells["PnL"] > 0]["PnL"]
+    losses = filled_sells[filled_sells["PnL"] < 0]["PnL"]
+    count = len(filled_sells)
+
+    win_rate = len(wins) / count if count > 0 else None
+
+    avg_gain = float(wins.mean()) if not wins.empty else None
+    avg_loss = float(losses.mean()) if not losses.empty else None
+    median_gain = float(wins.median()) if not wins.empty else None
+    median_loss = float(losses.median()) if not losses.empty else None
+
+    if avg_gain is not None and avg_loss is not None and avg_loss != 0:
+        profit_factor = abs(wins.sum()) / abs(losses.sum())
+    else:
+        profit_factor = None
+
+    if avg_gain is not None and avg_loss is not None and win_rate is not None:
+        expectancy = (avg_gain * win_rate) + (avg_loss * (1 - win_rate))
+    else:
+        expectancy = None
+
+    return {
+        "win_rate": float(win_rate) if win_rate is not None else None,
+        "avg_gain": avg_gain,
+        "avg_loss": avg_loss,
+        "median_gain": median_gain,
+        "median_loss": median_loss,
+        "profit_factor": float(profit_factor) if profit_factor is not None else None,
+        "expectancy": float(expectancy) if expectancy is not None else None,
+        "trade_count": int(count),
+    }
+
 def total_performance_calculations(
     portfolio_history_path: str | Path,
     trade_log_path: str | Path,
@@ -183,8 +238,10 @@ def total_performance_calculations(
             changed from its initial value, or if benchmark data cannot
             be downloaded.
     """
-    equity_series, returns, market_returns = load_performance_data(portfolio_history_path, trade_log_path, baseline_ticker)
-    
+    raw_trade_log, equity_series, returns, market_returns = load_performance_data(
+        portfolio_history_path, trade_log_path, baseline_ticker
+    )
+
     # ----- Risk & Return -----
     volatility = compute_volatility(returns)
     sharpe_period, sharpe_annual = compute_sharpe(returns)
@@ -196,30 +253,42 @@ def total_performance_calculations(
     # ----- CAPM -----
     beta, alpha_annual, r2 = compute_capm(returns, market_returns)
 
-    # ----- Compile all metrics -----
+    # ----- Trade Level -----
+    trade_metrics = compute_trade_metrics(raw_trade_log)
+
+# ----- Compile all metrics -----
     metrics_log = {
-    # --- Risk Metrics ---
-    "volatility_daily": volatility,
-    "sharpe_ratio_daily": sharpe_period,
-    "sharpe_ratio_annualized": sharpe_annual,
-    "sortino_ratio_daily": sortino_period,
-    "sortino_ratio_annualized": sortino_annual,
+        # --- Risk Metrics ---
+        "volatility_daily": volatility,
+        "sharpe_ratio_daily": sharpe_period,
+        "sharpe_ratio_annualized": sharpe_annual,
+        "sortino_ratio_daily": sortino_period,
+        "sortino_ratio_annualized": sortino_annual,
 
-    # --- Drawdown ---
-    "max_drawdown_pct": max_drawdown,
-    "max_drawdown_date": str(max_drawdown_date),
+        # --- Drawdown ---
+        "max_drawdown_pct": max_drawdown,
+        "max_drawdown_date": str(max_drawdown_date),
 
-    # --- CAPM ---
-    "capm_beta": beta,
-    "capm_alpha_annualized": alpha_annual,
-    "capm_r_squared": r2,
+        # --- CAPM ---
+        "capm_beta": beta,
+        "capm_alpha_annualized": alpha_annual,
+        "capm_r_squared": r2,
 
-    # --- Metadata ---
-    "start_date": str(equity_series.index[0]),
-    "end_date": str(equity_series.index[-1]),
-    "observation_count": len(returns),
-    "generated_at": str(date)
-}
+        # --- Trade Level ---
+        "trade_count": trade_metrics["trade_count"],
+        "win_rate": trade_metrics["win_rate"],
+        "avg_gain": trade_metrics["avg_gain"],
+        "avg_loss": trade_metrics["avg_loss"],
+        "median_gain": trade_metrics["median_gain"],
+        "median_loss": trade_metrics["median_loss"],
+        "profit_factor": trade_metrics["profit_factor"],
+        "expectancy": trade_metrics["expectancy"],
 
+        # --- Metadata ---
+        "start_date": str(equity_series.index[0]),
+        "end_date": str(equity_series.index[-1]),
+        "observation_count": len(returns),
+        "generated_at": str(date),
+    }
 
     return metrics_log
