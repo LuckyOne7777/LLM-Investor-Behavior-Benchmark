@@ -390,7 +390,7 @@ class LIBBmodel:
             - self.performance
             - self.layout.performance_path
         """
-        performance_log = total_performance_calculations(self.layout.portfolio_history_path, self.run_date, baseline_ticker)
+        performance_log = total_performance_calculations(self.layout.portfolio_history_path, self.layout.trade_log_path, self.run_date, baseline_ticker)
         self.performance.append(performance_log)
         self.writer.save_performance(self.performance)
         return performance_log

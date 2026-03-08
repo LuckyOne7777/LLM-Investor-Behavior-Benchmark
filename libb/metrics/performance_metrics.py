@@ -5,8 +5,9 @@ from datetime import date
 from pathlib import Path
 import yfinance as yf
 
-def load_performance_data(portfolio_history_path: Path | str, baseline_ticker: str) -> tuple[pd.Series, pd.Series, pd.Series]:
+def load_performance_data(portfolio_history_path: Path | str, trade_log_path: Path | str, baseline_ticker: str) -> tuple[pd.Series, pd.Series, pd.Series]:
     raw_portfolio_log = pd.read_csv(portfolio_history_path, parse_dates=["date"])
+    raw_trade_log = pd.read_csv(trade_log_path)
     raw_portfolio_log = raw_portfolio_log.set_index("date")
 
     assert raw_portfolio_log.index.is_unique, "Duplicate processed dates within portfolio log."
@@ -132,6 +133,7 @@ def compute_capm(returns: pd.Series, market_returns: pd.Series, rf_annual: float
 
 def total_performance_calculations(
     portfolio_history_path: str | Path,
+    trade_log_path: str | Path,
     date: str | date,
     baseline_ticker,
 ) -> dict:
@@ -181,7 +183,7 @@ def total_performance_calculations(
             changed from its initial value, or if benchmark data cannot
             be downloaded.
     """
-    equity_series, returns, market_returns = load_performance_data(portfolio_history_path, baseline_ticker)
+    equity_series, returns, market_returns = load_performance_data(portfolio_history_path, trade_log_path, baseline_ticker)
     
     # ----- Risk & Return -----
     volatility = compute_volatility(returns)
