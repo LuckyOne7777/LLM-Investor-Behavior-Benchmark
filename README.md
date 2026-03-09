@@ -36,6 +36,12 @@ So I developed a library designed to support rigorous evaluation of LLM-driven t
   Execution logic remains fully user-controlled, allowing researchers
   to integrate custom strategies, models, or data sources.
 
+- **Atomic Portfolio Processing with Rollback**
+  
+  All portfolio processing is transactional. If execution fails mid-run,
+  disk state is automatically restored to a snapshot taken at startup,
+  preventing partial writes and corrupt portfolio state.
+
 ## How It Works
 
 LIBB operates as a file-backed execution loop where portfolio state,
