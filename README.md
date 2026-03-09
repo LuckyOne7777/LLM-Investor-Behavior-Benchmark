@@ -25,7 +25,13 @@ So I developed a library designed to support rigorous evaluation of LLM-driven t
   Quantitative behavioral metrics (HHI concentration, loss aversion, turnover, cash allocation, order quality),
   key performance metrics (Sharpe, Sortino, drawdown, CAPM), and sentiment analysis via the Loughran-McDonald financial lexicon.
   All results are persisted as first-class research artifacts.
+
+- **Atomic Portfolio Processing with Rollback**
   
+  All portfolio processing is transactional. If execution fails mid-run,
+  disk state is automatically restored to a snapshot taken at startup,
+  preventing partial writes and corrupt portfolio state.
+
 - **Reproducible Run Structure**
   
   Each model run follows a consistent on-disk directory layout, making
@@ -35,12 +41,6 @@ So I developed a library designed to support rigorous evaluation of LLM-driven t
   
   Execution logic remains fully user-controlled, allowing researchers
   to integrate custom strategies, models, or data sources.
-
-- **Atomic Portfolio Processing with Rollback**
-  
-  All portfolio processing is transactional. If execution fails mid-run,
-  disk state is automatically restored to a snapshot taken at startup,
-  preventing partial writes and corrupt portfolio state.
 
 ## How It Works
 
@@ -70,13 +70,11 @@ and how to read the codebase effectively.
 ---
 
 ## Example Workflow
-
 ```python
 from libb import LIBBmodel
-from .prompt_orchestration.prompt_models import prompt_daily_report
 from libb.other.parse import parse_json
-import pandas as pd
 
+# See user_side/prompt_orchestration/prompt_models.py for a full prompting example
 MODELS = ["deepseek", "gpt-4.1"]
 
 def daily_flow():
@@ -98,20 +96,9 @@ def daily_flow():
 
 ---
 
-## What Gets Created Automatically
-
-- Run directory structure
-- Portfolio files
-- Metrics files
-
-No manual file setup is required.
-
----
-
 ## Created File Tree
 
 After running for the first time, LIBB generates a fixed directory structure at the user-specified output path.
-
 ```text
 <output_dir>/
 ├── metrics/                  # evaluation outputs
@@ -134,7 +121,8 @@ After running for the first time, LIBB generates a fixed directory structure at 
     └── deep_research/
 ```
 
-LIBB will use this file tree to save artifacts for all future runs in the output directory.
+No manual file setup is required. LIBB will use this file tree to save
+artifacts for all future runs in the output directory.
 
 ---
 
@@ -157,14 +145,12 @@ Choose the option that best fits your workflow.
 This option isolates dependencies and avoids conflicts with other Python projects.
 
 ### 1. Clone the Repository
-
 ```bash
 git clone https://github.com/LuckyOne7777/LLM-Investor-Behavior-Benchmark.git
 cd LLM-Investor-Behavior-Benchmark
 ```
 
 Verify contents:
-
 ```bash
 ls
 ```
@@ -174,13 +160,11 @@ You should see folders like libb/, user_side/, and requirements.txt.
 ### 2. Create a Virtual Environment
 
 Windows:
-
 ```bash
 python -m venv .venv
 ```
 
 macOS / Linux:
-
 ```bash
 python3 -m venv .venv
 ```
@@ -189,31 +173,26 @@ python3 -m venv .venv
 
 Windows (PowerShell)
 If activation fails due to script execution policy, run once:
-
 ```bash
 Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 ```
 
 Then activate:
-
 ```bash
 .venv\Scripts\activate
 ```
 
 Windows (Command Prompt alternative)
-
 ```bash
 .venv\Scripts\activate.bat
 ```
 
 macOS / Linux
-
 ```bash
 source .venv/bin/activate
 ```
 
 Verify activation:
-
 ```bash
 python --version
 ```
@@ -221,7 +200,6 @@ python --version
 You should see (.venv) in your shell prompt.
 
 ### 4. Install Dependencies
-
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
@@ -229,7 +207,6 @@ pip install -e .
 ```
 
 ### 5. Verify Installation
-
 ```bash
 python -c "import libb; print(libb.__file__)"
 ```
@@ -239,14 +216,12 @@ Expected output should point to `libb/__init__.py`.
 ### 6. Set Environment Variables
 
 macOS / Linux:
-
 ```bash
 export OPENAI_API_KEY="your_key_here"
 export DEEPSEEK_API_KEY="your_key_here"
 ```
 
 Windows (PowerShell):
-
 ```bash
 setx OPENAI_API_KEY "your_key_here"
 setx DEEPSEEK_API_KEY "your_key_here"
@@ -255,7 +230,6 @@ setx DEEPSEEK_API_KEY "your_key_here"
 Restart the terminal after using setx.
 
 ### 7. Run an Example Workflow
-
 ```bash
 python -m user_side.workflow
 ```
@@ -265,16 +239,16 @@ python -m user_side.workflow
 To remove the virtual environment entirely:
 
 Linux / macOS:
-
 ```bash
 rm -rf .venv
 ```
 
 Windows:
-
 ```bash
 Remove-Item -Recurse -Force .venv
 ```
+
+---
 
 ## Option B: Global Setup (No Virtual Environment)
 
@@ -282,7 +256,6 @@ This option installs dependencies into the active Python environment.
 Recommended only for users comfortable managing global Python packages.
 
 ### 1. Clone the Repo
-
 ```bash
 git clone https://github.com/LuckyOne7777/LLM-Investor-Behavior-Benchmark.git
 cd LLM-Investor-Behavior-Benchmark
@@ -291,26 +264,22 @@ cd LLM-Investor-Behavior-Benchmark
 ### 2. Verify Python Version
 
 LIBB requires Python 3.10 or newer.
-
 ```bash
 python --version
 ```
 
 ### 3. Upgrade pip
-
 ```bash
 python -m pip install --upgrade pip
 ```
 
 ### 4. Install Dependencies Globally
-
 ```bash
 pip install -r requirements.txt
 pip install -e .
 ```
 
 Verify installation:
-
 ```bash
 python -c "import libb; print(libb.__file__)"
 ```
@@ -320,7 +289,6 @@ python -c "import libb; print(libb.__file__)"
 Same as Option A.
 
 ### 6. Run an Example Workflow
-
 ```bash
 python -m user_side.workflow
 ```
@@ -328,7 +296,6 @@ python -m user_side.workflow
 ---
 
 ### Optional: Uninstall
-
 ```bash
 pip uninstall libb
 ```
