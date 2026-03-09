@@ -16,26 +16,31 @@ So I developed a library designed to support rigorous evaluation of LLM-driven t
 ## Features
 
 - **Persistent Portfolio State**
+  
   All portfolio data is explicitly stored on disk, enabling inspection,
   reproducibility, and post-hoc analysis across runs.
 
-- **Built-In Performance & Sentiment Analysis**
-  Calculation of key performance evaluation metrics (Sharpe, Sortino, Drawdown, R², etc.)
-  and sentiment analysis with results persisted as
-  first-class research artifacts.
-
-- **Behavioral Metrics**
-  Quantitative characterization of LLM decision-making patterns including
-  concentration (HHI), loss aversion, turnover, cash allocation, position
-  breadth, and order quality. Additional behavioral metrics are under development.
-
+- **Built-In Behavioral, Performance, and Sentiment Analysis**
+  
+  Quantitative behavioral metrics (HHI concentration, loss aversion, turnover, cash allocation, order quality),
+  key performance metrics (Sharpe, Sortino, drawdown, CAPM), and sentiment analysis via the Loughran-McDonald financial lexicon.
+  All results are persisted as first-class research artifacts.
+  
 - **Reproducible Run Structure**
+  
   Each model run follows a consistent on-disk directory layout, making
   experiments easy to reproduce, compare, and archive.
 
 - **Flexible Execution Workflows**
+  
   Execution logic remains fully user-controlled, allowing researchers
   to integrate custom strategies, models, or data sources.
+
+- **Atomic Portfolio Processing with Rollback**
+  
+  All portfolio processing is transactional. If execution fails mid-run,
+  disk state is automatically restored to a snapshot taken at startup,
+  preventing partial writes and corrupt portfolio state.
 
 ## How It Works
 
