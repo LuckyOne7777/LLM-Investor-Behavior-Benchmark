@@ -145,7 +145,7 @@ def total_behavioral_metrics(trade_df_path: Path | str, positions_df_path: Path 
 
             "total_buy_count": int(len(trade_df[trade_df["action"] == "BUY"])),
             "total_sell_count": int(len(trade_df[trade_df["action"] == "SELL"])),
-
+            "total_stoploss_sells": int (len(trade_df[trade_df["order_type"] == "STOPLOSS_MET"])),
             "total_failed_buys": int(len(trade_df[(trade_df["action"] == "BUY") & (trade_df["status"] == "FAILED")])),
             "total_failed_sells": int(len(trade_df[(trade_df["action"] == "SELL") & (trade_df["status"] == "FAILED")])),
             
