@@ -287,7 +287,7 @@ def total_performance_calculations(
 
         # --- Drawdown ---
         "max_drawdown_pct": max_drawdown,
-        "max_drawdown_date": str(max_drawdown_date),
+        "max_drawdown_date": str(max_drawdown_date.date()),
 
         # --- CAPM ---
         "capm_beta": beta,
@@ -309,8 +309,8 @@ def total_performance_calculations(
         "total_sell_count": int(len(raw_trade_log[raw_trade_log["action"] == "SELL"])),
 
         # --- Metadata ---
-        "start_date": str(equity_series.index[0]),
-        "end_date": str(equity_series.index[-1]),
+        "start_date": str(equity_series.index[0].date()),
+        "end_date": str(equity_series.index[-1].date()),
         "observation_count": len(returns),
         "generated_at": str(date),
     }
