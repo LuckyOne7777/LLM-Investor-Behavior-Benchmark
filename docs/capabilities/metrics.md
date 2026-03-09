@@ -378,7 +378,6 @@ setting.
 ---
 
 ### generate_behavior_metrics
-
 ```python
 libb.generate_behavior_metrics() -> dict
 ```
@@ -434,9 +433,7 @@ Writes:
   Ratio of average loss magnitude to average gain magnitude across all
   filled sell orders with nonzero PnL:
 
-  ```
   λ = |avg(PnL < 0)| / avg(PnL > 0)
-  ```
 
   Values greater than 1.0 indicate losses are larger in magnitude than
   gains on average. Directly analogous to the loss aversion coefficient
@@ -473,13 +470,20 @@ Writes:
 - `max_positions_in_a_day`
   Maximum number of concurrent positions observed on any single day.
 
-#### Order Quality
+#### Order Activity
 
 - `total_buy_count`
   Total buy-side orders across all statuses.
 
 - `total_sell_count`
   Total sell-side orders across all statuses.
+
+- `total_stoploss_updates`
+  Stop-loss update orders across all statuses.
+
+- `total_stoploss_sells`
+  Filled sells triggered by a stop-loss breach
+  (order_type == "STOPLOSS_MET").
 
 - `total_failed_buys`
   Buy orders with status FAILED. High values relative to total buy count
@@ -515,7 +519,6 @@ Writes:
 ---
 
 ### Example Usage
-
 ```python
 from libb import LIBBmodel
 
@@ -529,7 +532,6 @@ print(behavior_log)
 ---
 
 ### Example Output
-
 ```python
 {
     "loss_aversion_score": 3.006,
@@ -542,6 +544,8 @@ print(behavior_log)
     "max_positions_in_a_day": 3,
     "total_buy_count": 34,
     "total_sell_count": 31,
+    "total_stoploss_updates": 4,
+    "total_stoploss_sells": 2,
     "total_failed_buys": 14,
     "total_failed_sells": 3,
     "total_rejected_buys": 6,
