@@ -10,35 +10,7 @@ This document is intentionally limited in scope and subject to change.
 
 ## Top Priorities
 
-### 1. Behavioral Metrics
-
-The core behavioral metrics framework is implemented and available via
-`libb.generate_behavior_metrics()`. The following metrics are complete:
-
-- HHI-based concentration (with cash as explicit position)
-- Loss aversion ratio
-- Turnover ratio
-- Cash allocation (average and median)
-- Position counts (average, median, max per day)
-- Order quality counts (filled, failed, rejected by side)
-
-The following metrics exist as stubs and are not yet implemented:
-
-- `momentum_factor` — correlation between past k-day return and buy decisions
-- `volatility_tolerance` — willingness to hold volatile positions
-- `risk_aversion` — frequency of risk reduction following losses
-
-Remaining work:
-
-- implement the stub metrics above
-- add wrapper in main class for any new metrics
-- add behavioral metrics to the docs metrics capability page
-
-Behavioral metrics are intended for research and analysis, not enforcement.
-
----
-
-### 2. Config File Creation
+### 3. Config File Creation
 
 Introduce a structured JSON configuration system to centralize experiment
 parameters and backend behavior controls.
@@ -64,7 +36,7 @@ while preserving flexibility for research use cases.
 
 ---
 
-### 3. Multiple Data Source Support
+### 2. Multiple Data Source Support
 
 Wire existing market data source implementations into the main orchestrator.
 
@@ -83,7 +55,7 @@ Goals:
 
 ---
 
-### 4. Fractional Share Support
+### 3. Fractional Share Support
 
 Add first-class support for fractional share trading across order handling,
 portfolio state, and accounting logic.

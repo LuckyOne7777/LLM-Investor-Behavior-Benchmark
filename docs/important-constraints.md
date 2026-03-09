@@ -54,16 +54,6 @@ Always review docs and revise the system as outlined beforehand.
 
 ---
 
-## Behavioral Metrics — Partial Implementation
-
-Core behavioral metrics (HHI, loss aversion, turnover, cash allocation,
-position counts, order quality) are implemented and available via
-`libb.generate_behavior_metrics()`. Several additional metrics
-(`momentum_factor`, `volatility_tolerance`, `risk_aversion`) exist as stubs
-in `libb/metrics/behavior_metrics.py` and are not yet implemented.
-
----
-
 ## Stability
 
 LIBB has limited automated test coverage.
