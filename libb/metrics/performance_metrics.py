@@ -262,7 +262,6 @@ def total_performance_calculations(
     raw_trade_log, equity_series, returns, market_returns = load_performance_data(
         portfolio_history_path, trade_log_path, baseline_ticker
     )
-
     # ----- Risk & Return -----
     volatility = compute_volatility(returns)
     sharpe_period, sharpe_annual = compute_sharpe(returns)
@@ -304,6 +303,10 @@ def total_performance_calculations(
         "median_loss": trade_metrics["median_loss"],
         "profit_factor": trade_metrics["profit_factor"],
         "expectancy": trade_metrics["expectancy"],
+
+        # -- Completed Trade Count --
+        "total_buy_count": int(len(raw_trade_log[raw_trade_log["action"] == "BUY"])),
+        "total_sell_count": int(len(raw_trade_log[raw_trade_log["action"] == "SELL"])),
 
         # --- Metadata ---
         "start_date": str(equity_series.index[0]),
