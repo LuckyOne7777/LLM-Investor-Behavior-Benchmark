@@ -2,11 +2,13 @@ from pathlib import Path
 from datetime import date, datetime, UTC, time
 from zoneinfo import ZoneInfo
 from shutil import rmtree
+from typing import cast
 import json
 
 import pandas as pd
 
 from libb.other.types_file import ModelSnapshot, Log, DiskLayout
+from libb.other.config_setup import verifiy_config, set_config
 from libb.execution.utils import is_nyse_open
 from libb.metrics.sentiment_metrics import analyze_sentiment
 from libb.user_data.news import  _get_portfolio_news
@@ -28,7 +30,7 @@ class LIBBmodel:
     and daily execution for a single run date.
     """
     def __init__(self, model_path: Path | str, starting_cash: float = 10_000, 
-                 run_date: str | date | None = None):
+                 run_date: str | date | None = None, config: dict | None = None):
         """
         Initialize the trading model and load persisted state.
 
@@ -42,9 +44,10 @@ class LIBBmodel:
         else:
             run_date = pd.Timestamp(run_date).date()
 
-        self.start_time= datetime.now(UTC)
+        self.start_time = datetime.now(UTC)
 
         self.STARTING_CASH: float = starting_cash
+        self.passed_verified_config: dict = verifiy_config(config)
         self._root: Path = Path(model_path)
         self._model_path: str = str(model_path)
         self.run_date: date = run_date
@@ -89,6 +92,7 @@ class LIBBmodel:
         self._ensure_file(self.layout.behavior_path, "[]")
         self._ensure_file(self.layout.performance_path, "[]")
         self._ensure_file(self.layout.sentiment_path, "[]")
+        self._ensure_file(self.layout.config_path, json.dumps(self.passed_verified_config))
         return
     
     def _hydrate_from_disk(self) -> None:
@@ -98,6 +102,9 @@ class LIBBmodel:
         self.portfolio_history: pd.DataFrame = self.reader.load_csv(self.layout.portfolio_history_path)
         self.trade_log: pd.DataFrame = self.reader.load_csv(self.layout.trade_log_path)
         self.position_history: pd.DataFrame = self.reader.load_csv(self.layout.position_history_path)
+
+        self.CONFIG: dict = cast(dict, self.reader.load_json(self.layout.config_path))
+        set_config(self.CONFIG)
 
         self.pending_trades: dict[str, list[dict]] = self.reader.load_orders_dict(self.layout.pending_trades_path)
         self.performance: list[dict] = self.reader.load_json(self.layout.performance_path)
