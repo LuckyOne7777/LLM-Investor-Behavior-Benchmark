@@ -29,8 +29,8 @@ class LIBBmodel:
     Stateful trading model that manages portfolio data, metrics, research,
     and daily execution for a single run date.
     """
-    def __init__(self, model_path: Path | str, starting_cash: float = 10_000, 
-                 run_date: str | date | None = None, config: dict | None = None):
+    def __init__(self, model_path: Path | str, run_date: str | date | None = None, 
+                 config: dict | None = None):
         """
         Initialize the trading model and load persisted state.
 
@@ -46,7 +46,6 @@ class LIBBmodel:
 
         self.start_time = datetime.now(UTC)
 
-        self.STARTING_CASH: float = starting_cash
         self.passed_verified_config: dict = verifiy_config(config)
         self._root: Path = Path(model_path)
         self._model_path: str = str(model_path)
@@ -60,6 +59,7 @@ class LIBBmodel:
 
         self.ensure_file_system()
         self._hydrate_from_disk()
+        self._sync_config()
 
         self.filled_orders: int = 0
         self.failed_orders: int = 0
@@ -82,7 +82,7 @@ class LIBBmodel:
         self._ensure_file(self.layout.portfolio_history_path, "date,equity,cash,positions_value,daily_return_pct,overall_return_pct\n")
         self._ensure_file(self.layout.pending_trades_path, '{"orders": []}')
 
-        self._ensure_file(self.layout.cash_path, json.dumps({"cash": self.STARTING_CASH}) )
+        self._ensure_file(self.layout.cash_path, json.dumps({"cash": self.passed_verified_config["starting_cash"]}) )
 
         self._ensure_file(self.layout.portfolio_path, "ticker,shares,buy_price,cost_basis,stop_loss,market_price,market_value,unrealized_pnl\n")
         self._ensure_file(self.layout.trade_log_path, "date,ticker,action,order_type,shares,limit_price,executed_price,stop_loss,cost_basis,PnL,rationale,confidence,status,reason\n")
@@ -105,6 +105,7 @@ class LIBBmodel:
 
         self.CONFIG: dict = cast(dict, self.reader.load_json(self.layout.config_path))
         set_config(self.CONFIG)
+        self.STARTING_CASH = self.CONFIG["starting_cash"]
 
         self.pending_trades: dict[str, list[dict]] = self.reader.load_orders_dict(self.layout.pending_trades_path)
         self.performance: list[dict] = self.reader.load_json(self.layout.performance_path)
@@ -120,16 +121,16 @@ class LIBBmodel:
         self.STARTUP_DISK_SNAPSHOT = None
 
     def _sync_config(self):
-        if self.passed_verified_config is None or self.passed_verified_config == self.CONFIG:
+        disk_config = cast(dict, self.reader.load_json(self.layout.config_path))
+        if self.passed_verified_config is None or self.passed_verified_config == disk_config:
             return
 
-        if self.CONFIG.get("locked", True):
+        if disk_config.get("locked", True):
             print("Config mismatch detected: disk config is locked, keeping disk config.")
             return
 
-        self.CONFIG = self.passed_verified_config
-        set_config(self.CONFIG)
-        self.writer.overwrite_config(self.CONFIG)
+        set_config(self.passed_verified_config)
+        self.writer.overwrite_config(self.passed_verified_config)
         print("Config mismatch detected: overwriting disk config with passed config.")
     
     def reset_run(self, cli_check: bool = True, auto_ensure: bool = False) -> None:
