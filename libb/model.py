@@ -119,6 +119,18 @@ class LIBBmodel:
         self.start_time = datetime.now(UTC)
         self.STARTUP_DISK_SNAPSHOT = None
 
+    def _sync_config(self):
+        if self.passed_verified_config is None or self.passed_verified_config == self.CONFIG:
+            return
+
+        if self.CONFIG.get("locked", True):
+            print("Config mismatch detected: disk config is locked, keeping disk config.")
+            return
+
+        self.CONFIG = self.passed_verified_config
+        set_config(self.CONFIG)
+        self.writer.overwrite_config(self.CONFIG)
+        print("Config mismatch detected: overwriting disk config with passed config.")
     
     def reset_run(self, cli_check: bool = True, auto_ensure: bool = False) -> None:
          
