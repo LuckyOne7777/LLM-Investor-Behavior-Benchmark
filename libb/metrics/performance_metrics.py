@@ -4,6 +4,8 @@ import json
 from datetime import date
 from pathlib import Path
 import yfinance as yf
+from libb.other.config_setup import get_config
+
 
 def load_performance_data(portfolio_history_path: Path | str, trade_log_path: Path | str, baseline_ticker: str) -> tuple[pd.DataFrame, pd.Series, pd.Series, pd.Series]:
     raw_portfolio_log = pd.read_csv(portfolio_history_path, parse_dates=["date"])
@@ -65,11 +67,11 @@ def compute_volatility(returns: pd.Series) -> float:
 # 3. Sharpe Ratio
 # ============================================================
 
-def compute_sharpe(returns: pd.Series, rf_annual: float = 0.045) -> tuple[float, float]:
+def compute_sharpe(returns: pd.Series, rf_annual: float = 0.045, annual_trading_days: int = 252) -> tuple[float, float]:
     if len(returns) < 2:
         return float("nan"), float("nan")
 
-    rf_daily = (1 + rf_annual) ** (1 / 252) - 1
+    rf_daily = (1 + rf_annual) ** (1 / annual_trading_days) - 1
     mean_r = float(returns.mean())
     std_r = float(returns.std(ddof=1))
 
@@ -77,7 +79,7 @@ def compute_sharpe(returns: pd.Series, rf_annual: float = 0.045) -> tuple[float,
         return float("nan"), float("nan")
 
     sharpe_period = (mean_r - rf_daily) / std_r
-    sharpe_annual = sharpe_period * (252 ** 0.5)
+    sharpe_annual = sharpe_period * (annual_trading_days ** 0.5)
     
     return sharpe_period, sharpe_annual
 
@@ -86,11 +88,11 @@ def compute_sharpe(returns: pd.Series, rf_annual: float = 0.045) -> tuple[float,
 # 4. Sortino Ratio
 # ============================================================
 
-def compute_sortino(returns: pd.Series, rf_annual: float = 0.045) -> tuple[float, float]:
+def compute_sortino(returns: pd.Series, rf_annual: float = 0.045, annual_trading_days: int = 252) -> tuple[float, float]:
     if len(returns) < 2:
         return float("nan"), float("nan")
 
-    rf_daily = (1 + rf_annual) ** (1 / 252) - 1
+    rf_daily = (1 + rf_annual) ** (1 / annual_trading_days) - 1
     downside = (returns - rf_daily).clip(upper=0)
 
     downside_std = downside.std(ddof=1)
@@ -99,7 +101,7 @@ def compute_sortino(returns: pd.Series, rf_annual: float = 0.045) -> tuple[float
 
     mean_r = float(returns.mean())
     sortino_period = (mean_r - rf_daily) / downside_std
-    sortino_annual = sortino_period * (252 ** 0.5)
+    sortino_annual = sortino_period * (annual_trading_days ** 0.5)
 
     return sortino_period, sortino_annual
 
@@ -108,9 +110,9 @@ def compute_sortino(returns: pd.Series, rf_annual: float = 0.045) -> tuple[float
 # 5. CAPM Beta, Alpha, R²
 # ============================================================
 
-def compute_capm(returns: pd.Series, market_returns: pd.Series, rf_annual: float = 0.045) -> tuple[float, float, float]:
+def compute_capm(returns: pd.Series, market_returns: pd.Series, rf_annual: float = 0.045, annual_trading_days: int = 252) -> tuple[float, float, float]:
 
-    rf_daily = (1 + rf_annual) ** (1 / 252) - 1
+    rf_daily = (1 + rf_annual) ** (1 / annual_trading_days) - 1
     common = returns.index.intersection(market_returns.index)
     if len(common) < 2:
         return float("nan"), float("nan"), float("nan")
@@ -126,7 +128,7 @@ def compute_capm(returns: pd.Series, market_returns: pd.Series, rf_annual: float
         return float("nan"), float("nan"), float("nan")
 
     beta, alpha_daily = np.polyfit(x, y, 1)
-    alpha_annual = (1 + alpha_daily) ** 252 - 1
+    alpha_annual = (1 + alpha_daily) ** annual_trading_days - 1
     r2 = float(np.corrcoef(x, y)[0, 1] ** 2)
 
     return float(beta), float(alpha_annual), r2
@@ -190,7 +192,8 @@ def total_performance_calculations(
     portfolio_history_path: str | Path,
     trade_log_path: str | Path,
     date: str | date,
-    baseline_ticker,
+    baseline_ticker: str,
+
 ) -> dict:
     """
     Compute all performance metrics from portfolio equity history and
@@ -262,16 +265,25 @@ def total_performance_calculations(
     raw_trade_log, equity_series, returns, market_returns = load_performance_data(
         portfolio_history_path, trade_log_path, baseline_ticker
     )
+    config_dict = get_config()
+    risk_free_rate = config_dict["risk_free_rate"]
+    trading_days = config_dict["trading_days_per_year"]
+    
+    assert isinstance(risk_free_rate, (float, int))
+    assert isinstance(trading_days, int)
     # ----- Risk & Return -----
     volatility = compute_volatility(returns)
-    sharpe_period, sharpe_annual = compute_sharpe(returns)
-    sortino_period, sortino_annual = compute_sortino(returns)
+    sharpe_period, sharpe_annual = compute_sharpe(returns, rf_annual=risk_free_rate, 
+                                                  annual_trading_days=trading_days)
+    sortino_period, sortino_annual = compute_sortino(returns, rf_annual=risk_free_rate,
+                                                     annual_trading_days=trading_days)
 
     # ----- Max Drawdown -----
     max_drawdown, max_drawdown_date = compute_max_drawdown(equity_series)
 
     # ----- CAPM -----
-    beta, alpha_annual, r2 = compute_capm(returns, market_returns)
+    beta, alpha_annual, r2 = compute_capm(returns, market_returns, rf_annual=risk_free_rate,
+                                          annual_trading_days=trading_days)
 
     # ----- Trade Level -----
     trade_metrics = compute_trade_metrics(raw_trade_log)
