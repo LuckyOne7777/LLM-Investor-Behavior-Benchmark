@@ -127,6 +127,9 @@ class DiskLayout:
     behavior_path: Path
     sentiment_path: Path
 
+    # config file
+    config_path: Path
+
     @classmethod
     def from_root(cls, root: Path) -> "DiskLayout":
         portfolio_dir = root / "portfolio"
@@ -136,6 +139,8 @@ class DiskLayout:
 
         deep_research_dir = research_dir / "deep_research"
         daily_reports_dir = research_dir / "daily_reports"
+
+        config_path = root / "config.json"
 
         return cls(
             root=root,
@@ -158,4 +163,6 @@ class DiskLayout:
             performance_path=metrics_dir / "performance.json",
             behavior_path=metrics_dir / "behavior.json",
             sentiment_path=metrics_dir / "sentiment.json",
+
+            config_path=config_path
         )
