@@ -36,6 +36,15 @@ The following directories are created if missing:
 
 The following files are created if missing:
 
+#### Config File
+
+- Config (JSON)
+  Initialized with default or passed config values:
+  
+```json
+  {"starting_cash": 10000, "risk_free_rate": 0.045, "trading_days_per_year": 252, "slippage_pct_per_trade": 0.0}
+```
+
 #### Portfolio Files
 
 - Portfolio history (CSV)

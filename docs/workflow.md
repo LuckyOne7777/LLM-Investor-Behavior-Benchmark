@@ -43,12 +43,43 @@ The following parameters affect the behavior of a LIBB run:
   Overrides the run date used by the model.
   Useful for reproducing historical executions or evaluating behavior at a specific point in time.
 
-- `starting_cash` (`float`, default: `10_000`)
-  Initial cash balance used when initializing a portfolio.
-  Can be overridden to simulate different account sizes.
-  Changing starting cash after initial creation is not recommended.
+- `config` (`dict | None`, default: `None`)
+  Optional configuration dictionary. If `None`, default values are used.
+  See the Config section below for available keys and defaults.
 
 ---
+
+## Config
+
+LIBB accepts an optional `config` dict that controls experiment parameters.
+If no config is passed, all values default as shown below.
+
+```python
+config = {
+    "starting_cash": 10_000,        # Initial cash balance/metrics
+    "risk_free_rate": 0.045,        # Annual risk-free rate used in Sharpe/Sortino
+    "trading_days_per_year": 252,   # Used for annualizing metrics
+    "slippage_pct_per_trade": 0.0,  # Slippage applied at fill time (e.g. 0.001 = 0.1%)
+}
+```
+
+On first run, the config is written to `config.json` in the run directory.
+On subsequent runs, the disk config is used unless the run is explicitly unlocked.
+
+Once a config is written to disk it is locked by default, preventing accidental
+overwrites mid-experiment. To allow a new config to overwrite the disk config,
+set `"locked": false` in the on-disk `config.json`.
+
+### Notes
+
+- Partial configs are supported — omitted keys fall back to defaults.
+- Invalid types for any key also fall back to defaults silently.
+
+### Locking
+
+Once a config is written to disk it is locked by default, preventing accidental
+overwrites mid-experiment. To allow a new config to overwrite the disk config,
+set `"locked": false` in the on-disk `config.json`.
 
 ## Minimum Required Workflow
 
@@ -78,7 +109,7 @@ an example implementation.
 
 ## Example Workflows
 
-The following examples are taken from `user_side/workflow.py` and represent
+The following examples are similar to `user_side/workflow.py` and represent
 recommended usage patterns.
 
 ---
@@ -95,7 +126,8 @@ MODELS = ["deepseek", "gpt-4.1"]
 
 def weekly_flow(date):
     for model in MODELS:
-        libb = LIBBmodel(f"user_side/runs/run_v1/{model}", run_date=date)
+        config = {"starting_cash": 5_000, "slippage_pct_per_trade": 0.01}
+        libb = LIBBmodel(f"user_side/runs/run_v1/{model}", run_date=date, config=config)
         libb.process_portfolio()
 
         deep_research_report = prompt_deep_research(libb)
@@ -118,7 +150,8 @@ def weekly_flow(date):
 ```python
 def daily_flow(date):
     for model in MODELS:
-        libb = LIBBmodel(f"user_side/runs/run_v1/{model}", run_date=date)
+        config = {"starting_cash": 10_000, "slippage_pct_per_trade": 0.01}
+        libb = LIBBmodel(f"user_side/runs/run_v1/{model}", run_date=date, config=config)
         libb.process_portfolio()
 
         daily_report = prompt_daily_report(libb)
@@ -157,7 +190,11 @@ After running for the first time, LIBB generates a fixed directory structure at 
 
 ```text
 <output_dir>/
+├── config.json               # run configuration and parameters
+|
 ├── metrics/                  # evaluation outputs
+|
+|
 │   ├── behavior.json
 │   ├── performance.json
 │   └── sentiment.json

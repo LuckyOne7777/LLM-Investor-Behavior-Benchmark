@@ -100,7 +100,10 @@ def daily_flow():
 
 After running for the first time, LIBB generates a fixed directory structure at the user-specified output path.
 ```text
+
 <output_dir>/
+├── config.json               # run configuration and parameters
+|
 ├── metrics/                  # evaluation outputs
 │   ├── behavior.json
 │   ├── performance.json
@@ -319,12 +322,10 @@ by ongoing areas of improvement rather than a fixed roadmap.
 
 Areas of current interest include:
 
-- Completion of remaining behavioral metric stubs (momentum factor,
-  volatility tolerance, risk aversion)
 - Deeper integration of performance analytics into the core workflow
 - Expansion of sentiment analytics across multiple data sources
 - Improved tooling for comparing runs and strategies over time
-- Config system for centralizing experiment parameters and data source preferences
+- Expansion of config system to cover data source preferences and metric toggles
 - General design improvements for efficiency and code quality
 
 To see the current roadmap for major features, check out: [roadmap.md](docs/short-term-roadmap.md)

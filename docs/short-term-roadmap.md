@@ -10,33 +10,7 @@ This document is intentionally limited in scope and subject to change.
 
 ## Top Priorities
 
-### 3. Config File Creation
-
-Introduce a structured JSON configuration system to centralize experiment
-parameters and backend behavior controls.
-
-This is a prerequisite for the data source wiring in priority 3, as the
-config will manage API key preferences and source priority ordering.
-
-Goals:
-
-- create a default configuration schema covering:
-  - market assumptions (risk-free rate, baseline ticker, trading days)
-  - portfolio parameters (initial capital, fractional shares, cash buffer)
-  - LLM execution settings (temperature, seed, determinism)
-  - data source preferences and priority ordering
-  - metric toggles
-- auto-generate a default config file if none exists
-- allow partial overrides without requiring full specification
-- enforce schema validation to prevent silent misconfiguration
-- ensure all experiments are reproducible via serialized config snapshot
-
-The configuration system will serve as the backbone for experimental control
-while preserving flexibility for research use cases.
-
----
-
-### 2. Multiple Data Source Support
+### 1. Multiple Data Source Support
 
 Wire existing market data source implementations into the main orchestrator.
 
@@ -55,7 +29,7 @@ Goals:
 
 ---
 
-### 3. Fractional Share Support
+### 2. Fractional Share Support
 
 Add first-class support for fractional share trading across order handling,
 portfolio state, and accounting logic.
