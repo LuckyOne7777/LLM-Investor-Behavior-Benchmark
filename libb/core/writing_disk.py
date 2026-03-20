@@ -48,6 +48,14 @@ class DiskWriter:
             json.dump(orders, f, indent=2)
 
     # ----------------------------
+    # Config
+    # ----------------------------
+
+    def overwrite_config(self, config_dict: dict) -> None:
+        with open(self.layout.config_path, "w") as f:
+            json.dump(config_dict, f)
+
+    # ----------------------------
     # Metrics
     # ----------------------------
 
