@@ -3,6 +3,7 @@ _CONFIG_TYPES = {
     "trading_days_per_year": int,
     "starting_cash": (float, int),
     "slippage_pct_per_trade": (float, int),
+    "locked": bool
 }
 
 _DEFAULT_CONFIG = {
@@ -10,6 +11,7 @@ _DEFAULT_CONFIG = {
     "trading_days_per_year": 252,
     "starting_cash": 10_000,
     "slippage_pct_per_trade": 0.0,
+    "locked": True
 }
 
 def _is_valid_type(key: str, value) -> bool:
