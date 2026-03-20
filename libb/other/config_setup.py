@@ -15,7 +15,7 @@ _DEFAULT_CONFIG = {
 def _is_valid_type(key: str, value) -> bool:
     return isinstance(value, _CONFIG_TYPES[key])
 
-def load_config(config: dict | None) -> dict:
+def verifiy_config(config: dict | None) -> dict:
     if config is None:
         return _DEFAULT_CONFIG.copy()
 
@@ -28,3 +28,12 @@ def load_config(config: dict | None) -> dict:
             verified[key] = default_value
 
     return verified
+
+_active_config = {}
+
+def get_config():
+    return _active_config
+
+def set_config(config):
+    global _active_config
+    _active_config = config
