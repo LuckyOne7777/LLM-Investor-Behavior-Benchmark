@@ -1,11 +1,16 @@
 from .portfolio_editing import add_or_update_position
 from .utils import append_log, catch_missing_order_data, order_to_trade_schema
 from libb.execution.get_market_data import download_data_on_given_date
+from libb.other.config_setup import get_config
 import pandas as pd
 from ..other.types_file import Order
 from pathlib import Path
 
 def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log_path: Path) -> tuple[pd.DataFrame, float, bool]:
+
+    CONFIG = get_config()
+    slippage = CONFIG["slippage_pct_per_trade"]
+
     ticker = order["ticker"].upper()
     date = order["date"]
     order_type = order["order_type"].upper()
@@ -25,11 +30,9 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
             "shares",
             "ticker",
         ]
-        # return portfolio if null order
         if not catch_missing_order_data(order, required_cols, trade_log_path):
             return portfolio_df, cash, False
 
-        
         assert intended_limit_price is not None
         intended_limit_price = float(intended_limit_price)
 
@@ -41,6 +44,7 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
             return portfolio_df, cash, False
 
         fill_price = market_open if market_open <= intended_limit_price else intended_limit_price
+        fill_price = fill_price * (1 + slippage)
         cost = shares * fill_price
 
         if cost > cash:
@@ -49,7 +53,6 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
                                                status="FAILED", reason=reason)
             append_log(trade_log_path, trade_dict)
             return portfolio_df, cash, False
-
 
         trade_dict = order_to_trade_schema(order, executed_price=fill_price, PnL=None,
                                                status="FILLED", reason="")
@@ -69,10 +72,11 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
             "shares",
             "ticker",
         ]
-        # return portfolio if null order
         if not catch_missing_order_data(order, required_cols, trade_log_path):
             return portfolio_df, cash, False
-        cost = shares * market_open
+
+        fill_price = market_open * (1 + slippage)
+        cost = shares * fill_price
 
         if cost > cash:
             reason = f"Insufficient cash"
@@ -81,24 +85,20 @@ def process_buy(order: Order, portfolio_df: pd.DataFrame, cash: float, trade_log
             append_log(trade_log_path, trade_dict)
             return portfolio_df, cash, False
 
-
-        trade_dict = order_to_trade_schema(order, executed_price=market_open, PnL=None,
+        trade_dict = order_to_trade_schema(order, executed_price=fill_price, PnL=None,
                                                status="FILLED", reason="")
         append_log(trade_log_path, trade_dict)
 
         portfolio_df = add_or_update_position(
-            portfolio_df, ticker, shares, market_open, stop_loss
+            portfolio_df, ticker, shares, fill_price, stop_loss
         )
-
         cash -= cost
 
         return portfolio_df, cash, True
-
-
 
     else:
         reason = f"ORDER TYPE UNKNOWN"
         trade_dict = order_to_trade_schema(order, executed_price=None, PnL=None,
                                                status="FAILED", reason=reason)
-
+        append_log(trade_log_path, trade_dict)
         return portfolio_df, cash, False
