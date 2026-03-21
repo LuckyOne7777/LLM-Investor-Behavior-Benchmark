@@ -21,6 +21,27 @@ def get_valid_data_sources() -> Tuple[list[str], MarketConfig]:
     return valid_data_sources, config
 
 def download_data_on_given_date(ticker: str, date: date | str) -> MarketDataObject:
+    """
+    Download a single-day market snapshot for a ticker.
+
+    Fetches OHLCV data for the specified date by requesting a one-day range
+    and extracting the first row. Falls back across configured data sources
+    automatically.
+
+    Args:
+        ticker (str): Stock ticker symbol (e.g. "AAPL", "MSFT").
+        date (str or date): The trading date to fetch. Must be a market day —
+            weekends and holidays will raise an error.
+
+    Returns:
+        MarketDataObject: A dict containing Low, High, Close, Open, Volume,
+            and Ticker as scalar values for the given date.
+
+    Raises:
+        TypeError: If the returned data cannot be converted to a single-day
+            snapshot.
+        RuntimeError: If all configured data sources fail.
+    """
     start_date = pd.Timestamp(date)
     end_date = start_date + pd.Timedelta(days=1)
 
