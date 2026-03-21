@@ -61,6 +61,26 @@ def download_data_on_given_date(ticker: str, date: date | str) -> MarketDataObje
     return snapshot
 
 def download_data_on_given_range(ticker: str, start_date: date | str, end_date: date | str) -> MarketHistoryObject:
+    """
+    Download daily OHLCV data for a ticker over a date range.
+
+    Attempts each configured data source in order (yfinance, then Stooq)
+    and returns the first successful result. Raises if all sources fail.
+
+    Args:
+        ticker (str): Stock ticker symbol (e.g. "AAPL", "MSFT").
+        start_date (str or date): Start of the date range (inclusive).
+        end_date (str or date): End of the date range (exclusive for yfinance,
+            inclusive for Stooq — end one day ahead if precision matters).
+
+    Returns:
+        MarketHistoryObject: A dict containing Low, High, Close, Open, Volume
+            as pandas Series with a DatetimeIndex, plus Ticker, start_date,
+            and end_date as strings.
+
+    Raises:
+        RuntimeError: If all configured data sources fail to return valid data.
+    """
     valid_data_sources = ["yf", "stooq"]
     for source in valid_data_sources:
         match source:
