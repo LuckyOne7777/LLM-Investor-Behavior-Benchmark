@@ -7,16 +7,21 @@ import json
 
 import pandas as pd
 
-from libb.other.types_file import ModelSnapshot, Log, DiskLayout
+from libb.other.types_file import ModelSnapshot, Log, DiskLayout, MarketDataObject, MarketHistoryObject
 from libb.other.config_setup import verifiy_config, set_config
+
 from libb.execution.utils import is_nyse_open
-from libb.metrics.sentiment_metrics import analyze_sentiment
+from libb.execution.get_market_data import download_data_on_given_date, download_data_on_given_range
+
 from libb.user_data.news import  _get_portfolio_news
 from libb.user_data.logs import _recent_execution_logs
+
 from libb.graphs.sentiment import plot_equity_and_sentiment
 from libb.graphs.equity import plot_equity_vs_baseline, plot_equity
+
 from libb.metrics.performance_metrics import total_performance_calculations
 from libb.metrics.behavior_metrics import total_behavioral_metrics
+from libb.metrics.sentiment_metrics import analyze_sentiment
 
 
 from libb.core.processing import Processing
@@ -488,3 +493,13 @@ class LIBBmodel:
         self.sentiment.append(sentiment_log)
         self.writer.save_sentiment(self.sentiment)
         return sentiment_log
+
+# ----------------------------------
+# market data
+# ----------------------------------
+
+    def get_market_data(self, ticker: str, start_date: str | date, end_date: str | date) -> MarketHistoryObject:
+        """
+        Download market data for a ticker over a date range using configured data sources.
+        """
+        return download_data_on_given_range(ticker, start_date, end_date)
