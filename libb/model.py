@@ -503,3 +503,9 @@ class LIBBmodel:
         Download market data for a ticker over a date range using configured data sources.
         """
         return download_data_on_given_range(ticker, start_date, end_date)
+
+    def get_market_snapshot(self, ticker: str, date: str | date) -> MarketDataObject:
+        """
+        Download a single-day market snapshot for a ticker.
+        """
+        return download_data_on_given_date(ticker, date)
