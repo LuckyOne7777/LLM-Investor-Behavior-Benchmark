@@ -36,8 +36,9 @@ class LIBBmodel:
 
         Args:
             model_path: Root directory where all model data is stored.
-            starting_cash: Initial cash balance if no portfolio exists.
-            date: Run date for the model. If None, defaults to today.
+            run_date: Run date for the model. If None, defaults to today.
+            config: Optional configuration dictionary. If None, defaults are used.
+            See docs/workflow.md for available keys and defaults.
         """
         if run_date is None:
             run_date = pd.Timestamp.now().date()
