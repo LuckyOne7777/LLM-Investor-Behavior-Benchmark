@@ -129,7 +129,9 @@ class LIBBmodel:
             print("Config mismatch detected: disk config is locked, keeping disk config.")
             return
 
-        set_config(self.passed_verified_config)
+        self.CONFIG = self.passed_verified_config
+        self.STARTING_CASH = self.CONFIG["starting_cash"]
+        set_config(self.CONFIG)
         self.writer.overwrite_config(self.passed_verified_config)
         print("Config mismatch detected: overwriting disk config with passed config.")
     
