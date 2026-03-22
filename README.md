@@ -131,6 +131,37 @@ artifacts for all future runs in the output directory.
 
 ## Getting Started
 
+LIBB can be used in two ways:
+
+- **As a library** — install via pip and import `LIBBmodel` into your own project
+- **As a template** — clone the repo and build directly on top of `user_side/`
+
+---
+
+### Using LIBB as a Library
+
+Add to your `requirements.txt`:
+```
+git+https://github.com/LuckyOne7777/LLM-Investor-Behavior-Benchmark.git
+```
+
+Then install:
+```bash
+pip install -r requirements.txt
+```
+
+Or install directly:
+```bash
+pip install git+https://github.com/LuckyOne7777/LLM-Investor-Behavior-Benchmark.git
+```
+
+---
+
+### Using LIBB as a Template
+
+Clone the repo and build on top of `user_side/`. This gives you the full
+example workflow, prompt templates, and orchestration scaffolding to work from.
+
 This guide shows two supported setup paths:
 
 - **Option A (Recommended): Virtual Environment**
@@ -312,6 +343,8 @@ Windows users may encounter PowerShell execution policy restrictions.
 Command Prompt can be used instead of PowerShell if preferred.
 
 Execution scheduling and orchestration are intentionally left to the user.
+
+---
 
 ---
 
