@@ -43,9 +43,7 @@ def download_data_on_given_date(ticker: str, date: date | str) -> MarketDataObje
         RuntimeError: If all configured data sources fail.
     """
     start_date = pd.Timestamp(date)
-    end_date = start_date + pd.Timedelta(days=1)
-
-    data = download_data_on_given_range(ticker, start_date, end_date)
+    data = download_data_on_given_range(ticker, start_date, start_date)
     try:
         snapshot: MarketDataObject = {
             "Ticker": ticker,
@@ -70,8 +68,7 @@ def download_data_on_given_range(ticker: str, start_date: date | str, end_date: 
     Args:
         ticker (str): Stock ticker symbol (e.g. "AAPL", "MSFT").
         start_date (str or date): Start of the date range (inclusive).
-        end_date (str or date): End of the date range (exclusive for yfinance,
-            inclusive for Stooq — end one day ahead if precision matters).
+        end_date (str or date): End of the date range. (inclusive).
 
     Returns:
         MarketHistoryObject: A dict containing Low, High, Close, Open, Volume
@@ -110,6 +107,9 @@ def download_yf_data(ticker: str, start_date: date | str, end_date: date | str) 
     # account for YF ticker differences
     ticker = ticker.replace(".", "-")
 
+    # yf date range is exclusive
+    end_date = pd.Timestamp(end_date) + pd.Timedelta(days=1)
+
     try:
         ticker_data = yf.download(
         ticker,
@@ -139,7 +139,7 @@ def download_yf_data(ticker: str, start_date: date | str, end_date: date | str) 
             "Volume": ticker_data["Volume"],
             "Ticker": str(ticker),
             "start_date": str(start_date),
-            "end_date": str(end_date)
+            "end_date": str(start_date)
         }
     return data
 
@@ -240,6 +240,7 @@ def download_stooq_data(
     - Stooq expects lowercase tickers
     - US tickers usually work as-is (e.g. AAPL)
     - Some exchanges require suffixes (e.g. .us, .pl)
+    - end_date is inclusive
     """
 
     ticker = ticker.lower()
