@@ -1,23 +1,21 @@
 import matplotlib.pyplot as plt
+from libb.execution.get_market_data import download_data_on_given_range
 import pandas as pd
-import yfinance as yf # type: ignore
 
 def download_baseline(portfolio_df: pd.DataFrame, ticker: str, start_date: pd.Timestamp, end_date: pd.Timestamp) -> pd.DataFrame:
     """Download prices and normalise baseline to starting capital."""
 
     starting_capital = portfolio_df["equity"].iloc[0]
 
-    baseline = yf.download(ticker, start=start_date, end=pd.Timestamp(end_date) + pd.Timedelta(days=1), auto_adjust=True, progress=False)
+    baseline = download_data_on_given_range(ticker, start_date, end_date)
     if baseline is None:
-        raise RuntimeError(f"YahooFinance returned None while downloading baseline data (ticker: {ticker}). Check your internet or try again later.")    
-    baseline = baseline.reset_index()
-    if isinstance(baseline.columns, pd.MultiIndex):
-        baseline.columns = baseline.columns.get_level_values(0)
-    starting_price = baseline.loc[baseline.index[0], "Close"]
+        raise RuntimeError(f"Data sources returned None while downloading baseline data (ticker: {ticker}). Check your internet or try again later.")    
+    baseline_df = pd.DataFrame({"Close": baseline["Close"], "Date": baseline["Close"].index}).reset_index(drop=True)
+    starting_price = baseline_df.loc[baseline_df.index[0], "Close"]
 
     scaling_factor = starting_capital / starting_price
-    baseline["Adjusted Value"] = baseline["Close"] * scaling_factor
-    return baseline[["Date", "Adjusted Value"]]
+    baseline_df["Adjusted Value"] = baseline_df["Close"] * scaling_factor
+    return baseline_df[["Date", "Adjusted Value"]]
 
 def plot_equity_vs_baseline(portfolio_path, baseline_ticker="^SPX") -> None:
     """Generate and display the comparison graph; return metrics."""
