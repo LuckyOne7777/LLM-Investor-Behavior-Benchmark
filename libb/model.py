@@ -13,7 +13,6 @@ from libb.other.config_setup import verifiy_config, set_config
 from libb.execution.utils import is_nyse_open
 from libb.execution.get_market_data import download_data_on_given_date, download_data_on_given_range
 
-from libb.user_data.news import  _get_portfolio_news
 from libb.user_data.logs import _recent_execution_logs
 
 from libb.graphs.sentiment import plot_equity_and_sentiment
@@ -340,16 +339,7 @@ class LIBBmodel:
     
     def _save_new_logging_file(self, status: str = "SUCCESS", error: Exception | str = "none"):
         log = self._create_log_dict(status, error)
-        self.writer._save_logging_file_to_disk(log)
-
-# ----------------------------------
-# News
-# ----------------------------------
-
-    def get_portfolio_news(self, n: int = 2, summary_limit: int = 150):
-        """Return current-day portfolio news (see services.news.get_portfolio_news)."""
-        return _get_portfolio_news(self.portfolio, n=n, summary_limit=summary_limit)
-    
+        self.writer._save_logging_file_to_disk(log)  
 
 # ----------------------------------
 # user logs
