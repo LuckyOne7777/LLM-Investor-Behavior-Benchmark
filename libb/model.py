@@ -80,7 +80,7 @@ class LIBBmodel:
     def ensure_file_system(self):
         "Create and set up all files/folders needed for processing and metrics. Automatically called during construction."
         for dir in [self._root, self.layout.portfolio_dir, self.layout.metrics_dir, self.layout.research_dir, self.layout.daily_reports_dir, 
-                    self.layout.deep_research_dir, self.layout.logging_dir]:
+                    self.layout.deep_research_dir, self.layout.logging_dir, self.layout.prompt_dir]:
             self._ensure_dir(dir)
 
         # portfolio files
