@@ -25,6 +25,11 @@ class DiskWriter:
         path = self.layout.daily_reports_dir / f"daily_update - {self.run_date}.txt"
         path.write_text(text, encoding="utf-8")
         return path
+    
+    def save_prompt(self, text: str) -> Path:
+        path = self.layout.prompt_dir / f"prompt - {self.run_date}.txt"
+        path.write_text(text, encoding="utf-8")
+        return path
 
     def save_additional_log(
         self,

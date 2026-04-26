@@ -286,6 +286,9 @@ class LIBBmodel:
     def save_orders(self, json_block: dict) -> None:
         self.writer.save_orders(json_block)
 
+    def save_prompt(self, txt: str) -> Path:
+        return self.writer.save_prompt(txt)
+
     def save_additional_log(self, file_name: str, text: str, folder: str="additional_logs", append: bool=False) -> None:
         self.writer.save_additional_log(file_name, text, folder, append)
     

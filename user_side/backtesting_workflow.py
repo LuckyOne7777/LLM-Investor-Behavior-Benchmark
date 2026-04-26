@@ -23,7 +23,9 @@ def weekly_flow(date):
 
 def daily_flow(date):
     for model in MODELS:
-        libb = LIBBmodel(f"user_side/runs/run_v1/{model}", run_date=date)
+        config = {"risk_free_rate": 0.045, "trading_days_per_year": 252, "starting_cash": 10000, "slippage_pct_per_trade": 0.1,
+                  "locked": True}
+        libb = LIBBmodel(f"user_side/runs/run_v1/{model}", run_date=date, config=config)
         libb.process_portfolio()
 
         daily_report = prompt_daily_report(libb)
@@ -37,8 +39,8 @@ def daily_flow(date):
     return
 
 def main():
-    start_date = pd.Timestamp("2026-01-22")
-    for i in range(1):
+    start_date = pd.Timestamp("2026-01-23")
+    for i in range(20):
         run_date = start_date + pd.Timedelta(days=i)    
         day_num = run_date.weekday()
 

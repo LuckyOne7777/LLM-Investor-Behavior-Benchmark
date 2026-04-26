@@ -113,6 +113,7 @@ class DiskLayout:
 
     deep_research_dir: Path
     daily_reports_dir: Path
+    prompt_dir: Path
 
     # portfolio files
     portfolio_path: Path
@@ -139,6 +140,7 @@ class DiskLayout:
 
         deep_research_dir = research_dir / "deep_research"
         daily_reports_dir = research_dir / "daily_reports"
+        prompt_dir = research_dir / "prompts"
 
         config_path = root / "config.json"
 
@@ -152,6 +154,7 @@ class DiskLayout:
 
             deep_research_dir=deep_research_dir,
             daily_reports_dir=daily_reports_dir,
+            prompt_dir=prompt_dir,
 
             portfolio_path=portfolio_dir / "portfolio.csv",
             portfolio_history_path=portfolio_dir / "portfolio_history.csv",
